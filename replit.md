@@ -12,7 +12,7 @@ chess-star/
 ├── .gitignore
 ├── README.md
 └── public/
-    ├── index.html   # jocul complet (5244 linii inline)
+    ├── index.html   # jocul complet (~5400 linii inline) — v0.06
     └── opengraph.jpg
 ```
 

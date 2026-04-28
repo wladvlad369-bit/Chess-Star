@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Chess Star v0.04</title>
+<title>Chess Star v0.06</title>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -412,6 +412,44 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .themeToggle{display:flex;gap:8px;}
 .themeToggle button{flex:1;padding:8px;background:#1a0800;border:2px solid #5d4037;color:#f1c40f;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px;letter-spacing:1px;}
 .themeToggle button.on{background:#f1c40f;color:#000;border-color:#f1c40f;}
+/* v0.06 — sliding theme switch (☀ left = light, 🌙 right = dark) */
+.themeSwitchWrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 2px;}
+.themeSwitchWrap .tsLbl{font-size:10px;color:#c8a060;letter-spacing:2px;font-weight:bold;min-width:46px;text-align:center;user-select:none;}
+.themeSwitchWrap .tsLbl.on{color:#f1c40f;text-shadow:0 0 6px rgba(241,196,15,.55);}
+.themeSwitch{position:relative;flex:1;height:32px;background:#1a0800;border:2px solid #5d4037;border-radius:18px;cursor:pointer;overflow:hidden;transition:background .25s,border-color .25s;}
+.themeSwitch .tsKnob{position:absolute;top:2px;left:2px;width:46%;height:24px;background:linear-gradient(180deg,#f1c40f,#c89c0a);border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.5);transition:left .28s cubic-bezier(.18,.62,.32,1.18),background .25s;display:flex;align-items:center;justify-content:center;font-size:14px;color:#000;}
+.themeSwitch.dark .tsKnob{left:calc(54% - 2px);}
+.themeSwitch.dark .tsKnob::after{content:'🌙';}
+.themeSwitch:not(.dark) .tsKnob::after{content:'☀';}
+body.lightTheme .themeSwitch{background:#fff8e8;border-color:#a08060;}
+
+/* v0.06 — COMPREHENSIVE LIGHT MODE: covers all menus / settings / pieces / modals */
+body.lightTheme{background:#e8e0d0;color:#1a0500;}
+body.lightTheme #root{background:#f5ecd8;border-color:#8b6a3a;}
+body.lightTheme #titleBlock h1{color:#3a2306;text-shadow:0 1px 0 #fff8e8,0 0 6px rgba(0,0,0,.15);-webkit-text-stroke:0.5px #4a2c08;}
+body.lightTheme #titleBlock p{color:#6b4a1a;text-shadow:0 1px 0 #fff8e8;}
+body.lightTheme .topBar{background:rgba(245,236,216,.95);color:#3a2306;border-bottom:2px solid #a08060;}
+body.lightTheme .topTitle{color:#3a2306;text-shadow:0 1px 0 #fff;-webkit-text-stroke:0.4px #4a2c08;}
+body.lightTheme .backBtn{color:#3a2306;}
+body.lightTheme .eCard,body.lightTheme .pieceCard,body.lightTheme .ppCard,body.lightTheme .setSection,body.lightTheme .repItem,body.lightTheme .friendItem,body.lightTheme #playerCard,body.lightTheme #profileBox,body.lightTheme #saveCodeBox,body.lightTheme #codeImportBox{background:#fff8e8;color:#3a2306;border-color:#a08060;}
+body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .ppCard .ppName,body.lightTheme .setSection h3,body.lightTheme .invDet .invLbl{color:#7a4e20;text-shadow:none;}
+body.lightTheme .eCard p,body.lightTheme .setRow,body.lightTheme .pcDesc,body.lightTheme .ppDesc{color:#5a3a10;}
+body.lightTheme .miniBtn,body.lightTheme #ppGo,body.lightTheme #saveProfBtn,body.lightTheme .langBtn,body.lightTheme .themeToggle button,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme .modeOpt,body.lightTheme .endBtns button,body.lightTheme #repPlayerCtrl button,body.lightTheme .acctTab,body.lightTheme #acctGoBtn,body.lightTheme #infoModalCloseBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;text-shadow:none;}
+body.lightTheme .miniBtn:hover,body.lightTheme .langBtn.on,body.lightTheme .themeToggle button.on,body.lightTheme .modeOpt.on,body.lightTheme .acctTab.on,body.lightTheme #ppGo:not(:disabled),body.lightTheme .endBtns button:hover,body.lightTheme #repPlayerCtrl button:hover{background:#f1c40f;color:#3a2306;border-color:#c89c0a;}
+body.lightTheme #infoBtn,body.lightTheme .infoBtn{background:#fff8e8;color:#1976d2;border-color:#1976d2;}
+body.lightTheme #infoModalInner,body.lightTheme #milestoneModal>div,body.lightTheme #trophyInfoInner,body.lightTheme #inviteInner,body.lightTheme #vgInner,body.lightTheme #prePickInner,body.lightTheme #acctModalInner{background:linear-gradient(180deg,#fff8e8,#f5ecd8);color:#3a2306;border-color:#7a4e20;box-shadow:0 0 30px rgba(0,0,0,.25);}
+body.lightTheme #infoModalTitle,body.lightTheme #milestoneTitle,body.lightTheme #trophyInfoTitle,body.lightTheme #vgTitle,body.lightTheme #prePickTitle,body.lightTheme #acctTitle{color:#1976d2;text-shadow:0 1px 0 #fff;}
+body.lightTheme #infoModalText,body.lightTheme #milestoneBody,body.lightTheme #trophyInfoBody,body.lightTheme #prePickSub,body.lightTheme #acctSub,body.lightTheme #vgInner div,body.lightTheme #inviteFromName{color:#3a2306;}
+body.lightTheme .endPanel{background:linear-gradient(180deg,#fff8e8,#f5ecd8);color:#3a2306;border-color:#7a4e20;box-shadow:0 0 30px rgba(0,0,0,.25);}
+body.lightTheme .endPanel h2{color:#3a2306;text-shadow:0 1px 0 #fff;-webkit-text-stroke:0.4px #4a2c08;}
+body.lightTheme .endPanel .statBox{background:rgba(255,248,232,.85);color:#3a2306;border:1px solid #a08060;}
+body.lightTheme .endPanel .statBox small{color:#7a4e20;}
+body.lightTheme .teamLabel,body.lightTheme #classicInfo,body.lightTheme #gtsInfo,body.lightTheme #qocInfo,body.lightTheme #classicMsg,body.lightTheme #gtsMsg,body.lightTheme #qocMsg,body.lightTheme #lpsBar,body.lightTheme #classicBar,body.lightTheme #gtsBar,body.lightTheme #qocBar{color:#3a2306;text-shadow:0 1px 0 rgba(255,255,255,.6);}
+body.lightTheme #serverBadge,body.lightTheme #serverBadgeMini{background:rgba(255,248,232,.92);color:#7a4e20;border-color:#a08060;}
+body.lightTheme #toast{background:rgba(255,248,232,.97);color:#7a4e20;border-color:#c89c0a;}
+body.lightTheme #pName,body.lightTheme #profName,body.lightTheme .repTitle{text-shadow:0 1px 0 #fff;}
+/* subtle outlines so light text stays readable on light backgrounds */
+body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .ppCard .ppName,body.lightTheme .setSection h3{-webkit-text-stroke:0.3px #5a3a10;}
 #saveCodeRow{display:flex;gap:6px;}
 #saveCodeBox{flex:1;background:#1a0800;border:2px solid #5d4037;border-radius:6px;padding:8px;font-size:13px;color:#f1c40f;font-family:monospace;font-weight:bold;letter-spacing:1px;text-align:center;}
 .miniBtn{padding:8px 10px;background:#1a0800;border:2px solid #5d4037;color:#f1c40f;border-radius:6px;cursor:pointer;font-weight:bold;font-size:10px;letter-spacing:1px;}
@@ -524,12 +562,25 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .repResult.loss{background:rgba(231,76,60,.2);color:#e74c3c;border:1px solid #e74c3c;}
 #repPlayer{position:absolute;inset:0;background:rgba(0,0,0,.93);z-index:120;display:none;flex-direction:column;align-items:center;justify-content:center;padding:18px;}
 #repPlayer.show{display:flex;}
-#repPlayerInner{background:#1a0a04;border:3px solid #f1c40f;border-radius:12px;padding:14px;width:100%;max-width:320px;}
-#repPlayerTitle{font-size:13px;color:#f1c40f;font-weight:bold;letter-spacing:2px;margin-bottom:8px;text-align:center;}
+#repPlayerInner{background:#1a0a04;border:3px solid #f1c40f;border-radius:12px;padding:14px;width:100%;max-width:320px;position:relative;}
+#repExitBtn{position:absolute;top:10px;left:10px;width:32px;height:32px;border-radius:50%;background:#1a0800;color:#f1c40f;border:2px solid #5d4037;font-weight:bold;cursor:pointer;font-size:14px;z-index:122;display:flex;align-items:center;justify-content:center;}
+#repExitBtn:hover{background:#e74c3c;color:#fff;border-color:#e74c3c;}
+#repPlayerTitle{font-size:13px;color:#f1c40f;font-weight:bold;letter-spacing:2px;margin-bottom:4px;text-align:center;}
+#repEventTag{font-size:9px;color:#a08060;letter-spacing:2px;text-align:center;margin-bottom:8px;text-transform:uppercase;}
 #repPlayerCanvas{display:block;background:#2d1b0d;border:3px solid #3e2723;width:100%;height:auto;}
+#repProgress{font-size:9px;color:#a08060;text-align:center;margin-top:6px;letter-spacing:1px;}
 #repPlayerCtrl{display:flex;gap:6px;justify-content:center;margin-top:10px;}
 #repPlayerCtrl button{padding:8px 14px;background:#1a0800;color:#f1c40f;border:2px solid #5d4037;border-radius:6px;font-weight:bold;cursor:pointer;font-size:10px;letter-spacing:1px;}
 #repPlayerCtrl button:hover{background:#f1c40f;color:#000;}
+#repWinnerBanner{margin-top:10px;text-align:center;font-size:12px;font-weight:bold;letter-spacing:2px;padding:6px;border-radius:6px;display:none;}
+#repWinnerBanner.win{display:block;background:rgba(76,175,80,.18);color:#4caf50;border:1px solid #4caf50;}
+#repWinnerBanner.loss{display:block;background:rgba(231,76,60,.18);color:#e74c3c;border:1px solid #e74c3c;}
+.statsRow{display:flex;gap:8px;margin:6px 0 4px;}
+.statBox{flex:1;background:#140800;border:2px solid #3e1a00;border-radius:6px;padding:6px;text-align:center;}
+.statBox small{display:block;font-size:8px;color:#a08060;letter-spacing:1px;margin-bottom:3px;}
+.statBox div{font-size:18px;font-weight:bold;color:#f1c40f;font-family:Georgia,serif;}
+.statBox.sg{border-color:#4caf50;} .statBox.sg div{color:#4caf50;}
+.statBox.sr{border-color:#e74c3c;} .statBox.sr div{color:#e74c3c;}
 #repProgress{margin-top:8px;font-size:9px;color:#a08060;text-align:center;letter-spacing:1px;}
 
 /* v0.03 — SUGGEST A WALK overlay */
@@ -573,7 +624,7 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 <!-- MENU -->
 <div id="menuScreen" class="screen active">
   <canvas id="menuBg" width="360" height="600"></canvas>
-  <div id="titleBlock"><h1>CHESS STAR</h1><p data-i18n="menu.subtitle">v0.05 — ONLINE — SELECT AN EVENT</p></div>
+  <div id="titleBlock"><h1>CHESS STAR</h1><p data-i18n="menu.subtitle">v0.06 — ONLINE — SELECT AN EVENT</p></div>
   <!-- v0.04 — MILESTONE BARS (Wins + Trophies) -->
   <div id="milestoneRow">
     <div id="winsBar" class="msBtn" onclick="openMilestone('wins')" title="Wins milestones">
@@ -837,6 +888,8 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
   <div id="classicEndOverlay">
     <div class="endPanel">
       <h2 id="classicWinMsg">GAME OVER</h2>
+      <div id="classicEndSub" style="font-size:11px;color:#a08060;margin:4px 0 10px;text-align:center;letter-spacing:1px;"></div>
+      <div class="statsRow"><div class="statBox sg"><small data-i18n="stats.captures">Captures</small><div id="ccStatKills">0</div></div><div class="statBox sr"><small data-i18n="stats.checks">Checks given</small><div id="ccStatChecks">0</div></div></div>
       <div class="endBtns" style="margin-top:12px;"><button onclick="classicReplay()">▶ PLAY AGAIN</button><button onclick="classicGoMenu()" style="color:#a08060;">← BACK TO MENU</button></div>
     </div>
   </div>
@@ -867,6 +920,8 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
   <div id="gtsEndOverlay">
     <div class="endPanel">
       <h2 id="gtsWinMsg">GAME OVER</h2>
+      <div id="gtsEndSub" style="font-size:11px;color:#a08060;margin:4px 0 10px;text-align:center;letter-spacing:1px;"></div>
+      <div class="statsRow"><div class="statBox sg"><small data-i18n="stats.captures">Captures</small><div id="gtsStatKills">0</div></div><div class="statBox sr"><small data-i18n="stats.safeHits">Safe hits</small><div id="gtsStatHits">0</div></div></div>
       <div class="endBtns" style="margin-top:12px;"><button onclick="gtsReplay()">▶ PLAY AGAIN</button><button onclick="gtsGoMenu()" style="color:#a08060;">← BACK TO MENU</button></div>
     </div>
   </div>
@@ -883,6 +938,8 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
   <div id="qocEndOverlay">
     <div class="endPanel">
       <h2 id="qocWinMsg">GAME OVER</h2>
+      <div id="qocEndSub" style="font-size:11px;color:#a08060;margin:4px 0 10px;text-align:center;letter-spacing:1px;"></div>
+      <div class="statsRow"><div class="statBox sg"><small data-i18n="stats.captures">Captures</small><div id="qocStatKills">0</div></div><div class="statBox sr"><small data-i18n="stats.queens">Queens promoted</small><div id="qocStatQueens">0</div></div></div>
       <div class="endBtns" style="margin-top:12px;"><button onclick="qocReplay()">▶ PLAY AGAIN</button><button onclick="qocGoMenu()" style="color:#a08060;">← BACK TO MENU</button></div>
     </div>
   </div>
@@ -900,9 +957,10 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
   <div id="settingsContent">
     <div class="setSection">
       <h3 data-i18n="settings.theme">THEME</h3>
-      <div class="themeToggle">
-        <button id="themeDarkBtn" class="on" onclick="setTheme('dark')">🌙 <span data-i18n="settings.dark">DARK</span></button>
-        <button id="themeLightBtn" onclick="setTheme('light')">☀ <span data-i18n="settings.light">LIGHT</span></button>
+      <div class="themeSwitchWrap">
+        <span id="tsLblLight" class="tsLbl" data-i18n="settings.light">LIGHT</span>
+        <div id="themeSwitch" class="themeSwitch dark" onclick="toggleTheme()"><div class="tsKnob"></div></div>
+        <span id="tsLblDark" class="tsLbl on" data-i18n="settings.dark">DARK</span>
       </div>
     </div>
     <!-- v0.05 — LANGUAGE switcher (English / Romanian / Russian) -->
@@ -932,9 +990,9 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
       <button class="miniBtn" style="width:100%;margin-top:6px;" onclick="loadSaveCode()">↺ LOAD CODE</button>
     </div>
     <div class="setSection">
-      <h3>REPLAYS</h3>
-      <div class="setRow" style="font-size:9px;color:#888;margin-bottom:4px;">Last 5 matches saved automatically.</div>
-      <button class="miniBtn" style="width:100%;" onclick="goTo('replaysScreen')">▶ OPEN REPLAYS</button>
+      <h3 data-i18n="replays.title">MATCHES REPLAY</h3>
+      <div class="setRow" style="font-size:9px;color:#888;margin-bottom:4px;" data-i18n="replays.sub">Last 5 matches saved automatically.</div>
+      <button class="miniBtn" style="width:100%;" onclick="goTo('replaysScreen')">▶ <span data-i18n="replays.open">OPEN MATCHES REPLAY</span></button>
     </div>
     <div class="setSection">
       <h3>CONNECTION</h3>
@@ -954,7 +1012,7 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
       <h3>VERSION</h3>
       <div id="versionRow">
         <div class="setRow"><span>Game</span><span style="color:#f1c40f;font-weight:bold;letter-spacing:2px;">CHESS STAR</span></div>
-        <div class="setRow"><span>Build</span><span id="versionLabel" style="color:#4caf50;font-weight:bold;letter-spacing:2px;">v0.05</span></div>
+        <div class="setRow"><span>Build</span><span id="versionLabel" style="color:#4caf50;font-weight:bold;letter-spacing:2px;">v0.06</span></div>
         <div class="setRow"><span>Realtime</span><span style="color:#42a5f5;letter-spacing:1px;">Socket.io</span></div>
       </div>
     </div>
@@ -972,21 +1030,24 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
   <div id="friendsBody"></div>
 </div>
 
-<!-- v0.03 — REPLAYS SCREEN -->
+<!-- v0.06 — MATCHES REPLAY SCREEN -->
 <div id="replaysScreen" class="screen">
-  <div class="topBar"><button class="backBtn" onclick="goTo('settingsScreen')">←</button><span class="topTitle">REPLAYS</span></div>
+  <div class="topBar"><button class="backBtn" onclick="goTo('settingsScreen')">←</button><span class="topTitle" data-i18n="replays.title">MATCHES REPLAY</span></div>
   <div id="replaysList"></div>
   <div id="repPlayer">
+    <button id="repExitBtn" onclick="repClose()" title="Exit">✕</button>
     <div id="repPlayerInner">
       <div id="repPlayerTitle">REPLAY</div>
+      <div id="repEventTag"></div>
       <canvas id="repPlayerCanvas" width="280" height="280"></canvas>
       <div id="repProgress">— / —</div>
       <div id="repPlayerCtrl">
-        <button onclick="repPrev()">◀</button>
-        <button onclick="repTogglePlay()" id="repPlayBtn">▶</button>
-        <button onclick="repNext()">▶</button>
-        <button onclick="repClose()">✕</button>
+        <button onclick="repPrev()" title="Previous frame">◀</button>
+        <button onclick="repTogglePlay()" id="repPlayBtn" title="Play / Pause">▶</button>
+        <button onclick="repNext()" title="Next frame">▶</button>
+        <button onclick="repRestart()" title="Restart from beginning">↺</button>
       </div>
+      <div id="repWinnerBanner"></div>
     </div>
   </div>
 </div>
@@ -995,7 +1056,7 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 <div id="acctModal">
   <div id="acctModalInner">
     <div id="acctTitle">CHESS STAR</div>
-    <div id="acctSub">v0.05 — Sign in or create your account</div>
+    <div id="acctSub">v0.06 — Sign in or create your account</div>
     <div class="acctTabRow">
       <div class="acctTab on" data-acct="create" onclick="acctSwitch('create')">CREATE</div>
       <div class="acctTab" data-acct="login" onclick="acctSwitch('login')">LOGIN</div>
@@ -1082,7 +1143,7 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
     <p data-i18n="version.body">A newer version of Chess Star is available. Please refresh the page to continue playing.</p>
     <div id="vgVersions">
       <div><span data-i18n="version.you">You have</span>: <b id="vgYourVer">v0.04</b></div>
-      <div><span data-i18n="version.latest">Latest</span>: <b id="vgLatestVer" style="color:#4caf50;">v0.05</b></div>
+      <div><span data-i18n="version.latest">Latest</span>: <b id="vgLatestVer" style="color:#4caf50;">v0.06</b></div>
     </div>
     <button id="vgRefresh" onclick="location.reload(true)">↻ <span data-i18n="version.refresh">REFRESH NOW</span></button>
   </div>
@@ -2763,6 +2824,13 @@ function ccStatus(){
 
 function ccDoMove(fr,fc,tr,tc,mv){
   const p=ccBoard[fr][fc];
+  // v0.06 — track player captures
+  const target = ccBoard[tr][tc];
+  if(target && p && p.c===classicPlayerColor && target.c!==classicPlayerColor){
+    window.ccPlayerKills = (window.ccPlayerKills||0) + 1;
+  } else if(mv.ep && p && p.c===classicPlayerColor){
+    window.ccPlayerKills = (window.ccPlayerKills||0) + 1;
+  }
   // FIX 9: Set animation start position so piece travels FROM old square TO new square
   if(mv.castle==='k'){
     const br=p.c==='w'?7:0;
@@ -2807,15 +2875,31 @@ function ccEndMove(){
   const st=ccStatus();
   if(st==='checkmate'){
     ccGameOver=true;
-    const winner=ccTurn==='w'?'BLACK':'WHITE';
-    document.getElementById('classicWinMsg').textContent=winner+' WINS! ♟ CHECKMATE';
+    // v0.06 — winner = side opposite to ccTurn (the side checkmated). Show YOU WIN/LOSE based on player color.
+    const winner=ccTurn==='w'?'b':'w';   // 'w' or 'b'
+    const winnerName = winner==='w'?'WHITE':'BLACK';
+    const youWon = winner === classicPlayerColor;
+    const myTeam = (classicPlayerColor==='w'?'WHITE':'BLACK') + ' TEAM';
+    document.getElementById('classicWinMsg').textContent = youWon ? 'YOU WIN! 🏆' : 'YOU LOSE ☠';
+    const subEl = document.getElementById('classicEndSub');
+    if(subEl) subEl.textContent = (youWon ? winnerName + ' WINS — CHECKMATE — ' : winnerName + ' WINS — CHECKMATE — defeated ') + myTeam;
+    document.getElementById('ccStatKills').textContent  = window.ccPlayerKills||0;
+    document.getElementById('ccStatChecks').textContent = window.ccPlayerChecks||0;
     document.getElementById('classicEndOverlay').classList.add('show');
+    try{ window.notifyMatchFinished && window.notifyMatchFinished(youWon?'win':'loss'); }catch(e){}
   } else if(st==='stalemate'){
     ccGameOver=true;
     document.getElementById('classicWinMsg').textContent='DRAW — STALEMATE';
+    const subEl = document.getElementById('classicEndSub'); if(subEl) subEl.textContent='No legal moves — neither side wins.';
+    document.getElementById('ccStatKills').textContent  = window.ccPlayerKills||0;
+    document.getElementById('ccStatChecks').textContent = window.ccPlayerChecks||0;
     document.getElementById('classicEndOverlay').classList.add('show');
   } else {
     ccCheck=st==='check';
+    // v0.06 — count checks GIVEN by player (check exists & opponent's turn now)
+    if(ccCheck && ccTurn !== classicPlayerColor){
+      window.ccPlayerChecks = (window.ccPlayerChecks||0) + 1;
+    }
     const tn=ccTurn==='w'?'WHITE':'BLACK';
     document.getElementById('classicInfo').textContent='CLASSIC CHESS — '+tn+' TURN';
     document.getElementById('classicMsg').textContent=ccCheck?'⚠ CHECK!':'';
@@ -2844,6 +2928,8 @@ function initClassic(){
   ccTurn='w';ccSel=null;ccValMoves=[];
   ccEnPassant=null;ccCastle={w:{k:false,r0:false,r7:false},b:{k:false,r0:false,r7:false}};
   ccPromoting=false;ccPromoR=-1;ccPromoC=-1;ccCheck=false;ccGameOver=false;ccParticles=[];
+  // v0.06 — reset per-match stats
+  window.ccPlayerKills=0; window.ccPlayerChecks=0;
   document.getElementById('classicEndOverlay').classList.remove('show');
   document.getElementById('classicInfo').textContent='CLASSIC CHESS — WHITE TURN';
   document.getElementById('classicMsg').textContent='';
@@ -3001,6 +3087,9 @@ function initGTS(){
   gtsHpW=4;gtsHpB=4;gtsShieldW=0;gtsShieldB=0;
   gtsHalfTriggeredW=false;gtsHalfTriggeredB=false;
   gtsGameOver=false;
+  // v0.06 — reset per-match stats; default player to WHITE in single-player
+  window.gtsPlayerColor = window.gtsPlayerColor || 'w';
+  window.gtsPlayerKills=0; window.gtsPlayerHits=0;
   gtsUpdateHpBar();
   document.getElementById('gtsEndOverlay').classList.remove('show');
   document.getElementById('gtsInfo').textContent='GRIND THE SAFE — WHITE TURN';
@@ -3064,6 +3153,23 @@ function gtsGetMoves(r,c){
 
 function gtsDoMove(fr,fc,tr,tc,mv){
   const p=gtsBoard[fr][fc];
+  // v0.06 — track player captures (normal piece capture, not safe hit)
+  const _gtsTarget = gtsBoard[tr][tc];
+  const _gtsMyCol = window.gtsPlayerColor || 'w';
+  if(_gtsTarget && _gtsTarget.t!=='SAFE' && p && p.c===_gtsMyCol && _gtsTarget.c!==_gtsMyCol){
+    window.gtsPlayerKills = (window.gtsPlayerKills||0) + 1;
+  } else if(mv.ep && p && p.c===_gtsMyCol){
+    window.gtsPlayerKills = (window.gtsPlayerKills||0) + 1;
+  }
+  // v0.06 — track player safe hits (player attacks opponent's safe and shield is down)
+  if(mv.safe && mv.atk && p && p.c===_gtsMyCol){
+    const _tgtSafe = gtsBoard[tr][tc];
+    const _tgtIsWhiteSafe = _tgtSafe && _tgtSafe.c==='w';
+    const _shieldUp = _tgtIsWhiteSafe ? gtsShieldW>0 : gtsShieldB>0;
+    if(!_shieldUp && _tgtSafe && _tgtSafe.c!==_gtsMyCol){
+      window.gtsPlayerHits = (window.gtsPlayerHits||0) + 1;
+    }
+  }
   if(mv.safe&&mv.atk){
     const safeTarget = gtsBoard[tr][tc];
     const targetIsWhiteSafe = safeTarget.c==='w';
@@ -3106,13 +3212,27 @@ function gtsDoMove(fr,fc,tr,tc,mv){
     // Check victory
     if(gtsHpW<=0){
       gtsGameOver=true;
-      document.getElementById('gtsWinMsg').textContent='BLACK WINS! WHITE SAFE DESTROYED 🏆';
-      document.getElementById('gtsEndOverlay').classList.add('show');gtsRunning=false;return;
+      const _myCol = window.gtsPlayerColor || 'w';
+      const _won = _myCol==='b';
+      document.getElementById('gtsWinMsg').textContent = _won ? 'YOU WIN! 🏆' : 'YOU LOSE ☠';
+      const _sub = document.getElementById('gtsEndSub'); if(_sub) _sub.textContent = _won ? 'BLACK destroyed the WHITE safe.' : 'BLACK destroyed YOUR safe.';
+      document.getElementById('gtsStatKills').textContent = window.gtsPlayerKills||0;
+      document.getElementById('gtsStatHits').textContent  = window.gtsPlayerHits||0;
+      document.getElementById('gtsEndOverlay').classList.add('show');gtsRunning=false;
+      try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss'); }catch(e){}
+      return;
     }
     if(gtsHpB<=0){
       gtsGameOver=true;
-      document.getElementById('gtsWinMsg').textContent='WHITE WINS! BLACK SAFE DESTROYED 🏆';
-      document.getElementById('gtsEndOverlay').classList.add('show');gtsRunning=false;return;
+      const _myCol = window.gtsPlayerColor || 'w';
+      const _won = _myCol==='w';
+      document.getElementById('gtsWinMsg').textContent = _won ? 'YOU WIN! 🏆' : 'YOU LOSE ☠';
+      const _sub = document.getElementById('gtsEndSub'); if(_sub) _sub.textContent = _won ? 'WHITE destroyed the BLACK safe.' : 'WHITE destroyed YOUR safe.';
+      document.getElementById('gtsStatKills').textContent = window.gtsPlayerKills||0;
+      document.getElementById('gtsStatHits').textContent  = window.gtsPlayerHits||0;
+      document.getElementById('gtsEndOverlay').classList.add('show');gtsRunning=false;
+      try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss'); }catch(e){}
+      return;
     }
     // FIX 4: Piece stays adjacent (does NOT occupy safe square)
     gtsBoard[fr][fc]=null;
@@ -3280,9 +3400,23 @@ gtsC.addEventListener('click',e=>{
 // ═══════════════════════════════════════════
 function setTheme(t){
   document.body.classList.toggle('lightTheme', t==='light');
-  document.getElementById('themeDarkBtn').classList.toggle('on', t==='dark');
-  document.getElementById('themeLightBtn').classList.toggle('on', t==='light');
+  // v0.06 — sliding switch (knob right = dark, left = light)
+  const sw = document.getElementById('themeSwitch');
+  if(sw) sw.classList.toggle('dark', t==='dark');
+  const lblD = document.getElementById('tsLblDark');
+  const lblL = document.getElementById('tsLblLight');
+  if(lblD) lblD.classList.toggle('on', t==='dark');
+  if(lblL) lblL.classList.toggle('on', t==='light');
+  // legacy buttons (kept harmless if removed)
+  const oldD = document.getElementById('themeDarkBtn');
+  const oldL = document.getElementById('themeLightBtn');
+  if(oldD) oldD.classList.toggle('on', t==='dark');
+  if(oldL) oldL.classList.toggle('on', t==='light');
   try{ localStorage.setItem('chessstar_theme', t); }catch(e){}
+}
+function toggleTheme(){
+  const cur = document.body.classList.contains('lightTheme') ? 'light' : 'dark';
+  setTheme(cur==='dark' ? 'light' : 'dark');
 }
 (function(){ try{ const t=localStorage.getItem('chessstar_theme'); if(t==='light') setTimeout(()=>setTheme('light'),0); }catch(e){} })();
 
@@ -3416,6 +3550,8 @@ function initQOC(){
   }
   qocTurn='w'; qocSel=null; qocValMoves=[]; qocRunning=true; qocOver=false;
   qocPlies=0; qocBuffMsg=''; qocMustChain=null;
+  // v0.06 — reset per-match stats
+  window.qocPlayerKills=0; window.qocPlayerQueens=0;
   document.getElementById('qocEndOverlay').classList.remove('show');
   document.getElementById('qocMsg').textContent = 'Your turn — spin the wheel for a perk!';
   document.getElementById('qocBotTeam').textContent = 'YOU — '+(profile.name||'Player 1');
@@ -3477,12 +3613,20 @@ function qocAnyCaptures(color){
 
 function qocDoMove(fr,fc,tr,tc,mv){
   const p = qocBoard[fr][fc];
+  // v0.06 — track player captures + queens promoted
+  const _qMyCol = window.qocPlayerColor || 'w';
+  if(mv.cap && p && p.c===_qMyCol){
+    window.qocPlayerKills = (window.qocPlayerKills||0) + 1;
+  }
   qocBoard[fr][fc] = null;
   qocBoard[tr][tc] = p;
   if(mv.cap) qocBoard[mv.cap.r][mv.cap.c] = null;
   // Promotion
   if(p.t==='C'){
-    if((p.c==='w' && tr===0) || (p.c==='b' && tr===7)) p.t='B';
+    if((p.c==='w' && tr===0) || (p.c==='b' && tr===7)){
+      p.t='B';
+      if(p.c===_qMyCol) window.qocPlayerQueens = (window.qocPlayerQueens||0) + 1;
+    }
   }
   // Chain capture: if this was a capture and another capture is available from this square, force it
   if(mv.atk){
@@ -3502,8 +3646,17 @@ function qocDoMove(fr,fc,tr,tc,mv){
   const bAlive = qocBoard.flat().some(x=>x&&x.c==='b');
   if(!wAlive || !bAlive){
     qocOver=true; qocRunning=false;
-    document.getElementById('qocWinMsg').textContent = wAlive ? 'YOU WIN! 🏆' : 'DEFEATED ☠';
+    const _qMyCol2 = window.qocPlayerColor || 'w';
+    const _myAlive = _qMyCol2==='w' ? wAlive : bAlive;
+    const _won = _myAlive;
+    document.getElementById('qocWinMsg').textContent = _won ? 'YOU WIN! 🏆' : 'YOU LOSE ☠';
+    const _qSub = document.getElementById('qocEndSub');
+    const _myColName = _qMyCol2==='w'?'WHITE':'BLACK';
+    if(_qSub) _qSub.textContent = _won ? (_myColName + ' wiped the board.') : ('Your ' + _myColName + ' team was eliminated.');
+    document.getElementById('qocStatKills').textContent  = window.qocPlayerKills||0;
+    document.getElementById('qocStatQueens').textContent = window.qocPlayerQueens||0;
     document.getElementById('qocEndOverlay').classList.add('show');
+    try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss'); }catch(e){}
     return;
   }
   qocTurn = qocTurn==='w' ? 'b' : 'w';
@@ -4251,10 +4404,27 @@ function drawThumbQOC(){
   let repCur=null, repIdx=0, repPlaying=false, repTimer=null;
   function openReplayPlayer(i){
     const reps = loadReplays(); repCur = reps[i]; repIdx=0; repPlaying=false;
+    const evMap = {cc:'CLASSIC CHESS', lps:'LAST PIECE STANDING', gts:'GRIND THE SAFE', qoc:'QUEEN OF THE CASTLE'};
     $('repPlayerTitle').textContent = (repCur.title||repCur.event||'REPLAY').toUpperCase();
+    const tag = $('repEventTag');
+    if(tag) tag.textContent = (evMap[repCur.event]||repCur.event||'') + (repCur.mode?' • '+repCur.mode:'');
+    const banner = $('repWinnerBanner');
+    if(banner){
+      banner.className = '';
+      if(repCur.result==='win'){ banner.classList.add('win'); banner.textContent = 'YOU WON 🏆'; }
+      else if(repCur.result==='loss'){ banner.classList.add('loss'); banner.textContent = 'YOU LOST ☠'; }
+      else { banner.style.display='none'; }
+    }
+    const pb = $('repPlayBtn'); if(pb) pb.textContent = '▶';
     $('repPlayer').classList.add('show');
     drawReplayFrame();
   }
+  window.repRestart = function(){
+    if(!repCur) return;
+    repPlaying = false; clearInterval(repTimer);
+    const pb = $('repPlayBtn'); if(pb) pb.textContent = '▶';
+    repIdx = 0; drawReplayFrame();
+  };
   function drawReplayFrame(){
     const c = $('repPlayerCanvas'); const x = c.getContext('2d');
     x.fillStyle='#2d1b0d'; x.fillRect(0,0,c.width,c.height);
@@ -4586,12 +4756,12 @@ function drawThumbQOC(){
   //  - Version-required gate
   //  - Profile stats refresh on Profile screen open
   // ════════════════════════════════════════════════════════════════
-  const APP_VERSION = 'v0.05';
+  const APP_VERSION = 'v0.06';
 
   // ── i18n ──
   const I18N = {
     en: {
-      'menu.subtitle':'v0.05 — ONLINE — SELECT AN EVENT',
+      'menu.subtitle':'v0.06 — ONLINE — SELECT AN EVENT',
       'profile.title':'PROFILE','profile.wins':'WINS','profile.trophies':'TROPHIES','profile.pieces':'PIECES',
       'profile.name':'PLAYER NAME (MAX 10 CHARS)','profile.color':'NAME COLOR','profile.icon':'PROFILE ICON','profile.save':'SAVE',
       'settings.theme':'THEME','settings.dark':'DARK','settings.light':'LIGHT','settings.language':'LANGUAGE',
@@ -4599,10 +4769,12 @@ function drawThumbQOC(){
       'version.title':'UPDATE REQUIRED','version.body':'A newer version of Chess Star is available. Please refresh the page to continue playing.',
       'version.you':'You have','version.latest':'Latest','version.refresh':'REFRESH NOW',
       'prepick.title':'CHOOSE YOUR PIECES','prepick.sub':'Pick the pieces your team will use this match.',
-      'chat.title':'TEAM CHAT'
+      'chat.title':'TEAM CHAT',
+      'replays.title':'MATCHES REPLAY','replays.sub':'YOUR LAST 5 MATCHES','replays.open':'MATCHES REPLAY',
+      'stats.captures':'Captures','stats.checks':'Checks given','stats.safeHits':'Safe hits','stats.queens':'Queens promoted'
     },
     ro: {
-      'menu.subtitle':'v0.05 — ONLINE — ALEGE UN EVENIMENT',
+      'menu.subtitle':'v0.06 — ONLINE — ALEGE UN EVENIMENT',
       'profile.title':'PROFIL','profile.wins':'VICTORII','profile.trophies':'TROFEE','profile.pieces':'PIESE',
       'profile.name':'NUMELE JUCĂTORULUI (MAX 10)','profile.color':'CULOARE NUME','profile.icon':'PICTOGRAMĂ PROFIL','profile.save':'SALVEAZĂ',
       'settings.theme':'TEMĂ','settings.dark':'ÎNTUNECAT','settings.light':'LUMINOS','settings.language':'LIMBĂ',
@@ -4610,10 +4782,12 @@ function drawThumbQOC(){
       'version.title':'ACTUALIZARE NECESARĂ','version.body':'O versiune mai nouă de Chess Star este disponibilă. Reîncarcă pagina pentru a continua.',
       'version.you':'Ai','version.latest':'Cea mai nouă','version.refresh':'REÎNCARCĂ',
       'prepick.title':'ALEGE PIESELE','prepick.sub':'Alege piesele pe care le va folosi echipa ta.',
-      'chat.title':'CHAT ECHIPĂ'
+      'chat.title':'CHAT ECHIPĂ',
+      'replays.title':'RELUĂRI MECIURI','replays.sub':'ULTIMELE 5 MECIURI','replays.open':'RELUĂRI MECIURI',
+      'stats.captures':'Capturi','stats.checks':'Șahuri date','stats.safeHits':'Lovituri seif','stats.queens':'Regine promovate'
     },
     ru: {
-      'menu.subtitle':'v0.05 — ОНЛАЙН — ВЫБЕРИ СОБЫТИЕ',
+      'menu.subtitle':'v0.06 — ОНЛАЙН — ВЫБЕРИ СОБЫТИЕ',
       'profile.title':'ПРОФИЛЬ','profile.wins':'ПОБЕДЫ','profile.trophies':'ТРОФЕИ','profile.pieces':'ФИГУРЫ',
       'profile.name':'ИМЯ ИГРОКА (МАКС 10)','profile.color':'ЦВЕТ ИМЕНИ','profile.icon':'ИКОНКА ПРОФИЛЯ','profile.save':'СОХРАНИТЬ',
       'settings.theme':'ТЕМА','settings.dark':'ТЁМНАЯ','settings.light':'СВЕТЛАЯ','settings.language':'ЯЗЫК',
@@ -4621,7 +4795,9 @@ function drawThumbQOC(){
       'version.title':'НУЖНО ОБНОВЛЕНИЕ','version.body':'Доступна новая версия Chess Star. Обнови страницу, чтобы продолжить.',
       'version.you':'У тебя','version.latest':'Последняя','version.refresh':'ОБНОВИТЬ',
       'prepick.title':'ВЫБЕРИ ФИГУРЫ','prepick.sub':'Выбери фигуры, которыми будет играть твоя команда.',
-      'chat.title':'ЧАТ КОМАНДЫ'
+      'chat.title':'ЧАТ КОМАНДЫ',
+      'replays.title':'ПОВТОРЫ МАТЧЕЙ','replays.sub':'ПОСЛЕДНИЕ 5 МАТЧЕЙ','replays.open':'ПОВТОРЫ МАТЧЕЙ',
+      'stats.captures':'Захваты','stats.checks':'Шахи','stats.safeHits':'Удары по сейфу','stats.queens':'Превращений в ферзя'
     }
   };
   let currentLang = (function(){ try{ return localStorage.getItem('chessstar_lang') || 'en'; }catch(e){ return 'en'; } })();
