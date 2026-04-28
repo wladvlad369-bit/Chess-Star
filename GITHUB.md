@@ -1,86 +1,104 @@
-# Cum muți Chess Star pe GitHub
+# Cum trimiți Chess Star pe GitHub și Railway
 
-Proiectul este gata. Mai jos ai trei variante — alege ce ți se potrivește. Toate funcționează identic — diferă doar prin câte clickuri faci.
+Tot codul aplicației este acum într-un **singur folder**: `chess-star/`. Are un singur `npm start` și nu are nevoie de pnpm, monorepo, build pași sau alte complicații. Asta e exact ce vrea Railway.
+
+```
+chess-star/
+├── package.json     ← express + scriptul "start"
+├── server.js        ← serverul (API + servește jocul)
+├── Procfile         ← fallback pentru Heroku-style hosts
+├── .gitignore
+├── README.md
+└── public/
+    ├── index.html   ← jocul (5244 linii, totul inline)
+    └── opengraph.jpg
+```
 
 ---
 
-## Varianta 1 — Cea mai simplă: butonul „Connect to GitHub" din Replit
+## Recomandare: pune DOAR folderul `chess-star/` ca repo separat
 
-1. În Replit, deschide bara din stânga sus a workspace-ului și caută icoana **Git** (ramura).
-2. Apasă **Connect to GitHub** (sau **Create a Git repo** dacă nu ai una).
-3. Autorizează Replit să scrie în contul tău GitHub (o singură dată).
-4. Alege un nume pentru repo (ex. `chess-star`) și dacă vrei să fie public sau privat.
-5. Apasă **Create repository**. Replit împinge tot codul pe GitHub.
-6. Gata — repo-ul este la `https://github.com/<utilizatorul-tău>/chess-star`.
+Cel mai simplu și cel mai curat pentru Railway. Restul fișierelor din proiect (lib/, scripts/, pnpm-workspace.yaml, etc.) sunt pentru mediul Replit și nu sunt folosite de Railway.
 
-După asta, orice modificare faci în Replit o poți trimite mai departe cu butonul **Commit & push** din același panou.
+### Pași
 
----
+**1. Creează un repo nou pe GitHub** (gol, fără README, fără .gitignore — le avem deja).
 
-## Varianta 2 — Manual din terminal (dacă vrei control total)
+   Pe github.com → **New repository** → nume `chess-star` → public sau privat → **Create**.
 
-Deschide tab-ul **Shell** din Replit și rulează, în ordine:
+**2. Din shell-ul Replit:**
 
 ```bash
-# 1. Inițializează git (dacă nu există deja)
+cd chess-star
 git init -b main
-
-# 2. Pune toate fișierele în primul commit
 git add .
-git commit -m "Chess Star v0.05 — initial commit"
-
-# 3. Creează repo-ul gol pe GitHub întâi (de pe github.com → New repository)
-#    NU bifa „Add a README" sau „.gitignore" — îl avem deja.
-
-# 4. Leagă repo-ul local de cel de pe GitHub (înlocuiește URL-ul)
+git commit -m "Chess Star v0.05"
 git remote add origin https://github.com/<utilizatorul-tău>/chess-star.git
-
-# 5. Trimite codul
 git push -u origin main
 ```
 
-Ți se va cere user + parolă. **Important**: GitHub nu mai acceptă parola contului — folosește un **Personal Access Token**:
+La primul push, GitHub îți cere user + parolă. **Folosește un Personal Access Token** în loc de parolă:
+- GitHub: **Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token**
+- Bifează scope-ul `repo`, generează, copiază token-ul, lipește-l la promptul de parolă.
 
-- Pe GitHub: **Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token**.
-- Bifează scope-ul `repo`, generează tokenul, copiază-l.
-- La promptul de parolă din terminal, lipește tokenul în loc de parolă.
+**3. Pe Railway** (railway.app):
+
+- **New Project → Deploy from GitHub repo** → alege repo-ul `chess-star`.
+- Railway detectează singur `package.json`, rulează `npm install` și apoi `npm start`. Gata.
+- În câteva secunde primești un domeniu `*.up.railway.app` — acela e link-ul jocului.
+
+**4. Pentru webintoapp.com**:
+
+- Lipește URL-ul `*.up.railway.app` în webintoapp.com → primești APK-ul.
 
 ---
 
-## Varianta 3 — Descarcă local și împinge de pe calculator
+## Alternativă: pune tot proiectul Replit pe GitHub
 
-1. În Replit: **meniul cu trei puncte → Download as zip** (sau dă-mi mie comanda de download din shell).
-2. Dezarhivează pe calculatorul tău.
-3. Deschide un terminal în acel folder și rulează exact pașii 1–5 din **Varianta 2**.
+Dacă vrei să păstrezi tot proiectul împreună (inclusiv configurațiile Replit) urcă întreg folderul rădăcină. Pentru Railway:
+
+- pe Railway, în **Settings → Service → Root Directory** scrie `chess-star`.
+- Railway va intra în acel subfolder, va vedea `package.json` și `npm start`, și va porni jocul exact la fel.
+
+În rest, pașii git sunt aceiași — doar că rulezi `git init` în rădăcină în loc de `chess-star/`.
 
 ---
 
-## Ce e deja inclus și nu trebuie atins
+## Cum se actualizează automat după primul deploy
 
-- `.gitignore` — exclude `node_modules`, `dist`, cache-uri, secrete locale.
-- `package.json` + `pnpm-workspace.yaml` + `pnpm-lock.yaml` — definesc tot ce trebuie instalat.
-- `lib/` și `scripts/` — bibliotecile partajate ale monorepo-ului (utile pentru viitor, chiar dacă jocul de bază merge fără ele).
-- `artifacts/api-server/` — backend-ul Express care acoperă `/api/version`, `/api/healthz` și `/api/account/*` (acestea sunt cele care altfel afișau mesajul „UPDATE REQUIRED" sau blocau ecranul de cont).
+Odată conectat repo-ul, Railway urmărește branch-ul `main`. De fiecare dată când dai `git push`, Railway:
+1. Trage codul nou,
+2. Rulează `npm install`,
+3. Rulează `npm start`,
+4. Înlocuiește versiunea live fără downtime.
 
-## Cum rulezi proiectul după clonare (pe alt cont sau local)
+URL-ul rămâne același. Asta înseamnă că aplicația ta din webintoapp continuă să meargă la noua versiune fără să faci nimic.
+
+---
+
+## Test local înainte de deploy
 
 ```bash
-# instalezi dependențele (folosește pnpm — nu npm sau yarn)
-npm install -g pnpm
-pnpm install
-
-# pornești backendul (Express, port 8080)
-pnpm --filter @workspace/api-server run dev
-
-# într-un alt terminal, pornești frontend-ul (Vite, port 5173 dacă local)
-PORT=5173 BASE_PATH=/ pnpm --filter @workspace/chess-star run dev
+cd chess-star
+npm install
+npm start
+# deschide http://localhost:8080
 ```
 
-Pe Replit cele două sunt deja configurate ca workflow-uri și pornesc automat când deschizi proiectul.
+---
 
-## Bug-urile reparate în această sesiune
+## Ce NU trebuie să fie pe GitHub
 
-- **„UPDATE REQUIRED" persistent** — cauza era endpoint-ul `/api/version` lipsă. Acum serverul răspunde corect cu versiunea curentă.
-- **Modal de cont blocat fără răspuns** — endpoint-urile `/api/account/create`, `/login`, `/me`, `/search`, `/friends`, `/friend-request`, `/friend-respond`, `/friend-remove`, `/replay` lipseau. Toate sunt acum implementate (storage in-memory; trece la PostgreSQL când vrei persistență permanentă).
-- **Scaffolding React inutil** în `artifacts/chess-star/src/` — eliminat. Vite servește direct HTML-ul.
-- **Typecheck** — rulează curat pe tot monorepo-ul (`pnpm run typecheck`).
+`.gitignore` din `chess-star/` exclude deja:
+- `node_modules/` (Railway îl reinstalează singur)
+- `*.log`, `.DS_Store`
+- `.env`, `.env.local` (secrete locale)
+- `package-lock.json` (opțional)
+
+---
+
+## Probleme deja rezolvate
+
+- **Mesajul „UPDATE REQUIRED"** care bloca jocul — endpoint-ul `/api/version` lipsea.
+- **Modalul de cont blocat** — toate endpoint-urile `/api/account/*` lipseau.
+- **Structura monorepo prea complicată** pentru Railway — totul mutat într-un singur folder cu `npm start`.

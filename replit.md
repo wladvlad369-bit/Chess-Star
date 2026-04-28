@@ -1,48 +1,62 @@
 # Chess Star
 
-Self-contained 2D chess-themed mobile-style web app. The entire game lives in a single HTML file with inline CSS + JS. Backed by a small Express API for accounts, version, and friend search.
+Joc 2D de șah cu mai multe moduri (Last Piece Standing, Classic, Queens On Color, Grind The Safe). Tot codul aplicației este într-un singur folder simplu.
 
-## Structure
+## Structură (forma simplificată pentru Railway)
 
-- `artifacts/chess-star/index.html` — the whole client app (UI, engine, AI, persistence, sockets, i18n)
-- `artifacts/chess-star/vite.config.ts` — Vite dev server config (proxies `/api` to the API server)
-- `artifacts/api-server/src/routes/` — Express routes
-  - `health.ts` — `/api/healthz`
-  - `version.ts` — `/api/version` (gates the client; returns the current build)
-  - `account.ts` — `/api/account/*` (create, login, me, search, friends, friend-request, friend-respond, friend-remove, replay)
-- `lib/api-spec`, `lib/api-zod`, `lib/api-client-react`, `lib/db` — shared monorepo libs (kept from the workspace template; not used directly by the chess client)
-- `attached_assets/` — original handoff backups of the HTML
+```
+chess-star/
+├── package.json     # express + scriptul "start"
+├── server.js        # Express - servește jocul + /api/*
+├── Procfile         # fallback pentru hosts Heroku-style
+├── .gitignore
+├── README.md
+└── public/
+    ├── index.html   # jocul complet (5244 linii inline)
+    └── opengraph.jpg
+```
 
-## Running locally on Replit
+Pornire locală:
 
-Two workflows must be running:
+```bash
+cd chess-star
+npm install
+npm start    # http://localhost:8080
+```
 
-- `artifacts/api-server: API Server` — Express on `:8080`, exposed at `/api`
-- `artifacts/chess-star: web` — Vite dev server, exposed at `/`
+## Pe Replit
 
-The platform's path-based proxy routes `/api/*` to the API server and everything else to the game.
+Workflow-ul `artifacts/chess-star: web` rulează `node /home/runner/workspace/chess-star/server.js` pe portul 25566, expus de proxy la `/`. Folderul `artifacts/chess-star/` conține doar `.replit-artifact/artifact.toml` (configurația de preview Replit) — restul codului e în `chess-star/` la rădăcină.
 
-## Persistence (localStorage keys)
+`artifacts/api-server` și fișierele Vite din artifacts/chess-star/ au fost eliminate; nu mai sunt necesare. Un singur server Express acoperă atât HTML-ul cât și API-ul.
+
+## API
+
+Toate sunt JSON pe același domeniu cu jocul:
+
+- `GET  /api/healthz` — health check
+- `GET  /api/version` — `{latest, required}` pentru gate-ul de versiune
+- `POST /api/account/create` — creează cont nou (in-memory)
+- `POST /api/account/upsert` — creează sau actualizează după cod
+- `POST /api/account/login` — login cu cod 13 caractere
+- `GET  /api/account/me?code=...`
+- `GET  /api/account/search?q=...`
+- `GET  /api/account/friends?code=...`
+- `POST /api/account/friend-request` / `friend-respond` / `friend-remove`
+- `POST /api/account/replay`
+
+> Persistența este în-memorie. Pentru date durabile adaugă PostgreSQL.
+
+## Persistență client (localStorage)
 
 `chessstar_profile`, `chessstar_icon`, `chessstar_lang`, `chessstar_skins`, `chessstar_theme`, `chessstar_wins`, `chessstar_trophies`, `chessstar_streak`, `chessstar_recent`, `chessstar_replays`, `claimed_wins`, `claimed_trophies`, `chessstar_acct_code`, `chessstar_acct_name`.
 
-13-char save code format: `#NNNNNNNNCHH_` (8-char name, 1 color index, 2 hex skin bitmask, pad).
+Codul de save are 13 caractere: `#NNNNNNNNCHH_` (8 nume, 1 culoare, 2 hex skin bitmask, padding).
 
-## Events
+## Deploy pe Railway prin GitHub
 
-- `lps`     — Last Piece Standing (6 or 4 players, poison ring)
-- `classic` — Classic Chess (1v1, full rules) — with AI opponent
-- `qoc`     — Queens On Color (checkers/dame with bishop promotion + 2 wheels of fortune)
-- `gts`     — Grind The Safe (drain enemy safe HP) — with AI opponent
+Vezi `GITHUB.md` — pașii sunt în română, cu varianta recomandată (push doar al folderului `chess-star/` ca repo separat) și varianta cu monorepo + Root Directory.
 
-## Game modes
+## Versiune
 
-`1v1` / `2v2` / `4v4` selectable on every event. `2v2` and `4v4` trigger the pre-game piece picker.
-
-## Version
-
-Current: **v0.05** (April 2026)
-
-## Pushing this project to your GitHub
-
-See `GITHUB.md` for the step-by-step transfer guide.
+`v0.05` (April 2026)

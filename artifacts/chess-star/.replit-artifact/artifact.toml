@@ -15,17 +15,10 @@ paths = [ "/" ]
 localPort = 25566
 
 [services.development]
-run = "pnpm --filter @workspace/chess-star run dev"
+run = "node /home/runner/workspace/chess-star/server.js"
 
 [services.production]
-build = [ "pnpm", "--filter", "@workspace/chess-star", "run", "build" ]
-publicDir = "artifacts/chess-star/dist/public"
-serve = "static"
-
-[[services.production.rewrites]]
-from = "/*"
-to = "/index.html"
+run = "node /home/runner/workspace/chess-star/server.js"
 
 [services.env]
 PORT = "25566"
-BASE_PATH = "/"

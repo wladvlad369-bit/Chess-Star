@@ -1,0 +1,17 @@
+{
+  "name": "chess-star",
+  "version": "0.5.0",
+  "description": "Chess Star - mobile-style multi-mode chess game",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
