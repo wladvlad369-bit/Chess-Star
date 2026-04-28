@@ -47,7 +47,28 @@ La primul push, GitHub îți cere user + parolă. **Folosește un Personal Acces
 - Railway detectează singur `package.json`, rulează `npm install` și apoi `npm start`. Gata.
 - În câteva secunde primești un domeniu `*.up.railway.app` — acela e link-ul jocului.
 
-**4. Pentru webintoapp.com**:
+**4. (RECOMANDAT) Adaugă PostgreSQL ca să reziste conturile la restart**:
+
+Fără pas ăsta, conturile și prietenii se șterg de fiecare dată când Railway redeploy-ește (la fiecare `git push`). Cu pas ăsta, rămân pentru totdeauna.
+
+- În proiectul Railway: butonul **+ New → Database → Add PostgreSQL**.
+- Railway creează baza și injectează automat variabila `DATABASE_URL` în serviciul tău.
+- Apasă **Redeploy** la serviciul `chess-star` (sau așteaptă următorul `git push`).
+- În log-urile serviciului ar trebui să vezi:
+  ```
+  [storage] PostgreSQL (data persists across restarts)
+  [storage] schema ready
+  Chess Star v0.05 listening on http://0.0.0.0:... (storage: postgres)
+  ```
+
+Serverul detectează singur `DATABASE_URL` și creează tabelul `chess_accounts` automat la prima pornire. Nu trebuie să rulezi nimic manual.
+
+Dacă **NU** adaugi PostgreSQL, jocul tot merge — dar conturile sunt în memorie și se pierd la fiecare restart. Vei vedea în log-uri:
+```
+[storage] in-memory (data NOT persisted across restarts)
+```
+
+**5. Pentru webintoapp.com**:
 
 - Lipește URL-ul `*.up.railway.app` în webintoapp.com → primești APK-ul.
 

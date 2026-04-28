@@ -17,6 +17,7 @@ Apoi deschide `http://localhost:8080` în browser.
 
 Variabile opționale:
 - `PORT` — port de ascultare (default `8080`)
+- `DATABASE_URL` — string de conectare PostgreSQL. Dacă e setat, conturile se persistă în DB. Dacă nu, se țin în memorie și se șterg la restart.
 
 ---
 
@@ -27,12 +28,17 @@ Variabile opționale:
 3. Dacă repo-ul are mai multe foldere (cum e cazul aici), intră în **Settings → Service** și setează:
    - **Root Directory**: `chess-star`
    - **Start Command**: `npm start` (de obicei detectat singur)
-4. Railway îți dă automat un domeniu `*.up.railway.app`. Acela este link-ul jocului.
+4. **Adaugă PostgreSQL** (recomandat, ca să nu se piardă conturile la restart):
+   - În proiect: **+ New → Database → Add PostgreSQL**.
+   - Railway injectează `DATABASE_URL` automat. Serverul îl detectează singur și creează tabelul la prima pornire.
+   - Fără PostgreSQL, jocul rulează cu storage în memorie — funcționează, dar conturile se șterg la fiecare redeploy.
+5. Railway îți dă automat un domeniu `*.up.railway.app`. Acela este link-ul jocului.
 
 Railway:
 - detectează `package.json` și rulează `npm install` automat,
 - detectează scriptul `start` și rulează `npm start`,
-- injectează `PORT` automat — serverul îl folosește deja.
+- injectează `PORT` automat — serverul îl folosește deja,
+- injectează `DATABASE_URL` dacă ai adăugat PostgreSQL — serverul îl folosește deja.
 
 ---
 
@@ -69,7 +75,7 @@ Toate sunt JSON pe același domeniu cu jocul (CORS nu e necesar).
 | POST   | `/api/account/friend-remove`  | șterge prieten                             |
 | POST   | `/api/account/replay`         | salvează un replay                         |
 
-> Datele sunt stocate în memorie (`Map`) — se șterg la restart. Pentru persistență adaugă PostgreSQL sau Redis.
+**Persistență**: dacă variabila `DATABASE_URL` este setată, serverul folosește PostgreSQL (creează automat tabelul `chess_accounts` la prima pornire). Altfel ține datele în memorie (utile pentru dezvoltare locală).
 
 ## Versiune
 

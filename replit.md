@@ -30,6 +30,14 @@ Workflow-ul `artifacts/chess-star: web` rulează `node /home/runner/workspace/ch
 
 `artifacts/api-server` și fișierele Vite din artifacts/chess-star/ au fost eliminate; nu mai sunt necesare. Un singur server Express acoperă atât HTML-ul cât și API-ul.
 
+## Persistență
+
+Serverul detectează la pornire dacă există variabila `DATABASE_URL`:
+- **Setată** → PostgreSQL (`pg`). Tabelul `chess_accounts` e creat automat. Conturile, prietenii și replay-urile rezistă la restart.
+- **Lipsă** → memorie (`Map`). Datele se șterg la restart. Util pentru dev local.
+
+Pe Railway: `+ New → Database → Add PostgreSQL` și serverul preia singur. Pe Replit (acest workspace) baza e deja provizionată automat.
+
 ## API
 
 Toate sunt JSON pe același domeniu cu jocul:
