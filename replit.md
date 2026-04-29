@@ -67,4 +67,20 @@ Vezi `GITHUB.md` — pașii sunt în română, cu varianta recomandată (push do
 
 ## Versiune
 
-`v0.05` (April 2026)
+`v0.06` (April 2026)
+
+### Schimbări v0.06 (față de v0.05)
+
+- **Bug fix critic**: în single-player vs AI (CC + GTS), player-ul nu mai poate da click și muta piesele AI-ului în timpul turei AI. Click-ul pe board e blocat când `ccTurn !== classicPlayerColor` (respectiv `gtsTurn !== gtsPlayerColor`).
+- **Restricție piese 2v2/4v4** (Classic Chess + Grind The Safe + Queens On Color):
+  - CC/GTS: după pre-pick (2 tipuri în 2v2, 1 tip în 4v4) player-ul deține DOAR tipurile alese + pionii de pe fișierele acelor piese (ex: alegi N → ai cailor + pionii de pe coloanele 1 și 6). Restul pieselor de aceeași culoare sunt jucate automat de AI-ul de coleg de echipă.
+  - CC: regele și regina sunt cuplate — alegând una, cealaltă vine automat (fără cost suplimentar de slot).
+  - QOC: nu există picker (toate piesele sunt de același tip "checker") — partiție automată pe coloane: 2v2 = jumătate stânga vs jumătate dreapta; 4v4 = sferturi de coloane. Player-ul controlează slotul 0 (cel mai din stânga).
+- **AI coleg de echipă**: când player-ul nu are nicio mutare legală cu piesele lui (toate blocate), AI-ul preia tura curentă și mută o piesă neowned a aceleași culori. Mesaj inline: "🤝 Teammate AI thinking...".
+- **i18n extins** (en/ro/ru):
+  - `INFO_CONTENT` complet tradus pentru toate cele 5 evenimente + 6 tipuri de piese, cu mențiuni despre regulile 2v2/4v4 și cuplajul K+Q.
+  - `showToast()` are wrapper care traduce automat ~25 de mesaje frecvente (network, queue, invitations, anti-camper, walks).
+  - Mesaje "AI thinking..." și "Teammate AI thinking..." traduse.
+  - Subtitlu pre-pick + counter "X / Y selected" localizate.
+- **Helper-i nou expuși pe `window`**: `ccPlayerOwns`, `gtsPlayerOwns`, `qocPlayerOwns`, `derivePawnFiles`, `PIECE_TO_FILES`, `currentLang`, `tr()`, `translateMsg()`, `TOAST_I18N`.
+- State per-meci pe `window`: `ccPickedTypes`/`ccPickedFiles`, `gtsPickedTypes`/`gtsPickedFiles`, `qocSlotsActive`/`qocSlotCount`. Resetat la fiecare apel `startSelectedEvent`.

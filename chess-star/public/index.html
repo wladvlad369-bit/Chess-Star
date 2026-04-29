@@ -3021,6 +3021,8 @@ function ccLoop(){if(!ccRunning)return;ccUpdate();ccDraw();requestAnimationFrame
 
 ccC.addEventListener('click',e=>{
   if(!ccRunning||ccGameOver)return;
+  // v0.06 — block clicks during AI turn so player can't control opposing pieces
+  if(ccTurn !== classicPlayerColor) return;
   const rect=ccC.getBoundingClientRect();
   const sc=CSZ/rect.width;
   const ex=(e.clientX-rect.left)*sc,ey=(e.clientY-rect.top)*sc;
@@ -3031,13 +3033,15 @@ ccC.addEventListener('click',e=>{
     promo.forEach((t,i)=>{const bx=44+i*68,by=80;if(ex>=bx&&ex<=bx+58&&ey>=by&&ey<=by+58)ccPromote(t);});
     return;
   }
+  // v0.06 — in 2v2/4v4 player can only select pieces they own (picked types + their pawns)
+  const _ccOwns = (p,col)=> window.ccPlayerOwns ? window.ccPlayerOwns(p,col) : (p && p.c===classicPlayerColor);
   if(ccSel){
     const mv=ccValMoves.find(m=>m.r===r&&m.c===c);
     if(mv){ccDoMove(ccSel.r,ccSel.c,r,c,mv);return;}
-    if(ccBoard[r][c]&&ccBoard[r][c].c===ccTurn){ccSel={r,c};ccValMoves=ccLegal(r,c);return;}
+    if(ccBoard[r][c]&&_ccOwns(ccBoard[r][c],c)){ccSel={r,c};ccValMoves=ccLegal(r,c);return;}
     ccSel=null;ccValMoves=[];
   } else {
-    if(ccBoard[r][c]&&ccBoard[r][c].c===ccTurn){ccSel={r,c};ccValMoves=ccLegal(r,c);}
+    if(ccBoard[r][c]&&_ccOwns(ccBoard[r][c],c)){ccSel={r,c};ccValMoves=ccLegal(r,c);}
   }
 });
 
@@ -3375,6 +3379,9 @@ function gtsLoop(){if(!gtsRunning)return;gtsUpdate();gtsDraw();requestAnimationF
 
 gtsC.addEventListener('click',e=>{
   if(!gtsRunning||gtsGameOver)return;
+  // v0.06 — block clicks during AI turn (was previously broken: player could control AI pieces while AI was thinking)
+  const _myCol = window.gtsPlayerColor || 'w';
+  if(gtsTurn !== _myCol) return;
   const rect=gtsC.getBoundingClientRect();
   const sc=GSZ/rect.width;
   const ex=(e.clientX-rect.left)*sc,ey=(e.clientY-rect.top)*sc;
@@ -3385,13 +3392,15 @@ gtsC.addEventListener('click',e=>{
     promo.forEach((t,i)=>{const bx=44+i*68,by=80;if(ex>=bx&&ex<=bx+58&&ey>=by&&ey<=by+58)gtsPromote(t);});
     return;
   }
+  // v0.06 — in 2v2/4v4 player can only select pieces they own (picked types + their pawns)
+  const _gtsOwns = (p,col)=> window.gtsPlayerOwns ? window.gtsPlayerOwns(p,col) : (p && p.c===_myCol && p.t!=='SAFE');
   if(gtsSel){
     const mv=gtsValMoves.find(m=>m.r===r&&m.c===c);
     if(mv){gtsDoMove(gtsSel.r,gtsSel.c,r,c,mv);return;}
-    if(gtsBoard[r][c]&&gtsBoard[r][c].c===gtsTurn&&gtsBoard[r][c].t!=='SAFE'){gtsSel={r,c};gtsValMoves=gtsGetMoves(r,c);return;}
+    if(gtsBoard[r][c]&&_gtsOwns(gtsBoard[r][c],c)){gtsSel={r,c};gtsValMoves=gtsGetMoves(r,c);return;}
     gtsSel=null;gtsValMoves=[];
   } else {
-    if(gtsBoard[r][c]&&gtsBoard[r][c].c===gtsTurn&&gtsBoard[r][c].t!=='SAFE'){gtsSel={r,c};gtsValMoves=gtsGetMoves(r,c);}
+    if(gtsBoard[r][c]&&_gtsOwns(gtsBoard[r][c],c)){gtsSel={r,c};gtsValMoves=gtsGetMoves(r,c);}
   }
 });
 
@@ -3471,21 +3480,51 @@ function loadSaveCode(){
 window.addEventListener('DOMContentLoaded', refreshSaveCode);
 
 // Info modal content
+// v0.06 — INFO_CONTENT now multi-language; pick by current language (en/ro/ru)
 const INFO_CONTENT = {
-  conn:    {t:'CONNECTION',         b:'Live signal strength, ping (ms) and current frame rate (FPS). Green = strong, yellow = ok, red = weak. The bars also show in the SETTINGS screen.'},
-  lps:     {t:'LAST PIECE STANDING',b:'6 (or 4) players. Pick one piece type. Move on your turn. Last player with a piece on the board wins. A green poison ring closes in over time — get out!'},
-  classic: {t:'CLASSIC CHESS',      b:'Standard 8x8 chess. Castling, en passant, promotion. Random color pick at the start. Win by checkmate or resign.'},
-  qoc:     {t:'QUEENS ON COLOR',    b:'Checkers / dame style. Pieces move diagonally one square and jump enemies. Reach the last rank to promote your checker into a Bishop (any-distance diagonals). Two wheels of fortune trigger random perks each round.'},
-  gts:     {t:'GRIND THE SAFE',     b:'Two safes — one per side. Land on your enemy\'s safe square to drain its HP. Pieces don\'t leave the board, they bounce back. Each safe gets a yellow shield at half HP.'},
-  P:{t:'PAWN',  b:'Defense piece. Moves 1 step forward, captures 1 step diagonally forward. In LPS the pawn is omnidirectional — it can move 1 square in ANY of the 4 cardinal directions and capture on any of the 4 diagonals.'},
-  R:{t:'ROOK',  b:'Slides any number of squares horizontally or vertically.'},
-  N:{t:'KNIGHT',b:'Moves in an L: 2 squares in one direction then 1 perpendicular. Jumps over other pieces.'},
-  B:{t:'BISHOP',b:'Slides any number of squares diagonally.'},
-  Q:{t:'QUEEN', b:'Slides any number of squares in any of the 8 directions. Strongest piece.'},
-  K:{t:'KING',  b:'Moves 1 square in any direction. Most valuable — protect it!'},
+  en: {
+    conn:    {t:'CONNECTION',         b:'Live signal strength, ping (ms) and current frame rate (FPS). Green = strong, yellow = ok, red = weak. The bars also show in the SETTINGS screen.'},
+    lps:     {t:'LAST PIECE STANDING',b:'6 (or 4) players. Pick one piece type. Move on your turn. Last player with a piece on the board wins. A green poison ring closes in over time — get out!'},
+    classic: {t:'CLASSIC CHESS',      b:'Standard 8x8 chess. Castling, en passant, promotion. Random color pick at the start. Win by checkmate or resign. In 2v2 the team picks 2 piece types; in 4v4 each teammate plays 1 piece type. The King and Queen are coupled — picking one auto-includes the other.'},
+    qoc:     {t:'QUEENS ON COLOR',    b:'Checkers / dame style. Pieces move diagonally one square and jump enemies. Reach the last rank to promote your checker into a Bishop (any-distance diagonals). Two wheels of fortune trigger random perks each round. In 2v2 you control half of your color; in 4v4 you control a quarter.'},
+    gts:     {t:'GRIND THE SAFE',     b:'Two safes — one per side. Land on your enemy\'s safe square to drain its HP. Pieces don\'t leave the board, they bounce back. Each safe gets a yellow shield at half HP. In 2v2/4v4 the picked-piece rule applies: only your selected pieces + their front pawns are yours.'},
+    P:{t:'PAWN',  b:'Defense piece. Moves 1 step forward, captures 1 step diagonally forward. In LPS the pawn is omnidirectional — it can move 1 square in ANY of the 4 cardinal directions and capture on any of the 4 diagonals.'},
+    R:{t:'ROOK',  b:'Slides any number of squares horizontally or vertically.'},
+    N:{t:'KNIGHT',b:'Moves in an L: 2 squares in one direction then 1 perpendicular. Jumps over other pieces.'},
+    B:{t:'BISHOP',b:'Slides any number of squares diagonally.'},
+    Q:{t:'QUEEN', b:'Slides any number of squares in any of the 8 directions. Strongest piece.'},
+    K:{t:'KING',  b:'Moves 1 square in any direction. Most valuable — protect it!'},
+  },
+  ro: {
+    conn:    {t:'CONEXIUNE',                b:'Puterea semnalului în timp real, ping (ms) și rata cadrelor (FPS). Verde = puternic, galben = ok, roșu = slab. Barele apar și în ecranul SETĂRI.'},
+    lps:     {t:'ULTIMA PIESĂ ÎN PICIOARE', b:'6 (sau 4) jucători. Alegi un tip de piesă. Muți la rândul tău. Câștigă ultimul jucător cu piesă pe tablă. Un cerc verde otrăvit se strânge în timp — ieși din el!'},
+    classic: {t:'ȘAH CLASIC',                b:'Șah standard 8x8. Rocadă, en passant, promovare. Culoarea se alege aleatoriu la început. Câștigi prin șah-mat sau abandon. La 2v2 echipa alege 2 tipuri de piese; la 4v4 fiecare coleg joacă 1 tip. Regele și Regina sunt cuplate — alegând una, cealaltă vine automat.'},
+    qoc:     {t:'REGINE PE CULOARE',         b:'Stil dame/checkers. Piesele se mișcă diagonal o căsuță și sar peste inamici. Ajungând pe ultimul rând, pionul de dame se transformă în Nebun (diagonal pe orice distanță). Două roți ale norocului dau bonusuri aleatoare în fiecare rundă. La 2v2 controlezi jumătate din culoarea ta; la 4v4 doar un sfert.'},
+    gts:     {t:'SPARGE SEIFUL',             b:'Două seifuri — câte unul pe parte. Aterizează pe seiful adversarului ca să-i scazi HP-ul. Piesele nu părăsesc tabla, sunt respinse înapoi. La jumătate de HP, fiecare seif primește un scut galben. La 2v2/4v4 se aplică regula pieselor alese: doar piesele tale + pionii din față îți aparțin.'},
+    P:{t:'PION',     b:'Piesă defensivă. Înaintează 1 pas, capturează 1 pas în diagonală în față. În LPS, pionul e omnidirecțional — se mișcă 1 căsuță în oricare din cele 4 direcții și capturează pe oricare din cele 4 diagonale.'},
+    R:{t:'TURĂ',     b:'Alunecă pe orice număr de căsuțe orizontal sau vertical.'},
+    N:{t:'CAL',      b:'Se mișcă în L: 2 căsuțe într-o direcție și 1 perpendicular. Sare peste alte piese.'},
+    B:{t:'NEBUN',    b:'Alunecă pe orice număr de căsuțe în diagonală.'},
+    Q:{t:'REGINĂ',   b:'Alunecă pe orice număr de căsuțe în oricare din cele 8 direcții. Cea mai puternică piesă.'},
+    K:{t:'REGE',     b:'Se mișcă 1 căsuță în orice direcție. Cea mai valoroasă piesă — protejează-o!'},
+  },
+  ru: {
+    conn:    {t:'СОЕДИНЕНИЕ',           b:'Сила сигнала, пинг (мс) и текущий FPS. Зелёный = сильный, жёлтый = ок, красный = слабый. Полоски также показаны в экране НАСТРОЙКИ.'},
+    lps:     {t:'ПОСЛЕДНЯЯ ФИГУРА',     b:'6 (или 4) игрока. Выбираешь один тип фигуры. Ходишь по очереди. Побеждает последний игрок с фигурой на доске. Зелёное ядовитое кольцо сжимается со временем — уходи!'},
+    classic: {t:'КЛАССИЧЕСКИЕ ШАХМАТЫ', b:'Стандартные шахматы 8x8. Рокировка, взятие на проходе, превращение. Цвет случайный. Победа — мат или сдача. В 2v2 команда выбирает 2 типа фигур; в 4v4 каждый игрок играет 1 тип. Король и ферзь связаны — выбор одного включает второго.'},
+    qoc:     {t:'ФЕРЗИ ПО ЦВЕТУ',       b:'Стиль шашек/дамок. Фигуры ходят по диагонали на 1 клетку и бьют через врагов. Дошедшая до последнего ряда шашка становится слоном (диагонали на любую длину). В каждом раунде срабатывают два колеса фортуны. В 2v2 ты контролируешь половину своего цвета; в 4v4 — четверть.'},
+    gts:     {t:'ВСКРОЙ СЕЙФ',          b:'Два сейфа — по одному на сторону. Зайди на клетку сейфа врага, чтобы снять HP. Фигуры не уходят с доски, они отскакивают. На половине HP каждый сейф получает жёлтый щит. В 2v2/4v4 действует правило выбранных фигур: только твои фигуры + их пешки впереди.'},
+    P:{t:'ПЕШКА',  b:'Защитная фигура. Идёт на 1 клетку вперёд, бьёт на 1 клетку по диагонали вперёд. В LPS пешка всенаправленная — ходит на 1 клетку в любом из 4 направлений и бьёт по любой из 4 диагоналей.'},
+    R:{t:'ЛАДЬЯ',  b:'Скользит по горизонтали или вертикали на любое число клеток.'},
+    N:{t:'КОНЬ',   b:'Движение буквой L: 2 клетки в одном направлении и 1 перпендикулярно. Перепрыгивает другие фигуры.'},
+    B:{t:'СЛОН',   b:'Скользит по диагонали на любое число клеток.'},
+    Q:{t:'ФЕРЗЬ',  b:'Скользит на любое число клеток в любом из 8 направлений. Самая сильная фигура.'},
+    K:{t:'КОРОЛЬ', b:'Ходит на 1 клетку в любую сторону. Самая ценная — береги её!'},
+  }
 };
 function showInfoModal(key){
-  const data = INFO_CONTENT[key] || {t:'INFO', b:'No info available.'};
+  const lang = (window.currentLang && INFO_CONTENT[window.currentLang]) ? window.currentLang : 'en';
+  const data = (INFO_CONTENT[lang] && INFO_CONTENT[lang][key]) || INFO_CONTENT.en[key] || {t:'INFO', b:'No info available.'};
   document.getElementById('infoModalTitle').textContent = data.t;
   document.getElementById('infoModalText').textContent  = data.b;
   document.getElementById('infoModal').classList.add('show');
@@ -3715,6 +3754,8 @@ qocC.addEventListener('click', (e)=>{
   const ex = (e.clientX-rect.left)*sc, ey = (e.clientY-rect.top)*sc;
   const c = Math.floor(ex/QTL), r = Math.floor(ey/QTL);
   if(r<0||r>=8||c<0||c>=8) return;
+  // v0.06 — in 2v2/4v4 player owns only slot-0 pieces of their color
+  const _qOwns = (p)=> window.qocPlayerOwns ? window.qocPlayerOwns(p) : (p && p.c===myCol);
   const mustCap = qocAnyCaptures(myCol);
   if(qocSel){
     const mv = qocValMoves.find(m=>m.r===r && m.c===c);
@@ -3724,13 +3765,13 @@ qocC.addEventListener('click', (e)=>{
       qocDoMove(qocSel.r, qocSel.c, r, c, mv); return;
     }
     if(qocMustChain) return;
-    if(qocBoard[r][c] && qocBoard[r][c].c===myCol){
+    if(qocBoard[r][c] && _qOwns(qocBoard[r][c])){
       if(mustCap && !qocGetMoves(r,c).some(m=>m.atk)) return;
       qocSel={r,c}; qocValMoves=qocGetMoves(r,c).filter(m=>!mustCap||m.atk); return;
     }
     qocSel=null; qocValMoves=[];
   } else {
-    if(qocBoard[r][c] && qocBoard[r][c].c===myCol){
+    if(qocBoard[r][c] && _qOwns(qocBoard[r][c])){
       if(mustCap && !qocGetMoves(r,c).some(m=>m.atk)) return;
       qocSel={r,c}; qocValMoves=qocGetMoves(r,c).filter(m=>!mustCap||m.atk);
     }
@@ -4045,12 +4086,65 @@ function drawThumbQOC(){
     else if(on===false){ dot.classList.add('off'); txt.textContent='OFFLINE'; }
     else txt.textContent='connecting…';
   }
+  // v0.06 — translation map for dynamic toasts / inline messages.
+  // Keys are the EN source strings (or a regex-like template for ones with variables);
+  // values give RO and RU translations. Strings with variables use ${} placeholders that
+  // are filled by the wrapper.
+  window.TOAST_I18N = {
+    'No account — create one first': { ro:'Niciun cont — creează unul mai întâi', ru:'Нет аккаунта — сначала создай его' },
+    'Code copied': { ro:'Cod copiat', ru:'Код скопирован' },
+    'Code must be 13 chars': { ro:'Codul trebuie să aibă 13 caractere', ru:'Код должен быть 13 символов' },
+    'Invalid code': { ro:'Cod invalid', ru:'Неверный код' },
+    'Account loaded': { ro:'Cont încărcat', ru:'Аккаунт загружен' },
+    'Create an account first': { ro:'Creează un cont mai întâi', ru:'Сначала создай аккаунт' },
+    'Request sent': { ro:'Cerere trimisă', ru:'Запрос отправлен' },
+    'Failed': { ro:'Eșuat', ru:'Неудача' },
+    'Not connected': { ro:'Neconectat', ru:'Нет соединения' },
+    '⚠ Anti-camper bomb armed!': { ro:'⚠ Bomba anti-campare armată!', ru:'⚠ Бомба против кемпера активирована!' },
+    'Your piece exploded — anti-camper!': { ro:'Piesa ta a explodat — anti-campare!', ru:'Твоя фигура взорвалась — анти-кемпер!' },
+    'Bomb exploded': { ro:'Bomba a explodat', ru:'Бомба взорвалась' },
+    'Walk accepted': { ro:'Mutare acceptată', ru:'Ход принят' },
+    'Walk declined': { ro:'Mutare refuzată', ru:'Ход отклонён' },
+    'Walk only in 2v2/4v4': { ro:'Mutare doar în 2v2/4v4', ru:'Ход только в 2v2/4v4' },
+    'Walk suggested': { ro:'Mutare sugerată', ru:'Ход предложен' },
+    'Auth failed — please log in again': { ro:'Autentificare eșuată — te rugăm să te conectezi din nou', ru:'Авторизация не удалась — войдите снова' },
+    'Left queue': { ro:'Ai părăsit coada', ru:'Вы покинули очередь' },
+    'Invite declined': { ro:'Invitație refuzată', ru:'Приглашение отклонено' },
+    'Joining match…': { ro:'Te alături meciului…', ru:'Подключение к матчу…' },
+    // Templated patterns — matched by prefix + filled with the original captured payload
+    'Searching ': { ro:'Caut ', ru:'Поиск ' },
+    'No human found — playing with bots (': { ro:'Niciun jucător găsit — joc cu boți (', ru:'Игрок не найден — играю с ботами (' },
+    'Match found (': { ro:'Meci găsit (', ru:'Матч найден (' },
+    'Player left (': { ro:'Jucătorul a plecat (', ru:'Игрок вышел (' },
+    'Walk ': { ro:'Mutare ', ru:'Ход ' },
+    'Invite sent to ': { ro:'Invitație trimisă către ', ru:'Приглашение отправлено ' },
+    'Claimed ': { ro:'Revendicat ', ru:'Получено ' },
+    '🤖 AI thinking...': { ro:'🤖 AI-ul gândește...', ru:'🤖 ИИ думает...' },
+    '🤝 Teammate AI thinking...': { ro:'🤝 Coleg AI gândește...', ru:'🤝 ИИ союзник думает...' },
+    '🤝 Teammate thinking...': { ro:'🤝 Coleg gândește...', ru:'🤝 Союзник думает...' },
+  };
+  window.translateMsg = function(msg){
+    if(!msg || typeof msg !== 'string') return msg;
+    const lang = window.currentLang || 'en';
+    if(lang === 'en') return msg;
+    const map = window.TOAST_I18N || {};
+    // Direct match
+    if(map[msg] && map[msg][lang]) return map[msg][lang];
+    // Prefix match — replace the matching prefix only, preserving the dynamic tail
+    for(const key of Object.keys(map)){
+      if(msg.startsWith(key) && map[key][lang]){
+        return map[key][lang] + msg.slice(key.length);
+      }
+    }
+    return msg;
+  };
   function showToast(msg){
     const t = $('toast'); if(!t) return;
-    t.textContent = msg; t.classList.add('show');
+    t.textContent = window.translateMsg(msg); t.classList.add('show');
     clearTimeout(showToast._t);
     showToast._t = setTimeout(()=>t.classList.remove('show'), 2400);
   }
+  window.showToast = showToast;
 
   // ── ACCOUNT (server-issued 13-char code) ─────────────────────────
   const ACCT_KEY = 'chessstar_acct_code';
@@ -4801,6 +4895,7 @@ function drawThumbQOC(){
     }
   };
   let currentLang = (function(){ try{ return localStorage.getItem('chessstar_lang') || 'en'; }catch(e){ return 'en'; } })();
+  window.currentLang = currentLang; // v0.06 — expose for INFO_CONTENT, toast translations
   function applyI18n(){
     const dict = I18N[currentLang] || I18N.en;
     document.querySelectorAll('[data-i18n]').forEach(el=>{
@@ -4809,9 +4904,15 @@ function drawThumbQOC(){
     });
     document.querySelectorAll('.langBtn').forEach(b=>b.classList.toggle('on', b.dataset.lang===currentLang));
   }
+  // v0.06 — translation helper for plain strings (used by toasts, dynamic text)
+  window.tr = function(key, fallback){
+    const dict = I18N[currentLang] || I18N.en;
+    return (dict && dict[key]) || (I18N.en && I18N.en[key]) || fallback || key;
+  };
   window.setLanguage = function(lang){
     if(!I18N[lang]) return;
     currentLang = lang;
+    window.currentLang = lang;
     try{ localStorage.setItem('chessstar_lang', lang); }catch(e){}
     applyI18n();
     showToast({en:'Language: English',ro:'Limba: Română',ru:'Язык: Русский'}[lang]);
@@ -4988,7 +5089,7 @@ function drawThumbQOC(){
     const aiColor = classicPlayerColor==='w' ? 'b' : 'w';
     if(ccTurn !== aiColor) return;
     const level = window.aiLevel ? window.aiLevel('enemy') : 5;
-    document.getElementById('classicMsg').textContent = '🤖 AI thinking...';
+    document.getElementById('classicMsg').textContent = window.translateMsg('🤖 AI thinking...');
     // ~3s think time so the user can read and follow what's happening
     const thinkMs = 1800 + Math.floor(Math.random()*1400);
     setTimeout(()=>{
@@ -5015,8 +5116,13 @@ function drawThumbQOC(){
     const _origCcEndMove = ccEndMove;
     window.ccEndMove = function(){
       _origCcEndMove();
+      if(!ccRunning || ccGameOver) return;
       const aiColor = classicPlayerColor==='w' ? 'b' : 'w';
-      if(ccRunning && !ccGameOver && ccTurn===aiColor) ccAiPlay();
+      if(ccTurn===aiColor){ ccAiPlay(); return; }
+      // v0.06 — if it's player's turn but they own no movable pieces (2v2/4v4), let teammate AI play
+      if(window.ccPickedTypes && !ccPlayerHasMove()){
+        setTimeout(ccTeammateAiPlay, 450);
+      }
     };
     // Replace global reference too — JS function declarations can be reassigned
     try { /* eslint-disable */ eval('ccEndMove = window.ccEndMove'); } catch(e){}
@@ -5027,9 +5133,64 @@ function drawThumbQOC(){
     window.initClassic = function(){
       _origInitClassic.apply(this, arguments);
       const aiColor = classicPlayerColor==='w' ? 'b' : 'w';
-      if(ccTurn===aiColor) setTimeout(ccAiPlay, 600);
+      if(ccTurn===aiColor){ setTimeout(ccAiPlay, 600); return; }
+      // v0.06 — if player's turn but no owned movable pieces, teammate plays first
+      if(window.ccPickedTypes && !ccPlayerHasMove()){ setTimeout(ccTeammateAiPlay, 700); }
     };
     try { eval('initClassic = window.initClassic'); } catch(e){}
+  }
+
+  // ── v0.06 — OWNERSHIP HELPERS + TEAMMATE AI (CC) ──
+  // Pawn columns derived from picked piece types (their starting file on the back rank)
+  window.PIECE_TO_FILES = {R:[0,7], N:[1,6], B:[2,5], Q:[3], K:[4]};
+  window.derivePawnFiles = function(typesArr){
+    const s = new Set();
+    (typesArr||[]).forEach(t=>(window.PIECE_TO_FILES[t]||[]).forEach(c=>s.add(c)));
+    return s;
+  };
+  window.ccPlayerOwns = function(p, c){
+    if(!p) return false;
+    if(p.c !== classicPlayerColor) return false;
+    if(!window.ccPickedTypes) return true; // 1v1 / unrestricted → own everything of your color
+    if(window.ccPickedTypes.has(p.t)) return true;
+    if(p.t === 'P' && window.ccPickedFiles && window.ccPickedFiles.has(c)) return true;
+    return false;
+  };
+  function ccPlayerHasMove(){
+    if(!window.ccPickedTypes) return true;
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const p = ccBoard[r][c];
+      if(!p || !window.ccPlayerOwns(p, c)) continue;
+      if(ccLegal(r,c).length > 0) return true;
+    }
+    return false;
+  }
+  function ccTeammateAiPlay(){
+    if(!ccRunning || ccGameOver || ccPromoting) return;
+    if(ccTurn !== classicPlayerColor) return;
+    const moves = ccGenAllLegal(classicPlayerColor).filter(m=>{
+      const p = ccBoard[m.sr][m.sc];
+      return !window.ccPlayerOwns(p, m.sc);
+    });
+    if(!moves.length) return;
+    const level = window.aiLevel ? window.aiLevel('ally') : 5;
+    const msgEl = document.getElementById('classicMsg');
+    if(msgEl) msgEl.textContent = window.translateMsg('🤝 Teammate AI thinking...');
+    const thinkMs = 1400 + Math.floor(Math.random()*900);
+    setTimeout(()=>{
+      if(!ccRunning || ccGameOver) return;
+      const scored = moves.map(m=>({ mv:m, score: ccScoreMove(m, classicPlayerColor, level) }));
+      scored.sort((a,b)=>b.score - a.score);
+      const k = level>=8 ? 1 : (level>=5 ? 2 : 4);
+      const pick = scored[Math.floor(Math.random() * Math.min(k, scored.length))].mv;
+      ccSel = { r:pick.sr, c:pick.sc };
+      ccValMoves = ccLegal(pick.sr, pick.sc);
+      setTimeout(()=>{
+        if(!ccRunning || ccGameOver) return;
+        ccDoMove(pick.sr, pick.sc, pick.dr, pick.dc, pick.mv);
+        if(ccPromoting){ ccPromote('Q'); }
+      }, 380);
+    }, thinkMs);
   }
 
   // ── AI FOR GTS (Grind The Safe) — same shape as Classic ──
@@ -5088,11 +5249,13 @@ function drawThumbQOC(){
   }
   function gtsAiPlay(){
     if(!gtsRunning || gtsGameOver || gtsPromoting) return;
-    const aiColor = 'b'; // human always plays white in GTS for now
+    // v0.06 — AI plays the OPPOSITE color of the human (gtsPlayerColor; defaults to white)
+    const myCol = window.gtsPlayerColor || 'w';
+    const aiColor = myCol === 'w' ? 'b' : 'w';
     if(gtsTurn !== aiColor) return;
     const level = window.aiLevel ? window.aiLevel('enemy') : 5;
     const msg = document.getElementById('gtsMsg');
-    if(msg) msg.textContent = '🤖 AI thinking...';
+    if(msg) msg.textContent = window.translateMsg('🤖 AI thinking...');
     const thinkMs = 1800 + Math.floor(Math.random()*1400);
     setTimeout(()=>{
       if(!gtsRunning || gtsGameOver) return;
@@ -5111,31 +5274,190 @@ function drawThumbQOC(){
       }, 380);
     }, thinkMs);
   }
+
+  // ── v0.06 — OWNERSHIP HELPERS + TEAMMATE AI (GTS) ──
+  window.gtsPlayerOwns = function(p, c){
+    if(!p) return false;
+    const my = window.gtsPlayerColor || 'w';
+    if(p.c !== my) return false;
+    if(p.t === 'SAFE') return false;
+    if(!window.gtsPickedTypes) return true;
+    if(window.gtsPickedTypes.has(p.t)) return true;
+    if(p.t === 'P' && window.gtsPickedFiles && window.gtsPickedFiles.has(c)) return true;
+    return false;
+  };
+  function gtsPlayerHasMove(){
+    if(!window.gtsPickedTypes) return true;
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const p = gtsBoard[r][c];
+      if(!p || !window.gtsPlayerOwns(p, c)) continue;
+      if(gtsGetMoves(r,c).length > 0) return true;
+    }
+    return false;
+  }
+  function gtsTeammateAiPlay(){
+    if(!gtsRunning || gtsGameOver || gtsPromoting) return;
+    const myCol = window.gtsPlayerColor || 'w';
+    if(gtsTurn !== myCol) return;
+    const moves = gtsGenAllForColor(myCol).filter(m=>{
+      const p = gtsBoard[m.sr][m.sc];
+      return !window.gtsPlayerOwns(p, m.sc);
+    });
+    if(!moves.length) return;
+    const level = window.aiLevel ? window.aiLevel('ally') : 5;
+    const msg = document.getElementById('gtsMsg');
+    if(msg) msg.textContent = window.translateMsg('🤝 Teammate AI thinking...');
+    const thinkMs = 1400 + Math.floor(Math.random()*900);
+    setTimeout(()=>{
+      if(!gtsRunning || gtsGameOver) return;
+      const scored = moves.map(m=>({ mv:m, score: gtsScoreMove(m, myCol, level) }));
+      scored.sort((a,b)=>b.score - a.score);
+      const k = level>=8 ? 1 : (level>=5 ? 2 : 4);
+      const pick = scored[Math.floor(Math.random() * Math.min(k, scored.length))].mv;
+      gtsSel = { r:pick.sr, c:pick.sc };
+      gtsValMoves = gtsGetMoves(pick.sr, pick.sc);
+      setTimeout(()=>{
+        if(!gtsRunning || gtsGameOver) return;
+        gtsDoMove(pick.sr, pick.sc, pick.dr, pick.dc, pick.mv);
+        if(gtsPromoting){ gtsPromote('Q'); }
+      }, 380);
+    }, thinkMs);
+  }
+
   // Hook AI in by wrapping gtsEndMove
   if(typeof gtsEndMove === 'function'){
     const _origGtsEndMove = gtsEndMove;
     window.gtsEndMove = function(){
       _origGtsEndMove();
-      if(gtsRunning && !gtsGameOver && gtsTurn==='b') gtsAiPlay();
+      if(!gtsRunning || gtsGameOver) return;
+      const myCol = window.gtsPlayerColor || 'w';
+      const aiCol = myCol === 'w' ? 'b' : 'w';
+      if(gtsTurn === aiCol){ gtsAiPlay(); return; }
+      // v0.06 — teammate plays if player has no owned movable pieces
+      if(window.gtsPickedTypes && !gtsPlayerHasMove()){
+        setTimeout(gtsTeammateAiPlay, 450);
+      }
     };
     try { eval('gtsEndMove = window.gtsEndMove'); } catch(e){}
   }
-  // Block clicks on AI's pieces / during AI turn (the click handler currently lacks this check)
-  const gtsCanvas = document.getElementById('gtsCanvas');
-  if(gtsCanvas){
-    gtsCanvas.addEventListener('click', function(e){
-      // Run BEFORE the original handler? We can't intercept easily — instead block by
-      // forcing gtsTurn check inside DoMove via a guard flag.
-    }, true);
+  // Also kick off AI / teammate at game start if needed
+  const _origInitGTS = window.initGTS || (typeof initGTS === 'function' ? initGTS : null);
+  if(_origInitGTS){
+    window.initGTS = function(){
+      _origInitGTS.apply(this, arguments);
+      const myCol = window.gtsPlayerColor || 'w';
+      const aiCol = myCol === 'w' ? 'b' : 'w';
+      if(gtsTurn === aiCol){ setTimeout(gtsAiPlay, 600); return; }
+      if(window.gtsPickedTypes && !gtsPlayerHasMove()){ setTimeout(gtsTeammateAiPlay, 700); }
+    };
+    try { eval('initGTS = window.initGTS'); } catch(e){}
   }
-  // Patch the existing GTS click handler by intercepting at capture phase
-  if(gtsCanvas){
-    gtsCanvas.addEventListener('mousedown', function(e){
-      if(gtsRunning && !gtsGameOver && gtsTurn === 'b'){
-        e.stopPropagation();
-        e.preventDefault();
+
+  // ── v0.06 — OWNERSHIP HELPERS + TEAMMATE AI (QOC) ──
+  window.qocPlayerOwns = function(p){
+    if(!p) return false;
+    const my = window.qocPlayerColor || 'w';
+    if(p.c !== my) return false;
+    if(typeof p.slot !== 'number') return true; // 1v1 / un-tagged
+    return p.slot === 0;
+  };
+  function qocPlayerHasMove(){
+    const my = window.qocPlayerColor || 'w';
+    if(qocTurn !== my) return false;
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const p = qocBoard[r][c];
+      if(!p || !window.qocPlayerOwns(p)) continue;
+      if(qocGetMoves(r,c).length > 0) return true;
+    }
+    return false;
+  }
+  function qocTeammateAiPlay(){
+    if(!qocRunning || qocOver) return;
+    const my = window.qocPlayerColor || 'w';
+    if(qocTurn !== my) return;
+    // Build all moves for player color but filter to non-owned (teammate slot>0)
+    const moves = [];
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const p = qocBoard[r][c];
+      if(!p || p.c !== my) continue;
+      if(window.qocPlayerOwns(p)) continue; // skip player's own pieces
+      const ms = qocGetMoves(r,c);
+      for(const m of ms) moves.push({fr:r, fc:c, m:m});
+    }
+    if(!moves.length) return;
+    // Mandatory captures rule respected globally
+    const mustCap = qocAnyCaptures(my);
+    const filtered = mustCap ? moves.filter(x=>x.m.atk) : moves;
+    const finalMoves = filtered.length ? filtered : moves;
+    const level = window.aiLevel ? window.aiLevel('ally') : 5;
+    const buff = document.getElementById('qocBuff');
+    if(buff) buff.textContent = window.translateMsg('🤝 Teammate thinking...');
+    const thinkMs = 1200 + Math.floor(Math.random()*800);
+    setTimeout(()=>{
+      if(!qocRunning || qocOver) return;
+      // Prefer captures > advances
+      finalMoves.sort((a,b)=>{
+        const sa = (a.m.atk?10:0) + Math.random()*0.5;
+        const sb = (b.m.atk?10:0) + Math.random()*0.5;
+        return sb - sa;
+      });
+      const pick = finalMoves[0];
+      qocDoMove(pick.fr, pick.fc, pick.m.r, pick.m.c, pick.m);
+      if(qocMustChain && qocTurn === my) setTimeout(qocTeammateAiPlay, 500);
+    }, thinkMs);
+  }
+  // Hook QOC end-of-move detection (qocAiTurn already exists; we observe via wrapping qocDoMove indirectly).
+  // Cleanest hook: poll after each render; instead, wrap qocDoMove to re-check after enemy AI finished.
+  if(typeof qocDoMove === 'function'){
+    const _origQocDoMove = qocDoMove;
+    window.qocDoMove = function(){
+      _origQocDoMove.apply(this, arguments);
+      if(!qocRunning || qocOver) return;
+      const my = window.qocPlayerColor || 'w';
+      // After any move, if it's the player's turn but they have no owned-piece moves, teammate plays
+      if(qocTurn === my && window.qocSlotsActive && !qocPlayerHasMove()){
+        // Only trigger when there exist teammate pieces with moves
+        let teammateCanMove = false;
+        for(let r=0;r<8 && !teammateCanMove;r++) for(let c=0;c<8 && !teammateCanMove;c++){
+          const p = qocBoard[r][c];
+          if(p && p.c === my && !window.qocPlayerOwns(p) && qocGetMoves(r,c).length>0) teammateCanMove = true;
+        }
+        if(teammateCanMove) setTimeout(qocTeammateAiPlay, 500);
       }
-    }, true);
+    };
+    try { eval('qocDoMove = window.qocDoMove'); } catch(e){}
+  }
+  // Wrap initQOC to tag pieces with slot index based on column partition + player color
+  const _origInitQOC = window.initQOC || (typeof initQOC === 'function' ? initQOC : null);
+  if(_origInitQOC){
+    window.initQOC = function(){
+      _origInitQOC.apply(this, arguments);
+      const my = window.qocPlayerColor || 'w';
+      if(window.qocSlotsActive){
+        const n = window.qocSlotCount || 2;
+        // Partition columns into n equal groups; player slot 0 = leftmost group from PLAYER's perspective.
+        // Since black appears at top (rows 0-2) and white at bottom (rows 5-7), use absolute columns 0..7
+        // and assign slot = floor(col / (8/n)). Player gets slot 0 (leftmost columns).
+        const colWidth = 8 / n;
+        for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+          const p = qocBoard[r][c];
+          if(p && p.c === my) p.slot = Math.floor(c / colWidth);
+          else if(p) {
+            // Tag enemy pieces too with mirrored slots so AI can scope team allocations symmetrically
+            p.slot = Math.floor(c / colWidth);
+          }
+        }
+        // Kick off teammate if player has no moves at start
+        if(qocTurn === my && !qocPlayerHasMove()){
+          setTimeout(qocTeammateAiPlay, 700);
+        }
+      } else {
+        for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+          const p = qocBoard[r][c]; if(p) delete p.slot;
+        }
+      }
+    };
+    try { eval('initQOC = window.initQOC'); } catch(e){}
   }
 
   // ── PRE-GAME PIECE PICKER (2v2 = pick 2, 4v4 = pick 1 — your slot in the team) ──
@@ -5146,11 +5468,17 @@ function drawThumbQOC(){
     prePickAfter = onConfirm;
     const need = mode==='2v2' ? 2 : (mode==='4v4' ? 1 : 1);
     const sub = document.getElementById('prePickSub');
-    if(sub) sub.textContent = mode==='2v2'
-      ? 'Pick the 2 pieces your team will use this match.'
-      : (mode==='4v4' ? 'Pick the 1 piece YOUR slot will play (3 teammates pick separately).'
-                     : 'Pick the piece you want to play.');
-    document.getElementById('prePickCount').textContent = '0 / '+need+' selected';
+    // v0.06 — localized subtitles
+    const lang = window.currentLang || 'en';
+    const SUBS = {
+      en: { '2v2':'Pick the 2 pieces your team will use this match.', '4v4':'Pick the 1 piece YOUR slot will play (3 teammates pick separately).', def:'Pick the piece you want to play.' },
+      ro: { '2v2':'Alege cele 2 piese pe care echipa ta le va folosi în acest meci.', '4v4':'Alege 1 piesă pe care SLOT-UL TĂU o va juca (3 colegi aleg separat).', def:'Alege piesa pe care vrei s-o joci.' },
+      ru: { '2v2':'Выбери 2 фигуры, которые твоя команда будет использовать в этом матче.', '4v4':'Выбери 1 фигуру, которой будет играть ТВОЙ слот (3 союзника выбирают отдельно).', def:'Выбери фигуру, которой хочешь играть.' }
+    };
+    const dict = SUBS[lang] || SUBS.en;
+    if(sub) sub.textContent = mode==='2v2' ? dict['2v2'] : (mode==='4v4' ? dict['4v4'] : dict.def);
+    const SELECTED = { en:' selected', ro:' selectate', ru:' выбрано' };
+    document.getElementById('prePickCount').textContent = '0 / '+need+(SELECTED[lang]||SELECTED.en);
     // Refresh locks
     const wins = window.totalWins || 0;
     document.querySelectorAll('.ppCard').forEach(card=>{
@@ -5173,7 +5501,9 @@ function drawThumbQOC(){
       const p = card.getAttribute('data-pc');
       card.classList.toggle('on', prePickSel.includes(p));
     });
-    document.getElementById('prePickCount').textContent = prePickSel.length+' / '+need+' selected';
+    const _lang = window.currentLang || 'en';
+    const _SEL = { en:' selected', ro:' selectate', ru:' выбрано' };
+    document.getElementById('prePickCount').textContent = prePickSel.length+' / '+need+(_SEL[_lang]||_SEL.en);
     document.getElementById('ppGo').disabled = prePickSel.length !== need;
   };
   window.closePrePick = function(){
@@ -5188,16 +5518,56 @@ function drawThumbQOC(){
     if(cb) cb(prePickSel.slice());
     prePickSel = [];
   };
-  // Wrap startSelectedEvent — for 2v2 / 4v4 modes, show the picker first
+  // Wrap startSelectedEvent — for 2v2 / 4v4 modes, show the picker first.
+  // v0.06 — also sets per-event ownership state (CC/GTS picked types + pawn files; QOC slot partition).
   const _origStart = window.startSelectedEvent;
   if(_origStart){
     window.startSelectedEvent = function(){
       const mode = window.currentMode || '1v1';
-      if(mode==='1v1' || currentEvent==='lps'){
+      // Reset all ownership state — anything set below applies only to this match
+      window.ccPickedTypes = null;
+      window.ccPickedFiles = null;
+      window.gtsPickedTypes = null;
+      window.gtsPickedFiles = null;
+      window.qocSlotsActive = false;
+      window.qocSlotCount = 1;
+
+      if(mode === '1v1' || currentEvent === 'lps'){
         // LPS already has its own piece picker; 1v1 doesn't need a team picker
         return _origStart();
       }
+
+      if(currentEvent === 'qoc'){
+        // QOC: no piece-type picker (all checker pieces are the same type) — auto-partition by column.
+        // 2v2 → 2 slots (player gets left half); 4v4 → 4 slots (player gets leftmost quarter).
+        window.qocSlotsActive = true;
+        window.qocSlotCount = (mode === '2v2') ? 2 : 4;
+        return _origStart();
+      }
+
+      // CC / GTS — show the piece-type picker, then derive ownership rules
       window.openPrePick(mode, (picks)=>{
+        let typesArr = (picks || []).slice();
+
+        // CC special rule: King and Queen are coupled — picking either includes the other (no extra cost)
+        if(currentEvent === 'classic'){
+          const hasK = typesArr.includes('K');
+          const hasQ = typesArr.includes('Q');
+          if(hasK && !hasQ) typesArr.push('Q');
+          else if(hasQ && !hasK) typesArr.push('K');
+        }
+
+        const types = new Set(typesArr);
+        const files = window.derivePawnFiles(typesArr);
+
+        if(currentEvent === 'classic'){
+          window.ccPickedTypes = types;
+          window.ccPickedFiles = files;
+        } else if(currentEvent === 'gts'){
+          window.gtsPickedTypes = types;
+          window.gtsPickedFiles = files;
+        }
+
         window.teamPicks = picks;
         _origStart();
       });
