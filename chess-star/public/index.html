@@ -345,17 +345,35 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .catCardName{font-size:8px;color:#f1c40f;font-weight:bold;text-align:center;line-height:1.2;}
 
 /* LOADING */
-#loadingScreen{justify-content:space-between;align-items:center;padding-top:20px;padding-bottom:0;}
-#load3dC{display:block;}
-#loadBottom{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:0;position:absolute;left:0;right:0;top:75%;transform:translateY(-50%);}
-#loadBarWrap{width:220px;height:22px;background:#1a0800;border:2px solid #3e2000;border-radius:11px;overflow:visible;position:relative;}
-#loadFill{height:100%;width:0%;background:linear-gradient(90deg,#b8860b,#f1c40f,#fff8a0);border-radius:11px;position:relative;transition:width .28s linear;}
-#loadPawnEl{position:absolute;top:-18px;left:0%;transform:translateX(-50%);pointer-events:none;transition:left .28s linear;z-index:5;}
-#loadPct{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:bold;color:#fff;text-shadow:1px 1px 2px #000;white-space:nowrap;z-index:2;pointer-events:none;}
-#loadMsg{font-size:10px;color:#a08060;letter-spacing:2px;}
+#loadingScreen{justify-content:space-between;align-items:center;padding-top:20px;padding-bottom:0;background:url('/images/loading-screen.png') center/cover no-repeat, #0a0500;}
+#load3dC{display:none;}
+#loadBottom{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:0;position:absolute;left:0;right:0;bottom:60px;}
+#loadBarWrap{width:260px;height:24px;background:rgba(26,8,0,0.85);border:2px solid #f1c40f;border-radius:12px;overflow:visible;position:relative;box-shadow:0 0 20px rgba(241,196,15,0.4);}
+#loadFill{height:100%;width:0%;background:linear-gradient(90deg,#b8860b,#f1c40f,#fff8a0);border-radius:12px;position:relative;transition:width .28s linear;}
+#loadPawnEl{position:absolute;top:-20px;left:0%;transform:translateX(-50%);pointer-events:none;transition:left .28s linear;z-index:5;}
+#loadPct{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:bold;color:#fff;text-shadow:1px 1px 3px #000;white-space:nowrap;z-index:2;pointer-events:none;}
+#loadMsg{font-size:11px;color:#f1c40f;letter-spacing:2px;text-shadow:0 0 8px rgba(241,196,15,0.5);}
+
+/* v0.07 — INITIAL SPLASH (app launch splash) */
+#initSplashScreen{position:fixed;inset:0;background:url('/images/loading-screen.png') center/cover no-repeat, #0a0500;z-index:500;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:100px;}
+#initSplashText{font-size:14px;color:#f1c40f;letter-spacing:3px;font-weight:bold;text-shadow:0 0 15px rgba(241,196,15,0.8);animation:initPulse 1.5s ease-in-out infinite;}
+@keyframes initPulse{0%,100%{opacity:0.6}50%{opacity:1}}
+
+/* v0.07 — MATCHMAKING SCREEN (player search before game) */
+#matchmakingScreen{position:fixed;inset:0;background:url('/images/loading-screen.png') center/cover no-repeat, #0a0500;z-index:250;display:none;flex-direction:column;justify-content:center;align-items:center;}
+#matchmakingScreen.show{display:flex;}
+#mmBox{background:rgba(10,5,0,0.9);border:3px solid #f1c40f;border-radius:14px;padding:24px 32px;text-align:center;box-shadow:0 0 40px rgba(241,196,15,0.5);}
+#mmTitle{font-size:16px;color:#f1c40f;font-weight:bold;letter-spacing:3px;margin-bottom:8px;}
+#mmEvent{font-size:12px;color:#c8a060;letter-spacing:2px;margin-bottom:16px;}
+#mmPlayers{font-size:28px;color:#fff;font-weight:bold;font-family:Georgia,serif;margin-bottom:8px;}
+#mmPlayersLabel{font-size:10px;color:#a08060;letter-spacing:2px;margin-bottom:16px;}
+#mmTimer{font-size:12px;color:#4caf50;letter-spacing:1px;margin-bottom:12px;}
+#mmStatus{font-size:11px;color:#a08060;letter-spacing:1px;}
+#mmSpinner{width:40px;height:40px;border:3px solid rgba(241,196,15,0.2);border-top-color:#f1c40f;border-radius:50%;animation:mmSpin 1s linear infinite;margin:16px auto 0;}
+@keyframes mmSpin{to{transform:rotate(360deg)}}
 
 /* SPLASH */
-#splashScreen{justify-content:center;align-items:center;background:rgba(0,0,0,.93);z-index:40;}
+#splashScreen{justify-content:center;align-items:center;background:url('/images/loading-screen.png') center/cover no-repeat, rgba(0,0,0,.85);z-index:40;}
 #splashTitle{font-size:26px;font-weight:900;color:#f1c40f;text-align:center;letter-spacing:3px;text-shadow:0 0 30px rgba(241,196,15,.8),3px 3px 0 #3e1a00;font-family:'Georgia',serif;opacity:0;}
 #splashSub{font-size:14px;color:#c8a060;letter-spacing:3px;margin-top:14px;opacity:0;font-weight:bold;min-height:20px;}
 
@@ -619,6 +637,24 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 </style>
 </head>
 <body>
+<!-- v0.07 — Initial Splash Screen (appears on app launch) -->
+<div id="initSplashScreen">
+  <div id="initSplashText">LOADING CHESS STAR...</div>
+</div>
+
+<!-- v0.07 — Matchmaking Screen (player search) -->
+<div id="matchmakingScreen">
+  <div id="mmBox">
+    <div id="mmTitle">FINDING PLAYERS</div>
+    <div id="mmEvent">Last Piece Standing • 1v1</div>
+    <div id="mmPlayers">0 / 2</div>
+    <div id="mmPlayersLabel">PLAYERS FOUND</div>
+    <div id="mmTimer">Searching... 5s</div>
+    <div id="mmStatus">Looking for real players...</div>
+    <div id="mmSpinner"></div>
+  </div>
+</div>
+
 <div id="root">
 
 <!-- MENU -->
@@ -1205,6 +1241,155 @@ let catFilterMode = 'all';
 const PROF_COLORS = ['#3498db','#2ecc71','#e74c3c','#f1c40f','#ffffff','#aaaaaa','#9b59b6'];
 const PIECE_NAMES = {P:'Pawn', N:'Knight', B:'Bishop', R:'Rook', Q:'Queen', K:'King'};
 
+// ═══════════════════════════════════════════
+// v0.07 — SKILL COMPARTMENT SYSTEM
+// AI difficulty adapts based on player's recent wins/losses
+// Level 1-10: higher = smarter AI
+// ═══════════════════════════════════════════
+let skillLevel = parseInt(localStorage.getItem('chessstar_skill_level') || '5', 10);
+function loadSkillLevel() {
+  try { skillLevel = parseInt(localStorage.getItem('chessstar_skill_level') || '5', 10); } catch(e) { skillLevel = 5; }
+  skillLevel = Math.max(1, Math.min(10, skillLevel));
+}
+function saveSkillLevel() {
+  localStorage.setItem('chessstar_skill_level', String(skillLevel));
+}
+function adjustSkillOnWin() {
+  skillLevel = Math.min(10, skillLevel + 1);
+  saveSkillLevel();
+}
+function adjustSkillOnLoss() {
+  skillLevel = Math.max(1, skillLevel - 1);
+  saveSkillLevel();
+}
+loadSkillLevel();
+
+// v0.07 — Enhanced AI level function that uses skill compartment
+window.getSkillBasedAILevel = function(role) {
+  let base = skillLevel;
+  // Add some variance so it's not deterministic
+  const variance = Math.floor(Math.random() * 2) - 1; // -1, 0, or 1
+  base = Math.max(1, Math.min(10, base + variance));
+  // Allies slightly easier, enemies slightly harder
+  if (role === 'ally') base = Math.max(1, base - 1);
+  if (role === 'enemy') base = Math.min(10, base + 1);
+  return base;
+};
+
+// ═══════════════════════════════════════════
+// v0.07 — INITIAL SPLASH SCREEN (on app launch)
+// ═══════════════════════════════════════════
+let initSplashDismissed = false;
+function dismissInitSplash() {
+  if (initSplashDismissed) return;
+  initSplashDismissed = true;
+  const splash = document.getElementById('initSplashScreen');
+  if (splash) {
+    splash.style.transition = 'opacity 0.5s';
+    splash.style.opacity = '0';
+    setTimeout(() => { splash.style.display = 'none'; }, 500);
+  }
+}
+// Auto-dismiss after 2 seconds
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(dismissInitSplash, 2000);
+});
+
+// ═══════════════════════════════════════════
+// v0.07 — MATCHMAKING SCREEN (5 second player search)
+// Shows "X/Y players found" and falls back to AI if no humans
+// ═══════════════════════════════════════════
+let matchmakingActive = false;
+let matchmakingTimeout = null;
+let matchmakingCallback = null;
+let matchmakingFoundPlayers = 0;
+let matchmakingNeeded = 2;
+
+function showMatchmaking(eventName, mode, neededPlayers, onComplete) {
+  matchmakingActive = true;
+  matchmakingCallback = onComplete;
+  matchmakingFoundPlayers = 1; // Player themselves
+  matchmakingNeeded = neededPlayers;
+  
+  const screen = document.getElementById('matchmakingScreen');
+  const titleEl = document.getElementById('mmTitle');
+  const eventEl = document.getElementById('mmEvent');
+  const playersEl = document.getElementById('mmPlayers');
+  const timerEl = document.getElementById('mmTimer');
+  const statusEl = document.getElementById('mmStatus');
+  
+  if (titleEl) titleEl.textContent = 'FINDING PLAYERS';
+  if (eventEl) eventEl.textContent = eventName + ' • ' + mode;
+  if (playersEl) playersEl.textContent = '1 / ' + neededPlayers;
+  if (timerEl) timerEl.textContent = 'Searching... 5s';
+  if (statusEl) statusEl.textContent = 'Looking for real players...';
+  
+  screen.classList.add('show');
+  
+  let countdown = 5;
+  let interval = setInterval(() => {
+    countdown--;
+    if (timerEl) timerEl.textContent = 'Searching... ' + countdown + 's';
+    
+    // Simulate finding players (in real multiplayer this would come from server)
+    // For now, we simulate no players found
+    if (countdown <= 0) {
+      clearInterval(interval);
+      if (matchmakingFoundPlayers < matchmakingNeeded) {
+        // No humans found - play with AI
+        if (statusEl) statusEl.textContent = 'No players found — playing with AI (Skill Level ' + skillLevel + ')';
+        if (timerEl) timerEl.textContent = 'Starting with AI...';
+        setTimeout(() => {
+          hideMatchmaking();
+          if (matchmakingCallback) matchmakingCallback(true); // true = AI mode
+        }, 1200);
+      } else {
+        // Found players
+        if (statusEl) statusEl.textContent = 'Match found!';
+        setTimeout(() => {
+          hideMatchmaking();
+          if (matchmakingCallback) matchmakingCallback(false); // false = human players
+        }, 800);
+      }
+    }
+  }, 1000);
+  
+  matchmakingTimeout = interval;
+}
+
+function hideMatchmaking() {
+  matchmakingActive = false;
+  const screen = document.getElementById('matchmakingScreen');
+  if (screen) screen.classList.remove('show');
+  if (matchmakingTimeout) {
+    clearInterval(matchmakingTimeout);
+    matchmakingTimeout = null;
+  }
+}
+
+// ═══════════════════════════════════════════
+// v0.07 — PLAYER INACTIVITY AUTO-MOVE (7.5 seconds)
+// If player doesn't move, AI teammate makes a move
+// ═══════════════════════════════════════════
+let inactivityTimer = null;
+let inactivityCallback = null;
+
+function startInactivityTimer(onTimeout) {
+  clearInactivityTimer();
+  inactivityCallback = onTimeout;
+  inactivityTimer = setTimeout(() => {
+    if (inactivityCallback) inactivityCallback();
+  }, 7500);
+}
+
+function clearInactivityTimer() {
+  if (inactivityTimer) {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = null;
+  }
+  inactivityCallback = null;
+}
+
 // FIX 1: Persist profile + skins so they DON'T reset between games or sessions
 function loadPersisted(){
   try {
@@ -1285,14 +1470,31 @@ function confirmEv() {
 }
 
 function startSelectedEvent() {
-  // FIX (new batch): event splash now happens OVER the game board, not on a separate screen
-  if(currentEvent==='lps') goTo('selectScreen');
-  else if(currentEvent==='classic')
-    startLoading('Classic Chess',()=>showColorRand(()=>{ initClassic(); showEventOverlay('classicEvOverlay','CLASSIC CHESS'); }));
-  else if(currentEvent==='gts')
-    startLoading('Grind The Safe',()=>{ initGTS(); showEventOverlay('gtsEvOverlay','GRIND THE SAFE'); });
-  else if(currentEvent==='qoc')
-    startLoading('Queens On Color',()=>{ initQOC(); showEventOverlay('qocEvOverlay','QUEENS ON COLOR'); });
+  // v0.07 — Show matchmaking screen first for non-LPS events
+  const EVENT_LABELS = {
+    lps: 'Last Piece Standing',
+    classic: 'Classic Chess',
+    qoc: 'Queens On Color',
+    gts: 'Grind The Safe'
+  };
+  const mode = window.currentMode || '1v1';
+  const neededPlayers = mode === '1v1' ? 2 : (mode === '2v2' ? 4 : 8);
+  
+  if(currentEvent==='lps') {
+    // LPS has its own piece picker flow
+    goTo('selectScreen');
+  } else {
+    // Show matchmaking screen for 5 seconds, then start with AI
+    showMatchmaking(EVENT_LABELS[currentEvent] || 'Game', mode, neededPlayers, (isAIMode) => {
+      // After matchmaking, show loading and start game
+      if(currentEvent==='classic')
+        startLoading('Classic Chess',()=>showColorRand(()=>{ initClassic(); showEventOverlay('classicEvOverlay','CLASSIC CHESS'); }));
+      else if(currentEvent==='gts')
+        startLoading('Grind The Safe',()=>{ initGTS(); showEventOverlay('gtsEvOverlay','GRIND THE SAFE'); });
+      else if(currentEvent==='qoc')
+        startLoading('Queens On Color',()=>{ initQOC(); showEventOverlay('qocEvOverlay','QUEENS ON COLOR'); });
+    });
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -2238,8 +2440,18 @@ function paintParticles(ctx,arr){
 // ═══════════════════════════════════════════
 function launchLPS(type){
   lpsChosenType=type;
-  // FIX (new batch): event splash now appears OVER the LPS board (not on a separate screen)
-  startLoading('Last Piece Standing',()=>{ initLPS(type); showEventOverlay('lpsEvOverlay','LAST PIECE STANDING'); });
+  // v0.07 — Show matchmaking screen first
+  const mode = window.currentMode || '1v1';
+  const neededPlayers = mode === '1v1' ? 6 : (mode === '2v2' ? 4 : 8);
+  
+  showMatchmaking('Last Piece Standing', mode, neededPlayers, (isAIMode) => {
+    // After matchmaking, show loading and start game
+    // v0.07 FIX: AI only starts AFTER the overlay countdown finishes
+    startLoading('Last Piece Standing',()=>{ 
+      initLPS(type); 
+      showEventOverlay('lpsEvOverlay','LAST PIECE STANDING', lpsStartAIAfterOverlay); 
+    });
+  });
 }
 function lpsGoMenu(){
   lpsRunning=false;
@@ -2292,12 +2504,16 @@ function initLPS(type){
   const aliveNow=lpsAlive();
   lpsTurn=aliveNow[Math.floor(Math.random()*aliveNow.length)];
   document.getElementById('lpsTurnNum').textContent=lpsTurn+1;
-  // v0.04 — if first turn falls on an AI slot, kick it off
-  if(lpsTurn!==0) setTimeout(lpsAiTurn, 600);
+  // v0.07 FIX: Don't start AI here - wait for overlay to finish (handled via lpsStartAIAfterOverlay)
   document.getElementById('lpsShieldTxt').textContent='🛡 Shield active';
   goTo('lpsScreen');
   lpsRunning=true;
   requestAnimationFrame(lpsLoop);
+}
+
+// v0.07 — Called after event overlay finishes to start AI if needed
+function lpsStartAIAfterOverlay() {
+  if(lpsTurn!==0 && lpsRunning) setTimeout(lpsAiTurn, 600);
 }
 
 function initLPSStandard(type){
@@ -2493,11 +2709,36 @@ function lpsNextTurn(){
   if(lpsTurn!==0 && lpsRunning) setTimeout(lpsAiTurn, 380);
 }
 
-// v0.04 — AI control for LPS slots 1..N (human is always slot 0).
-// Picks a move with bias depending on the adaptive AI level.
+// v0.07 — ENHANCED AI control for LPS (smarter, threat-aware, adaptive)
+// Uses skill compartment level + enhanced scoring
 function lpsAiTurn(){
   if(!lpsRunning || lpsTurn===0) return;
-  const level = (window.aiLevel ? window.aiLevel('enemy') : 5);
+  // v0.07: Use skill-based level
+  const level = window.getSkillBasedAILevel ? window.getSkillBasedAILevel('enemy') : (window.aiLevel ? window.aiLevel('enemy') : 5);
+  
+  // v0.07 — Helper: check if a square is threatened by any enemy
+  function isSquareThreatened(x, y, myPlayer) {
+    for(let ey=0; ey<8; ey++) for(let ex=0; ex<8; ex++){
+      const enemy = lpsBoard[ey][ex];
+      if(!enemy || enemy.player === myPlayer) continue;
+      const enemyMoves = lpsGetMoves(ex, ey);
+      if(enemyMoves.some(m => m.x === x && m.y === y && m.atk)) return true;
+    }
+    return false;
+  }
+  
+  // v0.07 — Helper: count how many enemies can reach a square
+  function countThreats(x, y, myPlayer) {
+    let threats = 0;
+    for(let ey=0; ey<8; ey++) for(let ex=0; ex<8; ex++){
+      const enemy = lpsBoard[ey][ex];
+      if(!enemy || enemy.player === myPlayer) continue;
+      const enemyMoves = lpsGetMoves(ex, ey);
+      if(enemyMoves.some(m => m.x === x && m.y === y && m.atk)) threats++;
+    }
+    return threats;
+  }
+  
   // Collect all of this player's pieces and their candidate moves
   const moves = [];
   for(let y=0;y<8;y++) for(let x=0;x<8;x++){
@@ -2505,16 +2746,48 @@ function lpsAiTurn(){
     if(!p || p.player!==lpsTurn) continue;
     const mv = lpsGetMoves(x,y);
     for(const m of mv){
-      let score = Math.random()*0.25;
-      if(m.atk) score += (level>=5 ? 1.0 : 0.45);
-      // Hunt the human first when we feel pro
-      if(m.atk && lpsBoard[m.y] && lpsBoard[m.y][m.x] && lpsBoard[m.y][m.x].player===0 && level>=6) score += 0.6;
-      // Avoid stepping into poison (lower-level AI more careless)
-      if(lpsPoison(m.x, m.y)) score -= (level>=4 ? 0.7 : 0.2);
-      // Skip into shielded enemy = wasted turn → low priority
-      if(m.atk && lpsBoard[m.y] && lpsBoard[m.y][m.x] && lpsBoard[m.y][m.x].shield && level>=3) score -= 0.5;
-      // Lower-level AI is passive: prefer non-capture
+      let score = Math.random()*0.15; // Reduced randomness for smarter play
+      
+      // v0.07 — ENHANCED SCORING
+      
+      // 1. Captures are valuable
+      if(m.atk) score += (level>=5 ? 1.2 : 0.5);
+      
+      // 2. Hunt the human player (target player 0)
+      if(m.atk && lpsBoard[m.y] && lpsBoard[m.y][m.x] && lpsBoard[m.y][m.x].player===0) {
+        score += (level>=6 ? 0.8 : 0.3);
+      }
+      
+      // 3. Avoid stepping into poison (smarter at higher levels)
+      if(lpsPoison(m.x, m.y)) score -= (level>=4 ? 1.0 : 0.3);
+      
+      // 4. Don't attack shielded enemies (wasted turn)
+      if(m.atk && lpsBoard[m.y] && lpsBoard[m.y][m.x] && lpsBoard[m.y][m.x].shield) {
+        score -= (level>=3 ? 0.8 : 0.2);
+      }
+      
+      // 5. v0.07 NEW: Avoid moving to threatened squares (self-preservation)
+      if(level >= 4 && isSquareThreatened(m.x, m.y, lpsTurn)) {
+        const threatCount = countThreats(m.x, m.y, lpsTurn);
+        score -= 0.3 * threatCount;
+      }
+      
+      // 6. v0.07 NEW: If currently threatened, prioritize escaping
+      if(level >= 5 && isSquareThreatened(x, y, lpsTurn)) {
+        if(!isSquareThreatened(m.x, m.y, lpsTurn)) {
+          score += 0.5; // Bonus for escaping danger
+        }
+      }
+      
+      // 7. v0.07 NEW: Prefer center positions (strategic control)
+      if(level >= 6) {
+        const centerDist = Math.abs(m.x - 3.5) + Math.abs(m.y - 3.5);
+        score += (7 - centerDist) * 0.05; // Closer to center = better
+      }
+      
+      // 8. Lower-level AI is passive
       if(level<=3 && m.atk && Math.random()<0.55) score -= 0.6;
+      
       moves.push({sx:x, sy:y, dx:m.x, dy:m.y, score});
     }
   }
@@ -2528,7 +2801,8 @@ function lpsAiTurn(){
     return;
   }
   moves.sort((a,b)=>b.score-a.score);
-  const k = level>=8 ? 1 : (level>=5 ? 2 : (level>=3 ? 4 : 6));
+  // v0.07: Higher level = more deterministic (picks from top moves)
+  const k = level>=8 ? 1 : (level>=6 ? 2 : (level>=4 ? 3 : 5));
   const pool = moves.slice(0, Math.min(k, moves.length));
   const ch = pool[Math.floor(Math.random()*pool.length)];
   // Light highlight so the player sees what's happening
@@ -2563,6 +2837,9 @@ function lpsEnd(alive){
   document.getElementById('lpsKills').textContent=lpsStats.kills;
   document.getElementById('lpsKillerTxt').textContent=won?'Nobody':lpsStats.killer;
   document.getElementById('lpsEndOverlay').classList.add('show');
+  // v0.07 — Adjust skill level based on result
+  if(won) adjustSkillOnWin();
+  else adjustSkillOnLoss();
 }
 
 function lpsUpdate(){
