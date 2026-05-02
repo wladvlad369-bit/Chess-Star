@@ -207,6 +207,13 @@ function createPgStorage(databaseUrl) {
       );
       return r.rows.map(rowToAccount);
     },
+    async leaderboard(limit) {
+      const r = await pool.query(
+        "SELECT * FROM chess_accounts ORDER BY wins DESC LIMIT $1",
+        [limit],
+      );
+      return r.rows.map(rowToAccount);
+    },
   };
 }
 
