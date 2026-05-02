@@ -456,6 +456,16 @@ app.post("/api/account/replay", async (req, res, next) => {
   }
 });
 
+app.get("/api/leaderboard", async (req, res, next) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 100, 100);
+    const rows = await storage.leaderboard(limit);
+    res.json({ players: rows.map((a, i) => ({ rank: i + 1, code: a.code, name: a.name, color: a.color, wins: a.wins })) });
+  } catch (e) {
+    next(e);
+  }
+});
+
 // SPA fallback
 app.get(/^(?!\/api\/).*/, (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
