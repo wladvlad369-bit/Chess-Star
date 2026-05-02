@@ -616,6 +616,27 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #toast{position:absolute;left:50%;top:80px;transform:translateX(-50%);background:rgba(20,8,0,.95);border:2px solid #f1c40f;color:#f1c40f;padding:8px 14px;border-radius:6px;font-size:11px;font-weight:bold;letter-spacing:1px;z-index:300;display:none;}
 #toast.show{display:block;animation:toastIn .3s ease-out;}
 @keyframes toastIn{from{transform:translate(-50%,-12px);opacity:0;}to{transform:translateX(-50%);opacity:1;}}
+
+/* v0.06 — Castle loading screen */
+#loadingScreen{overflow:hidden;}
+#loadCastleImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s;pointer-events:none;z-index:0;}
+#loadCastleImg.show{opacity:1;}
+#loadCastleVignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,.15) 0%,rgba(0,0,0,.72) 100%);z-index:1;pointer-events:none;}
+#load3dC{position:relative;z-index:2;}
+#loadBottom{z-index:3;}
+
+/* v0.06 — Matchmaking overlay */
+#matchmakingOverlay{position:absolute;inset:0;background:rgba(0,0,0,.78);z-index:92;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;backdrop-filter:blur(4px);}
+#matchmakingOverlay.show{display:flex;}
+#mmTitle{font-size:22px;font-weight:900;color:#f1c40f;letter-spacing:5px;font-family:'Georgia',serif;text-shadow:0 0 24px rgba(241,196,15,.75),2px 2px 0 #3e1a00;}
+#mmSpinner{width:38px;height:38px;border:3px solid #3e2000;border-top-color:#f1c40f;border-radius:50%;animation:mmSpin .8s linear infinite;}
+@keyframes mmSpin{to{transform:rotate(360deg)}}
+#mmPlayerRow{display:flex;align-items:center;gap:10px;background:rgba(20,8,0,.7);border:1px solid #5d4037;border-radius:10px;padding:10px 20px;}
+#mmPlayerIco{font-size:26px;}
+#mmPlayerCount{font-size:32px;font-weight:900;color:#f1c40f;min-width:28px;text-align:center;}
+#mmPlayerLabel{font-size:10px;color:#a08060;letter-spacing:1px;line-height:1.4;}
+#mmCountdown{font-size:10px;color:#888;letter-spacing:2px;}
+#mmSub{font-size:10px;color:#c8a060;letter-spacing:3px;}
 </style>
 </head>
 <body>
@@ -822,6 +843,8 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 
 <!-- LOADING -->
 <div id="loadingScreen" class="screen">
+  <img id="loadCastleImg" src="/loading-castle.jpg" alt="" onerror="this.style.display='none'">
+  <div id="loadCastleVignette"></div>
   <canvas id="load3dC" width="340" height="265"></canvas>
   <div id="loadBottom">
     <div id="loadBarWrap">
@@ -1186,6 +1209,19 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
       <button id="tcSendBtn" onclick="tcSend()">→</button>
     </div>
   </div>
+</div>
+
+<!-- v0.06 — MATCHMAKING OVERLAY (shown before AI games start, 5s countdown then AI fills) -->
+<div id="matchmakingOverlay">
+  <div id="mmTitle">SEARCHING...</div>
+  <div id="mmSpinner"></div>
+  <div id="mmPlayerRow">
+    <span id="mmPlayerIco">♟</span>
+    <span id="mmPlayerCount">1</span>
+    <span id="mmPlayerLabel">PLAYER<br>ONLINE</span>
+  </div>
+  <div id="mmSub">FINDING A MATCH</div>
+  <div id="mmCountdown">AI fills in <span id="mmCountSecs">5</span>s...</div>
 </div>
 
 </div><!-- #root -->
@@ -2103,6 +2139,9 @@ function drawLoad3D(ctx,angle){
 
 function startLoading(evName,onDone){
   goTo('loadingScreen');
+  // v0.06 — show castle image background
+  const castleImg=document.getElementById('loadCastleImg');
+  if(castleImg){ castleImg.classList.remove('show'); requestAnimationFrame(()=>requestAnimationFrame(()=>castleImg.classList.add('show'))); }
   const lc=document.getElementById('load3dC'),lx=lc.getContext('2d');
   const fill=document.getElementById('loadFill');
   const pawnEl=document.getElementById('loadPawnEl');
@@ -2192,15 +2231,18 @@ function showColorRand(onDone){
   let flips=0;
   const iv=setInterval(()=>{
     const isW=flips%2===0;
-    pe.textContent=isW?'♙':'♟';
-    pe.style.color=isW?'#f5f0dc':'#2a1a08';
+    // v0.06 — always use filled pawn ♟ for both sides; white=bright white, black=visible gray
+    pe.textContent='♟';
+    pe.style.color=isW?'#ffffff':'#888888';
+    pe.style.textShadow=isW?'0 0 18px rgba(255,255,255,.6)':'0 0 10px rgba(180,180,180,.35)';
     flips++;
     if(flips>=20){
       clearInterval(iv);
       classicPlayerColor=Math.random()<.5?'w':'b';
-      pe.textContent=classicPlayerColor==='w'?'♙':'♟';
-      pe.style.color=classicPlayerColor==='w'?'#f5f0dc':'#2a1a08';
-      re.style.cssText='font-size:17px;font-weight:bold;color:'+(classicPlayerColor==='w'?'#f0e8cc':'#a0a0a0')+';margin-top:12px;';
+      pe.textContent='♟';
+      pe.style.color=classicPlayerColor==='w'?'#ffffff':'#aaaaaa';
+      pe.style.textShadow=classicPlayerColor==='w'?'0 0 22px rgba(255,255,255,.8)':'0 0 12px rgba(160,160,160,.5)';
+      re.style.cssText='font-size:17px;font-weight:bold;color:'+(classicPlayerColor==='w'?'#f0e8cc':'#c0c0c0')+';margin-top:12px;';
       re.textContent=classicPlayerColor==='w'?'WHITE — YOU GO FIRST':'BLACK — YOU GO SECOND';
       su.style.cssText='font-size:10px;color:#a08060;margin-top:8px;';
       su.textContent='Starting in 2 seconds...';
@@ -2238,8 +2280,8 @@ function paintParticles(ctx,arr){
 // ═══════════════════════════════════════════
 function launchLPS(type){
   lpsChosenType=type;
-  // FIX (new batch): event splash now appears OVER the LPS board (not on a separate screen)
-  startLoading('Last Piece Standing',()=>{ initLPS(type); showEventOverlay('lpsEvOverlay','LAST PIECE STANDING'); });
+  // v0.06 — AI first kick happens in the overlay's onDone callback, preventing AI moving under the countdown
+  startLoading('Last Piece Standing',()=>{ initLPS(type); showEventOverlay('lpsEvOverlay','LAST PIECE STANDING',()=>{ if(lpsTurn!==0 && lpsRunning) setTimeout(lpsAiTurn, 380); }); });
 }
 function lpsGoMenu(){
   lpsRunning=false;
@@ -2292,8 +2334,7 @@ function initLPS(type){
   const aliveNow=lpsAlive();
   lpsTurn=aliveNow[Math.floor(Math.random()*aliveNow.length)];
   document.getElementById('lpsTurnNum').textContent=lpsTurn+1;
-  // v0.04 — if first turn falls on an AI slot, kick it off
-  if(lpsTurn!==0) setTimeout(lpsAiTurn, 600);
+  // v0.06 — AI first kick is deferred to the showEventOverlay onDone callback in launchLPS (prevents AI moving during the countdown overlay)
   document.getElementById('lpsShieldTxt').textContent='🛡 Shield active';
   goTo('lpsScreen');
   lpsRunning=true;
@@ -3705,17 +3746,21 @@ function qocDoMove(fr,fc,tr,tc,mv){
   if(qocTurn!==myCol2) setTimeout(qocAiTurn, 600);
 }
 
+let _qocAiBusy = false; // v0.06 — guard against concurrent AI calls
 function qocAiTurn(){
   if(!qocRunning) return;
+  if(_qocAiBusy) return;
+  _qocAiBusy = true;
   const myCol = qocPlayerColor||'w';
   const aiCol = myCol==='w' ? 'b' : 'w';
-  if(qocTurn!==aiCol) return;
+  if(qocTurn!==aiCol){ _qocAiBusy=false; return; }
   const all=[];
   for(let r=0;r<8;r++) for(let c=0;c<8;c++){
     const p = qocBoard[r][c]; if(!p || p.c!==aiCol) continue;
     qocGetMoves(r,c).forEach(m=>all.push({fr:r,fc:c,m}));
   }
   if(all.length===0){
+    _qocAiBusy=false;
     qocOver=true; qocRunning=false;
     document.getElementById('qocWinMsg').textContent='YOU WIN! 🏆';
     document.getElementById('qocEndOverlay').classList.add('show');
@@ -3723,14 +3768,14 @@ function qocAiTurn(){
     return;
   }
   const caps = all.filter(x=>x.m.atk);
-  // AI scaling: when easier (low streak) sometimes skip best capture; when harder always take it
-  const diff = (window.aiDifficulty && window.aiDifficulty()) || 1;
+  // v0.06 — use adaptive aiLevel instead of legacy aiDifficulty
+  const lvl = (window.aiLevel && window.aiLevel('enemy')) || 5;
+  const diff = lvl <= 3 ? 1 : lvl <= 7 ? 2 : 3;
   let pool;
   if(caps.length){
     pool = caps;
   } else {
     if(diff>=2){
-      // prefer center
       pool = all.slice().sort((a,b)=>{
         const da = Math.abs(a.m.r-3.5)+Math.abs(a.m.c-3.5);
         const db = Math.abs(b.m.r-3.5)+Math.abs(b.m.c-3.5);
@@ -3741,6 +3786,7 @@ function qocAiTurn(){
     }
   }
   const pick = pool[Math.floor(Math.random()*pool.length)];
+  _qocAiBusy = false;
   qocDoMove(pick.fr, pick.fc, pick.m.r, pick.m.c, pick.m);
   if(qocMustChain && qocTurn===aiCol) setTimeout(qocAiTurn, 500);
 }
@@ -4727,8 +4773,13 @@ function drawThumbQOC(){
     walkPending=null;
   };
   window.suggestWalk = function(){
-    if(currentMode==='1v1'){ showToast('Walk only in 2v2/4v4'); return; }
-    if(!ws || ws.readyState!==1){ showToast('Not connected'); return; }
+    // v0.06 — works in all modes: use bot decision when offline/AI, socket when online
+    if(!ws || ws.readyState!==1){
+      const lvl = window.aiLevel ? window.aiLevel('enemy') : 5;
+      const accepted = window.botWalkDecision ? window.botWalkDecision(lvl) : (Math.random()<0.6);
+      showToast(accepted ? '🤝 Bot accepted the walk!' : '✕ Bot declined the walk');
+      return;
+    }
     ws.send(JSON.stringify({type:'suggest_walk'}));
     showToast('Walk suggested');
   };
@@ -5489,6 +5540,9 @@ function drawThumbQOC(){
       card.onclick = unlocked ? (()=>togglePrePick(pt)) : null;
     });
     document.getElementById('ppGo').disabled = true;
+    // v0.06 — hide Pawn card in 2v2/4v4 (pawns auto-assign in front of selected pieces)
+    const pawnCard = document.querySelector('#prePickGrid .ppCard[data-pc="P"]');
+    if(pawnCard) pawnCard.style.display = (mode==='2v2'||mode==='4v4') ? 'none' : '';
     document.getElementById('prePickModal').classList.add('show');
   };
   window.togglePrePick = function(pt){
@@ -5533,8 +5587,11 @@ function drawThumbQOC(){
       window.qocSlotCount = 1;
 
       if(mode === '1v1' || currentEvent === 'lps'){
-        // LPS already has its own piece picker; 1v1 doesn't need a team picker
-        return _origStart();
+        // LPS has its own loading + countdown overlay — skip matchmaking for LPS
+        // Classic/GTS/QOC in 1v1: show matchmaking screen first
+        if(currentEvent === 'lps') return _origStart();
+        const _evLabels = {classic:'CLASSIC CHESS',gts:'GRIND THE SAFE',qoc:'QUEENS ON COLOR',lps:'LAST PIECE STANDING'};
+        return window.showMatchmaking ? window.showMatchmaking(_evLabels[currentEvent]||currentEvent, _origStart) : _origStart();
       }
 
       if(currentEvent === 'qoc'){
@@ -5542,10 +5599,11 @@ function drawThumbQOC(){
         // 2v2 → 2 slots (player gets left half); 4v4 → 4 slots (player gets leftmost quarter).
         window.qocSlotsActive = true;
         window.qocSlotCount = (mode === '2v2') ? 2 : 4;
-        return _origStart();
+        const _evLblQ = {classic:'CLASSIC CHESS',gts:'GRIND THE SAFE',qoc:'QUEENS ON COLOR'};
+        return window.showMatchmaking ? window.showMatchmaking(_evLblQ[currentEvent]||currentEvent, _origStart) : _origStart();
       }
 
-      // CC / GTS — show the piece-type picker, then derive ownership rules
+      // CC / GTS — show the piece-type picker, then matchmaking, then start
       window.openPrePick(mode, (picks)=>{
         let typesArr = (picks || []).slice();
 
@@ -5569,7 +5627,8 @@ function drawThumbQOC(){
         }
 
         window.teamPicks = picks;
-        _origStart();
+        const _evLblCC = {classic:'CLASSIC CHESS',gts:'GRIND THE SAFE'};
+        window.showMatchmaking ? window.showMatchmaking(_evLblCC[currentEvent]||currentEvent, _origStart) : _origStart();
       });
     };
   }
@@ -5784,6 +5843,115 @@ function drawThumbQOC(){
     };
   }
   setTimeout(()=>{ try{ window.updateMilestones(); }catch(e){} }, 500);
+
+  // ── v0.06 MATCHMAKING SCREEN ──────────────────────────────────────
+  // Shows "Searching..." with a fake player count and 5s AI-fallback countdown.
+  // Resolves immediately (AI fills), cosmetically gives the feel of online matchmaking.
+  window.showMatchmaking = function(eventName, onReady){
+    const overlay = document.getElementById('matchmakingOverlay');
+    const countEl = document.getElementById('mmPlayerCount');
+    const secsEl  = document.getElementById('mmCountSecs');
+    const titleEl = document.getElementById('mmTitle');
+    const subEl   = document.getElementById('mmSub');
+    if(!overlay){ if(onReady) onReady(); return; }
+    overlay.classList.add('show');
+    let playerSim = 1, secs = 5;
+    titleEl.textContent = 'SEARCHING...';
+    subEl.textContent   = eventName ? eventName.toUpperCase() : 'FINDING A MATCH';
+    countEl.textContent = playerSim;
+    secsEl.textContent  = secs;
+    // Simulate player count increasing
+    const simTimer = setInterval(()=>{
+      if(playerSim < 3 && Math.random() < 0.5) playerSim++;
+      countEl.textContent = playerSim;
+    }, 900);
+    // Countdown to AI fill
+    const cdTimer = setInterval(()=>{
+      secs--;
+      secsEl.textContent = Math.max(0, secs);
+      if(secs <= 0){
+        clearInterval(cdTimer);
+        clearInterval(simTimer);
+        titleEl.textContent = 'AI FILLING SLOTS';
+        setTimeout(()=>{
+          overlay.classList.remove('show');
+          if(onReady) onReady();
+        }, 600);
+      }
+    }, 1000);
+  };
+
+  // ── v0.06 PLAYER INACTIVITY AUTO-MOVE (7.5s) ─────────────────────
+  // If the player is in a local/AI game and doesn't move for 7.5s, a
+  // random valid move is executed on their behalf to prevent stalling.
+  (function(){
+    let _iTimer = null;
+    function _resetTimer(){
+      clearTimeout(_iTimer);
+      _iTimer = setTimeout(_autoMove, 7500);
+    }
+    function _autoMove(){
+      try{
+        // Classic chess
+        if(typeof classicRunning!=='undefined' && classicRunning && typeof classicTurn!=='undefined'){
+          const pc = typeof classicPlayerColor!=='undefined' ? classicPlayerColor : 'w';
+          if(classicTurn !== pc){ _resetTimer(); return; }
+          const mvs = [];
+          for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+            const p = ccBoard[r][c]; if(!p||p.c!==pc) continue;
+            try{ ccGetMoves(r,c,true).forEach(m=>mvs.push({fr:r,fc:c,tr:m.r,tc:m.c})); }catch(e){}
+          }
+          if(mvs.length){ const mv=mvs[Math.floor(Math.random()*mvs.length)]; try{ ccDoMove(mv.fr,mv.fc,mv.tr,mv.tc); }catch(e){} }
+          _resetTimer(); return;
+        }
+        // GTS
+        if(typeof gtsRunning!=='undefined' && gtsRunning && typeof gtsTurn!=='undefined'){
+          const pc = typeof gtsPlayerColor!=='undefined' ? gtsPlayerColor : 'w';
+          if(gtsTurn !== pc){ _resetTimer(); return; }
+          const mvs = [];
+          for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+            const p = gtsBoard[r][c]; if(!p||p.c!==pc) continue;
+            try{ gtsGetMoves(r,c).forEach(m=>mvs.push({fr:r,fc:c,tr:m.r,tc:m.c})); }catch(e){}
+          }
+          if(mvs.length){ const mv=mvs[Math.floor(Math.random()*mvs.length)]; try{ gtsDoMove(mv.fr,mv.fc,mv.tr,mv.tc); }catch(e){} }
+          _resetTimer(); return;
+        }
+        // QOC — pick random valid move for player
+        if(typeof qocRunning!=='undefined' && qocRunning && !qocOver){
+          const pc = typeof qocPlayerColor!=='undefined' ? qocPlayerColor : 'w';
+          if(qocTurn !== pc){ _resetTimer(); return; }
+          const mvs = [];
+          for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+            const p = qocBoard[r][c]; if(!p||p.c!==pc) continue;
+            try{ qocGetMoves(r,c).forEach(m=>mvs.push({fr:r,fc:c,m})); }catch(e){}
+          }
+          const caps = mvs.filter(x=>x.m.atk);
+          const pool = caps.length ? caps : mvs;
+          if(pool.length){ const pk=pool[Math.floor(Math.random()*pool.length)]; try{ qocDoMove(pk.fr,pk.fc,pk.m.r,pk.m.c,pk.m); }catch(e){} }
+          _resetTimer(); return;
+        }
+        // LPS — make an AI-style move for player 0 if it's their turn
+        if(typeof lpsRunning!=='undefined' && lpsRunning && typeof lpsTurn!=='undefined' && lpsTurn===0){
+          try{
+            const myPieces=[];
+            for(let y=0;y<8;y++) for(let x=0;x<8;x++){ const p=lpsBoard[y][x]; if(p&&p.player===0) myPieces.push({x,y,p}); }
+            const allMvs=[];
+            myPieces.forEach(({x,y})=>{ try{ lpsGetMoves(lpsBoard[y][x]).forEach(m=>allMvs.push({fx:x,fy:y,tx:m.x,ty:m.y})); }catch(e){} });
+            if(allMvs.length){ const mv=allMvs[Math.floor(Math.random()*allMvs.length)]; try{ lpsDoMove(mv.fx,mv.fy,mv.tx,mv.ty); }catch(e){} }
+          }catch(e){}
+          _resetTimer(); return;
+        }
+      }catch(e){}
+      _resetTimer();
+    }
+    // Reset timer on any canvas interaction
+    ['classicCanvas','gtsCanvas','qocCanvas','lpsCanvas'].forEach(function(id){
+      const el = document.getElementById(id);
+      if(el){ el.addEventListener('click', _resetTimer, {passive:true}); el.addEventListener('touchstart', _resetTimer, {passive:true}); }
+    });
+    _resetTimer();
+  })();
+
 })();
 </script>
 </body>
