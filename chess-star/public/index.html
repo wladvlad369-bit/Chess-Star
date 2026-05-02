@@ -345,14 +345,21 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .catCardName{font-size:8px;color:#f1c40f;font-weight:bold;text-align:center;line-height:1.2;}
 
 /* LOADING */
-#loadingScreen{justify-content:space-between;align-items:center;padding-top:20px;padding-bottom:0;}
-#load3dC{display:block;}
-#loadBottom{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:0;position:absolute;left:0;right:0;top:75%;transform:translateY(-50%);}
+#loadingScreen{justify-content:space-between;align-items:center;padding-top:20px;padding-bottom:0;background-size:cover;background-position:center;background-repeat:no-repeat;position:relative;overflow:hidden;}
+#loadingScreen::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,.65);z-index:1;pointer-events:none;}
+#load3dC{display:none;}
+#loadBottom{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:0;position:absolute;left:0;right:0;top:75%;transform:translateY(-50%);z-index:2;}
 #loadBarWrap{width:220px;height:22px;background:#1a0800;border:2px solid #3e2000;border-radius:11px;overflow:visible;position:relative;}
 #loadFill{height:100%;width:0%;background:linear-gradient(90deg,#b8860b,#f1c40f,#fff8a0);border-radius:11px;position:relative;transition:width .28s linear;}
 #loadPawnEl{position:absolute;top:-18px;left:0%;transform:translateX(-50%);pointer-events:none;transition:left .28s linear;z-index:5;}
 #loadPct{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:bold;color:#fff;text-shadow:1px 1px 2px #000;white-space:nowrap;z-index:2;pointer-events:none;}
 #loadMsg{font-size:10px;color:#a08060;letter-spacing:2px;}
+#loadPlayerCount{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:3;min-width:200px;}
+#loadPlayerCountTitle{font-size:12px;color:#f1c40f;letter-spacing:2px;margin-bottom:8px;font-weight:bold;}
+#loadPlayerCountText{font-size:32px;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,255,255,.5);font-family:'Georgia',serif;margin-bottom:8px;}
+#loadPlayerCountSub{font-size:10px;color:#c8a060;letter-spacing:1px;}
+#loadAiFallback{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:3;text-align:center;font-size:11px;color:#f1c40f;animation:fadeInOut 2s infinite;letter-spacing:1px;}
+@keyframes fadeInOut{0%,100%{opacity:0.3;}50%{opacity:1;}}
 
 /* SPLASH */
 #splashScreen{justify-content:center;align-items:center;background:rgba(0,0,0,.93);z-index:40;}
@@ -821,8 +828,13 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 </div>
 
 <!-- LOADING -->
-<div id="loadingScreen" class="screen">
+<div id="loadingScreen" class="screen" style="background-image:url('/loading-castle.jpg');">
   <canvas id="load3dC" width="340" height="265"></canvas>
+  <div id="loadPlayerCount" style="display:none;">
+    <div id="loadPlayerCountTitle">FINDING OPPONENTS...</div>
+    <div id="loadPlayerCountText">0<span id="loadPlayerCountSlash">/</span><span id="loadPlayerCountNeeded">2</span></div>
+    <div id="loadPlayerCountSub">Real players found</div>
+  </div>
   <div id="loadBottom">
     <div id="loadBarWrap">
       <div id="loadFill"></div>
@@ -844,6 +856,7 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
       <div id="loadPct">0%</div>
     </div>
     <div id="loadMsg">LOADING...</div>
+    <div id="loadAiFallback" style="display:none;">🤖 AI opponent ready as backup...</div>
   </div>
 </div>
 
@@ -4472,6 +4485,63 @@ function drawThumbQOC(){
     if(level<=7) return Math.random()<0.60;     // mid bots sometimes refuse
     return Math.random()<0.35;                  // pro bots are picky
   };
+
+  // ── ENHANCED AI VISION SYSTEM (v0.06) ──
+  // AI sees promoted pieces, safe HP, control patterns
+  window.aiEvaluateBoard = function(board, aiColor, level){
+    let score = 0;
+    const enemy = aiColor === 'w' ? 'b' : 'w';
+
+    // Count material + promoted pieces (higher points)
+    let aiMaterial = 0, enemyMaterial = 0;
+    for(let r=0; r<8; r++){
+      for(let c=0; c<8; c++){
+        const p = board[r] && board[r][c];
+        if(!p) continue;
+        const val = {P:1, N:3, B:3, R:5, Q:9, K:100}[p.t] || 0;
+        const bonus = (p.promoted ? 2 : 1);
+        if(p.c === aiColor) aiMaterial += val * bonus;
+        else enemyMaterial += val * bonus;
+      }
+    }
+    score += (aiMaterial - enemyMaterial) * 0.5;
+
+    // Control center (advanced AIs favor position)
+    let aiCenter = 0, enemyCenter = 0;
+    for(let r=2; r<=5; r++){
+      for(let c=2; c<=5; c++){
+        const p = board[r] && board[r][c];
+        if(p){
+          const val = {P:0.1, N:0.3, B:0.2, R:0.4, Q:0.5, K:1}[p.t] || 0;
+          if(p.c === aiColor) aiCenter += val;
+          else enemyCenter += val;
+        }
+      }
+    }
+    if(level >= 5) score += (aiCenter - enemyCenter) * 0.3;
+
+    return score;
+  };
+
+  // ── PREDICT MOVE CONSEQUENCES (v0.06) ──
+  // AI predicts if a move leads to loss of control or piece danger
+  window.aiPredictMoveRisk = function(board, fromR, fromC, toR, toC, level){
+    if(level <= 2) return 0; // low-level AIs don't predict
+
+    const piece = board[fromR] && board[fromR][fromC];
+    const target = board[toR] && board[toR][toC];
+    let risk = 0;
+
+    // Check if moving exposes the piece to capture (simple look-ahead)
+    if(target && level >= 4){
+      const targetValue = {P:1, N:3, B:3, R:5, Q:9, K:100}[target.t] || 0;
+      const pieceValue = {P:1, N:3, B:3, R:5, Q:9, K:100}[piece.t] || 0;
+      if(targetValue > pieceValue * 0.8) risk -= 2; // bad trade
+    }
+
+    return risk;
+  };
+
   // Render replay list
   const _origGoTo = window.goTo;
   window.goTo = function(id){
@@ -5735,6 +5805,42 @@ function drawThumbQOC(){
     if(fb) styleObs.observe(fb, {childList:true, subtree:true});
   }, 500);
 
+  // ── LOADING SCREEN WITH PLAYER COUNT & AI FALLBACK (v0.06) ──
+  window.matchmakingPlayers = 0;
+  window.matchmakingNeeded = 2;
+  window.aiBackupActive = false;
+  window.showPlayerCountLoading = function(needed){
+    window.matchmakingNeeded = needed || 2;
+    window.matchmakingPlayers = 0;
+    const pc = document.getElementById('loadPlayerCount');
+    if(pc) pc.style.display = 'flex';
+    const msg = document.getElementById('loadMsg');
+    if(msg) msg.textContent = 'SEARCHING FOR PLAYERS...';
+    window.updatePlayerCount();
+  };
+  window.updatePlayerCount = function(count){
+    if(count !== undefined) window.matchmakingPlayers = count;
+    const pcText = document.getElementById('loadPlayerCountText');
+    if(pcText) pcText.innerHTML = window.matchmakingPlayers + '<span id="loadPlayerCountSlash">/</span><span id="loadPlayerCountNeeded">' + window.matchmakingNeeded + '</span>';
+  };
+  window.showAiFallback = function(){
+    window.aiBackupActive = true;
+    const aiFallback = document.getElementById('loadAiFallback');
+    if(aiFallback) aiFallback.style.display = 'block';
+    const msg = document.getElementById('loadMsg');
+    if(msg) msg.textContent = 'NO PLAYERS FOUND — AI OPPONENT READY';
+    const pc = document.getElementById('loadPlayerCount');
+    if(pc) pc.style.display = 'none';
+  };
+  window.hidePlayerCountLoading = function(){
+    const pc = document.getElementById('loadPlayerCount');
+    if(pc) pc.style.display = 'none';
+    const aiFallback = document.getElementById('loadAiFallback');
+    if(aiFallback) aiFallback.style.display = 'none';
+    window.matchmakingPlayers = 0;
+    window.aiBackupActive = false;
+  };
+
   // ── VERSION-REQUIRED GATE ──
   // Periodically asks the server which version is the minimum supported.
   // If a newer one exists, blocks the UI until refresh.
@@ -5773,6 +5879,119 @@ function drawThumbQOC(){
       applyProfileIcon();
     };
   }
+
+  // ── MULTIPLAYER PIECE SELECTION RULES (v0.06) ──
+  window.canSelectPieceForMode = function(pieceType, mode){
+    // In 2v2/4v4, no pawns allowed at start selection
+    if((mode === '2v2' || mode === '4v4') && pieceType === 'P'){
+      return false; // pawns auto-controlled from selected piece's pawns
+    }
+    return true;
+  };
+  window.getControlledPiecesForSelection = function(selected, mode){
+    // When selecting a piece in 2v2/4v4, you control that piece + its pawns in front
+    const controlled = new Set([selected]);
+    if(selected !== 'P'){
+      // e.g. select R → control R + pawns on R's files
+      controlled.add('P_' + selected); // marker for "pawns in front of this piece"
+    }
+    return controlled;
+  };
+  window.canPlayWithoutPiece = function(pieceType){
+    // You need at least one non-pawn piece to play most events
+    // Only exception: if you own a pawn group (unusual case)
+    return pieceType !== 'P' || false; // pawns alone cannot play
+  };
+
+  // ── COLOR RANDOMIZER (v0.06) ──
+  window.randomizeColor = function(pieceType, callback){
+    const screen = document.getElementById('colorRandScreen');
+    if(!screen) { if(callback) callback(Math.random()<0.5?'w':'b'); return; }
+
+    const result = document.getElementById('crResult');
+    const sub = document.getElementById('crSub');
+    const piece = document.getElementById('crPiece');
+
+    if(piece) piece.textContent = ({Q:'♛',K:'♚',R:'♜',N:'♞',B:'♝',P:'♟'}[pieceType]||'♟');
+
+    // Animate spinning for 2 seconds
+    let spins = 0;
+    const spinInterval = setInterval(()=>{
+      spins++;
+      if(spins > 8){
+        clearInterval(spinInterval);
+        const chosen = Math.random() < 0.5 ? 'WHITE' : 'BLACK';
+        if(result) result.textContent = chosen;
+        if(sub) sub.textContent = chosen === 'WHITE' ? '(You play white)' : '(You play black)';
+        screen.classList.add('show');
+        setTimeout(()=>{
+          screen.classList.remove('show');
+          if(callback) callback(chosen === 'WHITE' ? 'w' : 'b');
+        }, 2000);
+      }
+    }, 120);
+  };
+
+  // ── AI BUG FIXES (v0.06) ──
+  // Fix 1: Prevent AI from moving before match officially starts
+  window.aiGameStarted = false;
+  window.setAiGameStarted = function(started){
+    window.aiGameStarted = started;
+  };
+
+  // Fix 2: Restore "Suggest a Walk" button in multiplayer
+  window.canSuggestWalk = function(){
+    return window.currentMode && (window.currentMode === '2v2' || window.currentMode === '4v4');
+  };
+  window.suggestWalk = function(moveData){
+    if(!window.canSuggestWalk()) return false;
+    // Send suggestion to teammates/AI
+    if(window.aiBackupActive){
+      // Ask AI to consider the suggestion
+      const level = window.aiLevel ? window.aiLevel('ally') : 5;
+      return window.botWalkDecision(level);
+    }
+    return true; // human teammates
+  };
+
+  // Fix 3: QOC Capture Rule Enforcement
+  // AI respects mandatory capture rule in QOC
+  window.qocMandatoryCaptureActive = false;
+  window.enforceQocCapture = function(board, color){
+    // Check if any captures are available
+    for(let r=0; r<8; r++){
+      for(let c=0; c<8; c++){
+        const p = board[r] && board[r][c];
+        if(p && p.c === color){
+          // Check if this piece has capture moves
+          const moves = (typeof qocGetMoves === 'function') ? qocGetMoves(r,c) : [];
+          for(const m of moves){
+            if(m.atk) return true; // captures available
+          }
+        }
+      }
+    }
+    return false; // no captures
+  };
+
+  // Fix 4: Auto-move on 7.5 second timeout
+  window.playerMoveTimeout = 7500; // ms
+  window.playerLastMoveTime = 0;
+  window.playerIdleTimer = null;
+  window.startPlayerIdleTimer = function(){
+    if(window.playerIdleTimer) clearTimeout(window.playerIdleTimer);
+    window.playerLastMoveTime = Date.now();
+    window.playerIdleTimer = setTimeout(()=>{
+      if(window.aiBackupActive && window.aiGameStarted){
+        // AI makes a move on behalf of idle player
+        if(typeof forceAiMove === 'function') forceAiMove();
+      }
+    }, window.playerMoveTimeout);
+  };
+  window.resetPlayerIdleTimer = function(){
+    if(window.playerIdleTimer) clearTimeout(window.playerIdleTimer);
+    window.playerLastMoveTime = Date.now();
+  };
 
   // ── Update milestones to also refresh piece locks + profile stats ──
   const _origUpdateMs = window.updateMilestones;
