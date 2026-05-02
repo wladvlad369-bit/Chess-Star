@@ -2500,6 +2500,7 @@ function lpsPoison(x,y){
 
 function initLPS(type){
   lpsBoard=Array(8).fill(0).map(()=>Array(8).fill(null));
+  window._repFrames = [];
   lpsTurn=0;lpsMoves=0;lpsRounds=0;lpsPoisonStg=0;lpsPoisonOn=false;
   lpsStats={kills:0,killer:'-'};lpsParticles=[];lpsSkulls=[];
   lps1v1=false;lps1v1T=0;lpsSel=null;lpsValMoves=[];lpsRunning=false;
@@ -2678,6 +2679,7 @@ function lpsAlive(){
 }
 
 function lpsNextTurn(){
+  try{ window._pushRepFrame && window._pushRepFrame(window._snapLpsBoard()); }catch(e){}
   lpsMoves++;
   lpsBoard.forEach(r=>r.forEach(p=>{
     if(p&&p.player===lpsTurn){p.shieldTurns++;if(p.shieldTurns>=2)p.shield=false;}
@@ -2791,7 +2793,8 @@ function lpsEnd(alive){
       event:'lps', mode:'1v1', date:Date.now(),
       result:won?'win':'loss',
       kills:lpsStats.kills,
-      piece:lpsChosenType
+      piece:lpsChosenType,
+      frames:(window._repFrames||[]).slice()
     });
   }catch(e){}
 }
@@ -3102,6 +3105,7 @@ function ccPromote(t){
 }
 
 function ccEndMove(){
+  try{ window._pushRepFrame && window._pushRepFrame(window._snapCcBoard()); }catch(e){}
   ccTurn=ccOpp(ccTurn);
   const st=ccStatus();
   if(st==='checkmate'){
@@ -3118,7 +3122,7 @@ function ccEndMove(){
     document.getElementById('ccStatChecks').textContent = window.ccPlayerChecks||0;
     document.getElementById('classicEndOverlay').classList.add('show');
     try{ window.notifyMatchFinished && window.notifyMatchFinished(youWon?'win':'loss'); }catch(e){}
-    try{ window.saveReplay && window.saveReplay({event:'classic',mode:'1v1',date:Date.now(),result:youWon?'win':'loss',kills:window.ccPlayerKills||0,checks:window.ccPlayerChecks||0}); }catch(e){}
+    try{ window.saveReplay && window.saveReplay({event:'classic',mode:'1v1',date:Date.now(),result:youWon?'win':'loss',kills:window.ccPlayerKills||0,checks:window.ccPlayerChecks||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
   } else if(st==='stalemate'){
     ccGameOver=true;
     document.getElementById('classicWinMsg').textContent='DRAW — STALEMATE';
@@ -3140,6 +3144,7 @@ function ccEndMove(){
 }
 
 function initClassic(){
+  window._repFrames = [];
   ccBoard=Array(8).fill(0).map(()=>Array(8).fill(null));
   const back=['R','N','B','Q','K','B','N','R'];
   for(let c=0;c<8;c++){
@@ -3312,6 +3317,7 @@ function gtsUpdateHpBar(){
 }
 
 function initGTS(){
+  window._repFrames = [];
   gtsBoard=Array(8).fill(0).map(()=>Array(8).fill(null));
   const back=['R','N','B','Q','K','B','N','R'];
   for(let c=0;c<8;c++){
@@ -3461,7 +3467,7 @@ function gtsDoMove(fr,fc,tr,tc,mv){
       document.getElementById('gtsStatHits').textContent  = window.gtsPlayerHits||0;
       document.getElementById('gtsEndOverlay').classList.add('show');gtsRunning=false;
       try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss'); }catch(e){}
-      try{ window.saveReplay && window.saveReplay({event:'gts',mode:'1v1',date:Date.now(),result:_won?'win':'loss',kills:window.gtsPlayerKills||0,hits:window.gtsPlayerHits||0}); }catch(e){}
+      try{ window.saveReplay && window.saveReplay({event:'gts',mode:'1v1',date:Date.now(),result:_won?'win':'loss',kills:window.gtsPlayerKills||0,hits:window.gtsPlayerHits||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
       return;
     }
     if(gtsHpB<=0){
@@ -3474,7 +3480,7 @@ function gtsDoMove(fr,fc,tr,tc,mv){
       document.getElementById('gtsStatHits').textContent  = window.gtsPlayerHits||0;
       document.getElementById('gtsEndOverlay').classList.add('show');gtsRunning=false;
       try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss'); }catch(e){}
-      try{ window.saveReplay && window.saveReplay({event:'gts',mode:'1v1',date:Date.now(),result:_won?'win':'loss',kills:window.gtsPlayerKills||0,hits:window.gtsPlayerHits||0}); }catch(e){}
+      try{ window.saveReplay && window.saveReplay({event:'gts',mode:'1v1',date:Date.now(),result:_won?'win':'loss',kills:window.gtsPlayerKills||0,hits:window.gtsPlayerHits||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
       return;
     }
     // FIX 4: Piece stays adjacent (does NOT occupy safe square)
@@ -3507,6 +3513,7 @@ function gtsPromote(t){
 }
 
 function gtsEndMove(){
+  try{ window._pushRepFrame && window._pushRepFrame(window._snapGtsBoard()); }catch(e){}
   gtsTurn = gtsTurn==='w' ? 'b' : 'w';
   // Decrement shield counters AFTER turn switch (each shield lasts 2 half-turns = 1 full cycle)
   if(gtsShieldW>0){ gtsShieldW--; if(gtsShieldW===0) document.getElementById('gtsMsg').textContent='✅ White safe is vulnerable again.'; }
@@ -3818,6 +3825,7 @@ let qocBoard=[], qocTurn='w', qocSel=null, qocValMoves=[], qocRunning=false, qoc
 let qocPlies=0, qocBuffMsg='', qocMustChain=null;
 
 function initQOC(){
+  window._repFrames = [];
   qocBoard = Array(8).fill(0).map(()=>Array(8).fill(null));
   // Standard 8x8 international-checkers placement on dark squares only
   for(let r=0;r<3;r++) for(let c=0;c<8;c++){
@@ -3935,7 +3943,7 @@ function qocDoMove(fr,fc,tr,tc,mv){
     document.getElementById('qocStatQueens').textContent = window.qocPlayerQueens||0;
     document.getElementById('qocEndOverlay').classList.add('show');
     try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss'); }catch(e){}
-    try{ window.saveReplay && window.saveReplay({event:'qoc',mode:'1v1',date:Date.now(),result:_won?'win':'loss',kills:window.qocPlayerKills||0}); }catch(e){}
+    try{ window.saveReplay && window.saveReplay({event:'qoc',mode:'1v1',date:Date.now(),result:_won?'win':'loss',kills:window.qocPlayerKills||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
     return;
   }
   qocTurn = qocTurn==='w' ? 'b' : 'w';
@@ -3984,7 +3992,7 @@ function qocAiTurn(){
     document.getElementById('qocWinMsg').textContent='YOU WIN! 🏆';
     document.getElementById('qocEndOverlay').classList.add('show');
     if(window.notifyMatchFinished) window.notifyMatchFinished('win');
-    try{ window.saveReplay && window.saveReplay({event:'qoc',mode:'1v1',date:Date.now(),result:'win',kills:window.qocPlayerKills||0}); }catch(e){}
+    try{ window.saveReplay && window.saveReplay({event:'qoc',mode:'1v1',date:Date.now(),result:'win',kills:window.qocPlayerKills||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
     return;
   }
   const caps = all.filter(x=>x.m.atk);
@@ -4709,6 +4717,51 @@ function drawThumbQOC(){
   }
 
   // ── REPLAYS ──────────────────────────────────────────────────────
+  window._repFrames = [];
+  window._repMaxFrames = 250;
+  window._pushRepFrame = function(frame){
+    if(window._repFrames.length < window._repMaxFrames) window._repFrames.push(frame);
+  };
+  window._snapCcBoard = function(){
+    const PICO={R:'♜',N:'♞',B:'♝',Q:'♛',K:'♚',P:'♟'};
+    const pieces=[];
+    if(typeof ccBoard==='undefined') return {pieces};
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const p=ccBoard[r][c]; if(!p) continue;
+      pieces.push({r, c2:c, c:p.c, s:PICO[p.t]||'?'});
+    }
+    return {pieces};
+  };
+  window._snapGtsBoard = function(){
+    const PICO={R:'♜',N:'♞',B:'♝',Q:'♛',K:'♚',P:'♟'};
+    const pieces=[];
+    if(typeof gtsBoard==='undefined') return {pieces};
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const p=gtsBoard[r][c]; if(!p) continue;
+      pieces.push({r, c2:c, c:p.c, s:PICO[p.t]||'?'});
+    }
+    return {pieces};
+  };
+  window._snapQocBoard = function(){
+    const PICO={B:'♛',C:'♟',Q:'♛',K:'♚',R:'♜',N:'♞',P:'♟'};
+    const pieces=[];
+    if(typeof qocBoard==='undefined') return {pieces};
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const p=qocBoard[r][c]; if(!p) continue;
+      pieces.push({r, c2:c, c:p.c, s:PICO[p.t]||'?'});
+    }
+    return {pieces};
+  };
+  window._snapLpsBoard = function(){
+    const PICO={R:'♜',N:'♞',B:'♝',Q:'♛',K:'♚',P:'♟'};
+    const pieces=[];
+    if(typeof lpsBoard==='undefined') return {pieces};
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const p=lpsBoard[r][c]; if(!p) continue;
+      pieces.push({r, c2:c, c:p.player===0?'w':'b', s:PICO[p.t]||'?'});
+    }
+    return {pieces};
+  };
   function loadReplays(){
     try { return JSON.parse(localStorage.getItem('chessstar_replays')||'[]'); } catch(e){ return []; }
   }
@@ -4720,6 +4773,7 @@ function drawThumbQOC(){
     if(myCode){
       fetch('/api/account/replay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,replay:rep})}).catch(()=>{});
     }
+    window._repFrames = [];
   }
   window.notifyMatchFinished = function(result, opts){
     opts = opts || {};
@@ -5860,6 +5914,7 @@ function drawThumbQOC(){
     const _origQocDoMove = qocDoMove;
     window.qocDoMove = function(){
       _origQocDoMove.apply(this, arguments);
+      try{ window._pushRepFrame && window._pushRepFrame(window._snapQocBoard()); }catch(e){}
       if(!qocRunning || qocOver) return;
       const my = window.qocPlayerColor || 'w';
       // After any move, if it's the player's turn but they have no owned-piece moves, teammate plays
