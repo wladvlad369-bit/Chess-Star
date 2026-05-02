@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Chess Star v0.06</title>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{width:100%;height:100%;background:#0a0500;display:flex;justify-content:center;align-items:center;font-family:'Verdana',sans-serif;color:#fff;overflow:hidden;touch-action:none;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;margin:0;padding:0;background:#0a0500;font-family:'Verdana',sans-serif;color:#fff;overflow:hidden;touch-action:none;-webkit-tap-highlight-color:transparent;}
 *{-webkit-tap-highlight-color:transparent;outline:none;}
 button,div,canvas{-webkit-tap-highlight-color:transparent;}
-#root{position:relative;width:360px;height:600px;overflow:hidden;background:#0a0500;border:2px solid #3e2723;box-shadow:0 0 40px rgba(0,0,0,.9);}
+#root{position:fixed;width:360px;height:600px;overflow:hidden;background:#0a0500;border:2px solid #3e2723;box-shadow:0 0 40px rgba(0,0,0,.9);transform-origin:top left;}
 body.lightTheme{background:#e8e0d0;color:#1a0500;}
 body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;}
@@ -454,7 +454,15 @@ body.lightTheme #titleBlock p{color:#6b4a1a;text-shadow:0 1px 0 #fff8e8;}
 body.lightTheme .topBar{background:rgba(245,236,216,.95);color:#3a2306;border-bottom:2px solid #a08060;}
 body.lightTheme .topTitle{color:#3a2306;text-shadow:0 1px 0 #fff;-webkit-text-stroke:0.4px #4a2c08;}
 body.lightTheme .backBtn{color:#3a2306;}
-body.lightTheme .eCard,body.lightTheme .pieceCard,body.lightTheme .ppCard,body.lightTheme .setSection,body.lightTheme .repItem,body.lightTheme .friendItem,body.lightTheme #playerCard,body.lightTheme #profileBox,body.lightTheme #saveCodeBox,body.lightTheme #codeImportBox{background:#fff8e8;color:#3a2306;border-color:#a08060;}
+body.lightTheme .eCard,body.lightTheme .ppCard,body.lightTheme .setSection,body.lightTheme .repItem,body.lightTheme .friendItem,body.lightTheme #playerCard,body.lightTheme #profileBox,body.lightTheme #saveCodeBox,body.lightTheme #codeImportBox{background:#fff8e8;color:#3a2306;border-color:#a08060;}
+body.lightTheme .cThumb{background:#0a0500!important;border-color:#3e2723!important;}
+body.lightTheme .cBody{background:#fff8e8;}
+body.lightTheme .cTitle{color:#3a2306;}
+body.lightTheme .cDesc{color:#7a4e20;}
+body.lightTheme #eventsBtn{background:#fff8e8;border-color:#a08060;}
+body.lightTheme #evLabel{color:#7a4e20;}
+body.lightTheme #evName{color:#3a2306;}
+body.lightTheme #startBtn{background:#c8860a;color:#fff;border-color:#a06000;}
 body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .ppCard .ppName,body.lightTheme .setSection h3,body.lightTheme .invDet .invLbl{color:#7a4e20;text-shadow:none;}
 body.lightTheme .eCard p,body.lightTheme .setRow,body.lightTheme .pcDesc,body.lightTheme .ppDesc{color:#5a3a10;}
 body.lightTheme .miniBtn,body.lightTheme #ppGo,body.lightTheme #saveProfBtn,body.lightTheme .langBtn,body.lightTheme .themeToggle button,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme .modeOpt,body.lightTheme .endBtns button,body.lightTheme #repPlayerCtrl button,body.lightTheme .acctTab,body.lightTheme #acctGoBtn,body.lightTheme #infoModalCloseBtn,body.lightTheme .exitBtn,body.lightTheme #ppCancel,body.lightTheme .fBtnSm,body.lightTheme .backBtn,body.lightTheme #lbRefreshBtn,body.lightTheme #msClose,body.lightTheme #tInfoClose,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme #startBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;text-shadow:none;}
@@ -555,7 +563,7 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #friendsBtnBadge{position:absolute;top:-4px;right:-4px;background:#e74c3c;color:#fff;border:1px solid #000;border-radius:50%;min-width:16px;height:16px;font-size:9px;font-weight:bold;display:none;align-items:center;justify-content:center;padding:0 3px;}
 #friendsBtnBadge.show{display:flex;}
 /* v0.06 — LEADERBOARD BUTTON (above friends btn) */
-#leaderboardBtn{position:absolute;right:12px;top:calc(50% - 62px);width:52px;height:52px;border:2px solid #5d4037;border-radius:8px;background:#1a0800;cursor:pointer;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color .2s;gap:2px;}
+#leaderboardBtn{position:absolute;right:12px;top:calc(50% - 94px);width:52px;height:52px;border:2px solid #5d4037;border-radius:8px;background:#1a0800;cursor:pointer;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color .2s;gap:2px;}
 #leaderboardBtn:hover{border-color:#f1c40f;}
 #leaderboardBtnIco{font-size:22px;line-height:1;}
 #leaderboardBtnLbl{font-size:7px;color:#f1c40f;letter-spacing:1px;font-weight:bold;}
@@ -691,7 +699,7 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
 #loadCastleImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s;pointer-events:none;z-index:0;}
 #loadCastleImg.show{opacity:1;}
 #loadCastleVignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,.15) 0%,rgba(0,0,0,.72) 100%);z-index:1;pointer-events:none;}
-#load3dC{position:relative;z-index:2;}
+#load3dC{position:relative;z-index:2;display:none!important;}
 #loadBottom{z-index:3;}
 
 /* v0.06 — Matchmaking overlay */
@@ -706,6 +714,16 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
 #mmPlayerLabel{font-size:10px;color:#a08060;letter-spacing:1px;line-height:1.4;}
 #mmCountdown{font-size:10px;color:#888;letter-spacing:2px;}
 #mmSub{font-size:10px;color:#c8a060;letter-spacing:3px;}
+#mmSlash{font-size:28px;font-weight:900;color:#f1c40f;margin:0 2px;}
+#mmNeeded{font-size:32px;font-weight:900;color:rgba(241,196,15,.5);min-width:28px;text-align:center;}
+/* v0.06 — WALK SELECTION OVERLAY (teammate piece selector for suggest walk) */
+#walkSelOverlay{position:absolute;inset:0;background:rgba(0,0,0,.93);z-index:160;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
+#walkSelOverlay.show{display:flex;}
+#walkSelTitle{font-size:13px;font-weight:900;color:#4fc3f7;letter-spacing:3px;text-align:center;text-shadow:0 0 12px rgba(79,195,247,.6);}
+#walkSelCanvas{border:2px solid #4fc3f7;border-radius:4px;cursor:pointer;}
+#walkSelMsg{font-size:10px;color:#a08060;letter-spacing:1px;text-align:center;padding:0 16px;max-width:340px;}
+#walkSelCancel{background:#1a0800;border:2px solid #5d4037;color:#f1c40f;padding:8px 24px;border-radius:6px;font-weight:bold;font-size:11px;letter-spacing:2px;cursor:pointer;margin-top:4px;}
+#walkSelCancel:hover{background:#f1c40f;color:#000;}
 </style>
 </head>
 <body>
@@ -745,7 +763,7 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
   </div>
   <div id="fpsLbl">60 FPS</div>
   <div id="leaderboardBtn" onclick="openLeaderboard()" title="Leaderboard">
-    <div id="leaderboardBtnIco">🏆</div>
+    <div id="leaderboardBtnIco">🎖️</div>
     <div id="leaderboardBtnLbl">RANKS</div>
   </div>
   <div id="friendsBtn" onclick="openFriends()" title="Friends">
@@ -1225,6 +1243,14 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
   </div>
 </div>
 
+<!-- v0.06 — WALK SELECTION OVERLAY: player picks teammate piece + destination -->
+<div id="walkSelOverlay">
+  <div id="walkSelTitle">SUGGEST A MOVE</div>
+  <canvas id="walkSelCanvas" width="352" height="352"></canvas>
+  <div id="walkSelMsg">Tap a teammate piece (shown in blue)</div>
+  <button id="walkSelCancel" onclick="window.cancelWalkSel&&window.cancelWalkSel()">✕ CANCEL</button>
+</div>
+
 <!-- v0.03 — TOAST -->
 <div id="toast"></div>
 
@@ -1333,8 +1359,8 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
   <div id="mmSpinner"></div>
   <div id="mmPlayerRow">
     <span id="mmPlayerIco">♟</span>
-    <span id="mmPlayerCount">1</span>
-    <span id="mmPlayerLabel">PLAYER<br>ONLINE</span>
+    <span id="mmPlayerCount">1</span><span id="mmSlash">/</span><span id="mmNeeded">2</span>
+    <span id="mmPlayerLabel">PLAYERS<br>IN QUEUE</span>
   </div>
   <div id="mmSub">FINDING A MATCH</div>
   <div id="mmCountdown">AI fills in <span id="mmCountSecs">5</span>s...</div>
@@ -3122,10 +3148,15 @@ function initClassic(){
     ccBoard[6][c]={t:'P',c:'w',moved:false,px:c*CTL,py:6*CTL};
     ccBoard[7][c]={t:back[c],c:'w',moved:false,px:c*CTL,py:7*CTL};
   }
+  // v0.06 AI-FIX: Save original choice for UI labels; then normalize so player is ALWAYS 'w'
+  // After the board flip, player's pieces become c='w', AI pieces become c='b'.
+  // classicPlayerColor must equal 'w' so ccAiPlay correctly targets 'b' pieces.
+  const _playerChoseBlack = classicPlayerColor === 'b';
   if(classicPlayerColor==='b'){
     ccBoard.reverse();
     ccBoard.forEach(row=>row.reverse());
     ccBoard.forEach(row=>row.forEach(p=>{if(p)p.c=p.c==='w'?'b':'w';}));
+    classicPlayerColor = 'w'; // normalize: player pieces always 'w', AI always 'b'
     // Fix px/py after reversing
     for(let r=0;r<8;r++) for(let c=0;c<8;c++) {
       if(ccBoard[r][c]) { ccBoard[r][c].px = c*CTL; ccBoard[r][c].py = r*CTL; }
@@ -3140,12 +3171,12 @@ function initClassic(){
   document.getElementById('classicInfo').textContent='CLASSIC CHESS — WHITE TURN';
   document.getElementById('classicMsg').textContent='';
   // FIX 11: Team labels (per team, not per piece). Player on bottom row.
-  const myTeam = classicPlayerColor==='w' ? 'WHITE' : 'BLACK';
-  const oppTeam = classicPlayerColor==='w' ? 'BLACK' : 'WHITE';
+  const myTeam = _playerChoseBlack ? 'BLACK' : 'WHITE';
+  const oppTeam = _playerChoseBlack ? 'WHITE' : 'BLACK';
   const topEl = document.getElementById('ccTopTeam');
   const botEl = document.getElementById('ccBotTeam');
   topEl.textContent = oppTeam + ' TEAM — Player 2';
-  topEl.style.color = classicPlayerColor==='w' ? '#bbb' : '#fff';
+  topEl.style.color = _playerChoseBlack ? '#fff' : '#bbb';
   botEl.textContent = myTeam + ' TEAM — ' + profile.name;
   botEl.style.color = profile.color;
   goTo('classicScreen');
@@ -5020,15 +5051,114 @@ function drawThumbQOC(){
     if(accept) showToast('Walk accepted'); else showToast('Walk declined');
     walkPending=null;
   };
+  // ── v0.06 SUGGEST WALK — teammate piece selection overlay ──────────
+  let _walkSelState = null;
+  window.cancelWalkSel = function(){
+    const ov = document.getElementById('walkSelOverlay');
+    if(ov) ov.classList.remove('show');
+    _walkSelState = null;
+    const wc = document.getElementById('walkSelCanvas');
+    if(wc) wc.onclick = null;
+  };
+  function _drawWalkSel(board, playerColor, pickedTypes){
+    const cvs = document.getElementById('walkSelCanvas');
+    if(!cvs || !board) return;
+    const ctx = cvs.getContext('2d');
+    const W=352, SQ=W/8;
+    ctx.clearRect(0,0,W,W);
+    const PICO={R:'♜',N:'♞',B:'♝',Q:'♛',K:'♚',P:'♟'};
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      ctx.fillStyle=(r+c)%2===0?'#f0d9b5':'#b58863';
+      ctx.fillRect(c*SQ,r*SQ,SQ,SQ);
+    }
+    // Highlight selected piece square
+    if(_walkSelState && _walkSelState.selR>=0){
+      ctx.fillStyle='rgba(0,150,255,.55)';
+      ctx.fillRect(_walkSelState.selC*SQ,_walkSelState.selR*SQ,SQ,SQ);
+    }
+    // Highlight valid destinations
+    if(_walkSelState && _walkSelState.selMoves){
+      _walkSelState.selMoves.forEach(m=>{
+        ctx.fillStyle='rgba(0,220,100,.45)';
+        ctx.fillRect(m.c*SQ,m.r*SQ,SQ,SQ);
+        ctx.fillStyle='rgba(0,220,100,.8)';
+        ctx.beginPath();ctx.arc(m.c*SQ+SQ/2,m.r*SQ+SQ/2,SQ*.22,0,Math.PI*2);ctx.fill();
+      });
+    }
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const p=board[r][c]; if(!p) continue;
+      const isTeammate = pickedTypes && p.c===playerColor && !window.ccPlayerOwns(p,c);
+      // Blue halo on teammate pieces
+      if(isTeammate){
+        ctx.fillStyle='rgba(79,195,247,.3)';
+        ctx.fillRect(c*SQ,r*SQ,SQ,SQ);
+        ctx.strokeStyle='rgba(79,195,247,.9)';
+        ctx.lineWidth=2;
+        ctx.strokeRect(c*SQ+1,r*SQ+1,SQ-2,SQ-2);
+      }
+      const px=c*SQ+SQ/2, py=r*SQ+SQ/2;
+      ctx.font='bold '+(SQ*.62)+'px serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle=p.c==='w'?'rgba(0,0,0,.35)':'rgba(0,0,0,.35)';
+      ctx.fillText(PICO[p.t],px+1,py+2);
+      ctx.fillStyle=p.c==='w'?'#fff8e0':'#1a0a00';
+      ctx.strokeStyle=p.c==='w'?'#8b6508':'#e0c070';ctx.lineWidth=.5;
+      ctx.fillText(PICO[p.t],px,py);ctx.strokeText(PICO[p.t],px,py);
+    }
+  }
   window.suggestWalk = function(){
-    // v0.06 — works in all modes: use bot decision when offline/AI, socket when online
-    if(!ws || ws.readyState!==1){
-      const lvl = window.aiLevel ? window.aiLevel('enemy') : 5;
-      const accepted = window.botWalkDecision ? window.botWalkDecision(lvl) : (Math.random()<0.6);
-      showToast(accepted ? '🤝 Bot accepted the walk!' : '✕ Bot declined the walk');
+    // In team mode with picked pieces, show the teammate selection overlay
+    if(window.ccPickedTypes && typeof ccRunning!=='undefined' && ccRunning && ccTurn===classicPlayerColor){
+      const msgEl=document.getElementById('walkSelMsg');
+      const ov=document.getElementById('walkSelOverlay');
+      _walkSelState={selR:-1,selC:-1,selMoves:null};
+      if(ov) ov.classList.add('show');
+      if(msgEl) msgEl.textContent='Tap a teammate piece (blue glow)';
+      _drawWalkSel(ccBoard, classicPlayerColor, window.ccPickedTypes);
+      const wc=document.getElementById('walkSelCanvas');
+      if(wc) wc.onclick=function(e){
+        const rect=this.getBoundingClientRect();
+        const sc=352/rect.width;
+        const ex=(e.clientX-rect.left)*sc, ey=(e.clientY-rect.top)*sc;
+        const c=Math.floor(ex/(352/8)), r=Math.floor(ey/(352/8));
+        if(r<0||r>7||c<0||c>7) return;
+        // If a destination is clicked
+        if(_walkSelState.selMoves){
+          const mv=_walkSelState.selMoves.find(m=>m.r===r&&m.c===c);
+          if(mv){
+            const fr=_walkSelState.selR,fc=_walkSelState.selC;
+            const p=ccBoard[fr][fc];
+            window.cancelWalkSel();
+            if(typeof sock!=='undefined'&&sock&&sock.connected){
+              sock.emit('suggest_walk',{sr:fr,sc:fc,dr:r,dc:c,piece:p?p.t:''});
+              showToast('Walk suggested to teammate!');
+            } else {
+              const lvl=window.aiLevel?window.aiLevel('ally'):5;
+              const acc=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.65);
+              showToast(acc?'🤝 Teammate accepted the walk!':'✕ Teammate declined the walk');
+            }
+            return;
+          }
+        }
+        // Try selecting a teammate piece
+        const p=ccBoard[r]&&ccBoard[r][c];
+        if(p && p.c===classicPlayerColor && window.ccPickedTypes && !window.ccPlayerOwns(p,c)){
+          _walkSelState.selR=r;_walkSelState.selC=c;
+          _walkSelState.selMoves=ccLegal(r,c);
+          if(msgEl) msgEl.textContent='Now tap where it should go';
+          _drawWalkSel(ccBoard,classicPlayerColor,window.ccPickedTypes);
+        }
+      };
       return;
     }
-    ws.send(JSON.stringify({type:'suggest_walk'}));
+    // 1v1 / non-team: bot or socket
+    if(typeof sock==='undefined'||!sock||!sock.connected){
+      const lvl=window.aiLevel?window.aiLevel('enemy'):5;
+      const accepted=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.6);
+      showToast(accepted?'🤝 Bot accepted the walk!':'✕ Bot declined the walk');
+      return;
+    }
+    sock.emit('suggest_walk',{});
     showToast('Walk suggested');
   };
 
@@ -5854,9 +5984,10 @@ function drawThumbQOC(){
       window.qocSlotCount = 1;
 
       if(mode === '1v1' || currentEvent === 'lps'){
-        // LPS has its own loading + countdown overlay — skip matchmaking for LPS
-        // Classic/GTS/QOC in 1v1: show matchmaking screen first
-        if(currentEvent === 'lps') return _origStart();
+        // LPS gets matchmaking too (needs 6 players) — AI fills after 5s
+        if(currentEvent === 'lps'){
+          return window.showMatchmaking ? window.showMatchmaking('LAST PIECE STANDING', _origStart, 6) : _origStart();
+        }
         const _evLabels = {classic:'CLASSIC CHESS',gts:'GRIND THE SAFE',qoc:'QUEENS ON COLOR',lps:'LAST PIECE STANDING'};
         return window.showMatchmaking ? window.showMatchmaking(_evLabels[currentEvent]||currentEvent, _origStart) : _origStart();
       }
@@ -6112,38 +6243,49 @@ function drawThumbQOC(){
   setTimeout(()=>{ try{ window.updateMilestones(); }catch(e){} }, 500);
 
   // ── v0.06 MATCHMAKING SCREEN ──────────────────────────────────────
-  // Shows "Searching..." with a fake player count and 5s AI-fallback countdown.
-  // Resolves immediately (AI fills), cosmetically gives the feel of online matchmaking.
-  window.showMatchmaking = function(eventName, onReady){
+  // Shows real server queue count in X/needed format; after 5s fills with AI.
+  window.showMatchmaking = function(eventName, onReady, neededOverride){
     const overlay = document.getElementById('matchmakingOverlay');
     const countEl = document.getElementById('mmPlayerCount');
+    const neededEl= document.getElementById('mmNeeded');
     const secsEl  = document.getElementById('mmCountSecs');
     const titleEl = document.getElementById('mmTitle');
     const subEl   = document.getElementById('mmSub');
     if(!overlay){ if(onReady) onReady(); return; }
     overlay.classList.add('show');
-    let playerSim = 1, secs = 5;
+    const mode = window.currentMode || '1v1';
+    const needed = neededOverride || ({lps:6,'1v1':2,'2v2':4,'4v4':8}[mode]||2);
+    if(neededEl) neededEl.textContent = needed;
+    let found = 1, secs = 5;
     titleEl.textContent = 'SEARCHING...';
     subEl.textContent   = eventName ? eventName.toUpperCase() : 'FINDING A MATCH';
-    countEl.textContent = playerSim;
+    countEl.textContent = found;
     secsEl.textContent  = secs;
-    // Simulate player count increasing
-    const simTimer = setInterval(()=>{
-      if(playerSim < 3 && Math.random() < 0.5) playerSim++;
-      countEl.textContent = playerSim;
-    }, 900);
+    // Generate session ID and join queue on server
+    const sessId = 'mm'+(Date.now()+'').slice(-7)+Math.random().toString(36).slice(2,5);
+    const ev = (eventName||'').toLowerCase().replace(/[\s]+/g,'_');
+    fetch('/api/queue/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:sessId,event:ev,mode})})
+      .then(r=>r.json()).then(d=>{ found=Math.max(1,d.count||1); countEl.textContent=found; }).catch(()=>{});
+    // Poll real queue count every 1.8s
+    const pollT = setInterval(()=>{
+      fetch('/api/queue/count?event='+encodeURIComponent(ev)+'&mode='+mode)
+        .then(r=>r.json()).then(d=>{ found=Math.max(1,d.count||1); countEl.textContent=found; }).catch(()=>{});
+    },1800);
     // Countdown to AI fill
     const cdTimer = setInterval(()=>{
       secs--;
       secsEl.textContent = Math.max(0, secs);
       if(secs <= 0){
         clearInterval(cdTimer);
-        clearInterval(simTimer);
+        clearInterval(pollT);
+        // Leave queue
+        fetch('/api/queue/leave',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:sessId})}).catch(()=>{});
         titleEl.textContent = 'AI FILLING SLOTS';
+        countEl.textContent = needed;
         setTimeout(()=>{
           overlay.classList.remove('show');
           if(onReady) onReady();
-        }, 600);
+        }, 700);
       }
     }, 1000);
   };
@@ -6160,14 +6302,14 @@ function drawThumbQOC(){
     function _autoMove(){
       try{
         const _teamMode = window.currentMode==='2v2'||window.currentMode==='4v4';
-        // Classic chess
-        if(typeof classicRunning!=='undefined' && classicRunning && typeof classicTurn!=='undefined'){
+        // Classic chess — use correct variable names ccRunning/ccTurn (NOT classicRunning/classicTurn)
+        if(typeof ccRunning!=='undefined' && ccRunning && typeof ccTurn!=='undefined'){
           const pc = typeof classicPlayerColor!=='undefined' ? classicPlayerColor : 'w';
-          if(!_teamMode && classicTurn !== pc){ _resetTimer(); return; }
+          if(!_teamMode && ccTurn !== pc){ _resetTimer(); return; }
           const mvs = [];
           for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-            const p = ccBoard[r][c]; if(!p||p.c!==classicTurn) continue;
-            try{ ccGetMoves(r,c,true).forEach(m=>mvs.push({fr:r,fc:c,tr:m.r,tc:m.c})); }catch(e){}
+            const p = ccBoard[r][c]; if(!p||p.c!==ccTurn) continue;
+            try{ ccLegal(r,c).forEach(m=>mvs.push({fr:r,fc:c,tr:m.r,tc:m.c})); }catch(e){}
           }
           if(mvs.length){ const mv=mvs[Math.floor(Math.random()*mvs.length)]; try{ ccDoMove(mv.fr,mv.fc,mv.tr,mv.tc); }catch(e){} }
           _resetTimer(); return;
@@ -6218,6 +6360,23 @@ function drawThumbQOC(){
       if(el){ el.addEventListener('click', _resetTimer, {passive:true}); el.addEventListener('touchstart', _resetTimer, {passive:true}); }
     });
     _resetTimer();
+  })();
+
+  // ── v0.06 FULL-SCREEN SCALE (9:16 for Median / phone) ─────────────
+  // Scales #root to fill the viewport while maintaining 360×600 aspect ratio.
+  (function(){
+    function scaleRoot(){
+      const r=document.getElementById('root');
+      if(!r) return;
+      const vw=window.innerWidth||360, vh=window.innerHeight||600;
+      const s=Math.min(vw/360, vh/600);
+      r.style.transform='scale('+s+')';
+      r.style.left=Math.round((vw-360*s)/2)+'px';
+      r.style.top=Math.round((vh-600*s)/2)+'px';
+    }
+    scaleRoot();
+    window.addEventListener('resize', scaleRoot);
+    window.addEventListener('orientationchange', function(){ setTimeout(scaleRoot, 120); });
   })();
 
 })();

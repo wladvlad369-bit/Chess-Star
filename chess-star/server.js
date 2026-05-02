@@ -457,6 +457,30 @@ app.post("/api/account/replay", async (req, res, next) => {
   }
 });
 
+// ── v0.06 — QUEUE TRACKER (in-memory; shows real player count in matchmaking) ──
+const _queue = new Map(); // sessionId -> { event, mode, joined }
+function _queueClean(){ const now=Date.now(); for(const [k,v] of _queue) if(now-v.joined>90000) _queue.delete(k); }
+app.post("/api/queue/join", (req, res) => {
+  const { sessionId, event, mode } = req.body || {};
+  if(sessionId) _queue.set(sessionId, { event:event||'', mode:mode||'1v1', joined:Date.now() });
+  _queueClean();
+  const count = [..._queue.values()].filter(v=>v.event===(event||'')&&v.mode===(mode||'1v1')).length;
+  const needed = ({lps:6,'1v1':2,'2v2':4,'4v4':8})[mode||'1v1']||2;
+  res.json({ count: Math.max(1, count), needed });
+});
+app.post("/api/queue/leave", (req, res) => {
+  const { sessionId } = req.body || {};
+  if(sessionId) _queue.delete(sessionId);
+  res.json({ ok: true });
+});
+app.get("/api/queue/count", (req, res) => {
+  _queueClean();
+  const event = req.query.event||'', mode = req.query.mode||'1v1';
+  const count = [..._queue.values()].filter(v=>v.event===event&&v.mode===mode).length;
+  const needed = ({lps:6,'1v1':2,'2v2':4,'4v4':8})[mode]||2;
+  res.json({ count: Math.max(1, count), needed });
+});
+
 app.get("/api/leaderboard", async (req, res, next) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 100, 100);
