@@ -626,7 +626,7 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #loadBottom{z-index:3;}
 
 /* v0.06 — Matchmaking overlay */
-#matchmakingOverlay{position:absolute;inset:0;background:rgba(0,0,0,.78);z-index:92;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;backdrop-filter:blur(4px);}
+#matchmakingOverlay{position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.78),rgba(0,0,0,.78)),url('/loading-castle.jpg') center/cover;z-index:92;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;backdrop-filter:blur(4px);}
 #matchmakingOverlay.show{display:flex;}
 #mmTitle{font-size:22px;font-weight:900;color:#f1c40f;letter-spacing:5px;font-family:'Georgia',serif;text-shadow:0 0 24px rgba(241,196,15,.75),2px 2px 0 #3e1a00;}
 #mmSpinner{width:38px;height:38px;border:3px solid #3e2000;border-top-color:#f1c40f;border-radius:50%;animation:mmSpin .8s linear infinite;}

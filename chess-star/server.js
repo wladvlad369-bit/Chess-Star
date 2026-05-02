@@ -90,6 +90,11 @@ function createMemStorage() {
     async getMany(codes) {
       return codes.map((c) => accounts.get(c)).filter(Boolean);
     },
+    async leaderboard(limit) {
+      return [...accounts.values()]
+        .sort((a, b) => b.wins - a.wins)
+        .slice(0, limit);
+    },
   };
 }
 
