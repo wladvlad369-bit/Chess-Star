@@ -286,6 +286,7 @@ app.post("/api/account/upsert", async (req, res, next) => {
           code: existing.code,
           name: existing.name,
           color: existing.color,
+          wins: existing.wins,
         });
       }
     }
@@ -317,7 +318,7 @@ app.post("/api/account/login", async (req, res, next) => {
       a = newAccount(code, "Player", "#3498db");
     }
     await touch(a);
-    res.json({ code: a.code, name: a.name, color: a.color });
+    res.json({ code: a.code, name: a.name, color: a.color, wins: a.wins });
   } catch (e) {
     next(e);
   }

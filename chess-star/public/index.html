@@ -93,9 +93,8 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .pIco{font-size:22px;width:32px;text-align:center;}.pInfo{flex:1;}.pNm{font-size:12px;font-weight:bold;color:#f1c40f;}.pDs{font-size:9px;color:#a08060;margin-top:2px;}.pLk{font-size:9px;color:#555;background:#1a0a00;border:1px solid #333;padding:2px 5px;border-radius:3px;}
 
 /* PROFILE */
-#profileScreen{justify-content:flex-start;}
+#profileScreen{justify-content:flex-start;position:relative;overflow:hidden;}
 #profContent{width:100%;padding:16px 14px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
-#bigIcon{width:68px;height:68px;border:3px solid #5d4037;border-radius:10px;background:#1a0800;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto;}
 .fLbl{font-size:10px;color:#a08060;letter-spacing:2px;margin-bottom:5px;}
 #nameInput{background:#1a0800;border:2px solid #5d4037;border-radius:6px;padding:10px 12px;font-size:14px;font-weight:bold;font-family:'Verdana',sans-serif;outline:none;width:100%;transition:border-color .2s;color:#fff;}
 #nameInput:focus{border-color:#f1c40f;}
@@ -108,19 +107,41 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .profStat .psNum{font-size:16px;font-weight:bold;color:#f1c40f;margin-top:3px;}
 .profStat .psLbl{font-size:8px;color:#a08060;letter-spacing:1.2px;margin-top:2px;}
 /* v0.05 — emoji icon picker */
-#iconPicker{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-.iPick{width:34px;height:34px;border:2px solid #3e1a00;border-radius:7px;background:#0d0500;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative;transition:border-color .15s,transform .12s;}
-body.lightTheme .iPick{background:#fff8e8;border-color:#a08060;}
+#iconPicker{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.iPick{width:44px;height:44px;border:2px solid #3e1a00;border-radius:8px;background:#0d0500;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;position:relative;transition:border-color .15s,transform .12s;color:#fff;}
+body.lightTheme .iPick{background:#fff8e8;border-color:#a08060;color:#1a0500;}
 body.lightTheme .iPick.on{background:#ffe9a0;border-color:#f1c40f;}
 .iPick:hover:not(.locked){border-color:#f1c40f;transform:scale(1.1);}
 .iPick.on{border-color:#f1c40f;background:#3a2a05;box-shadow:0 0 8px rgba(241,196,15,.5);}
 .iPick.locked{opacity:.35;filter:grayscale(.6);cursor:not-allowed;}
 .iPick.locked::after{content:'🔒';position:absolute;bottom:-2px;right:-2px;font-size:10px;}
-.cDot{width:30px;height:30px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .15s;}
+.cDot{width:32px;height:32px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .15s;}
 .cDot:hover{transform:scale(1.15);}
 .cDot.on{border-color:#fff;transform:scale(1.2);}
 #saveProfBtn{padding:12px;background:#1a0800;color:#f1c40f;border:2px solid #f1c40f;border-radius:8px;font-weight:bold;font-size:12px;cursor:pointer;letter-spacing:2px;transition:background .15s;}
 #saveProfBtn:hover{background:#f1c40f;color:#000;}
+/* Profile name display (clickable) */
+#profNameDisplay{font-size:15px;font-weight:bold;padding:11px 13px;border:2px solid #5d4037;border-radius:6px;background:#1a0800;cursor:pointer;text-align:center;transition:border-color .15s;}
+#profNameDisplay:hover{border-color:#f1c40f;}
+#profNameEditHint{font-size:9px;color:#888;letter-spacing:1px;margin-top:3px;text-align:center;}
+#bigIconWrap{cursor:pointer;position:relative;width:68px;height:68px;margin:0 auto;}
+#bigIcon{width:68px;height:68px;border:3px solid #5d4037;border-radius:10px;background:#1a0800;display:flex;align-items:center;justify-content:center;font-size:34px;transition:border-color .15s;}
+#bigIconWrap:hover #bigIcon{border-color:#f1c40f;}
+#bigIconEditBadge{position:absolute;bottom:-4px;right:-4px;font-size:11px;background:#1976d2;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+/* Icon picker modal / Name+color modal (slide over profile content) */
+#iconPickerModal,#nameColorModal{position:absolute;inset:0;background:rgba(4,2,0,.97);z-index:60;display:none;flex-direction:column;}
+#iconPickerModal.show,#nameColorModal.show{display:flex;}
+#iconPickerHeader,#nameColorHeader{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #2a1200;flex-shrink:0;}
+#iconPickerHeader .topTitle,#nameColorHeader .topTitle{flex:1;}
+#iconPickerScroll{flex:1;overflow-y:auto;padding:14px;}
+#iconSelectBtn,#nameSelectBtn{margin:10px 14px 14px;padding:12px;background:#1976d2;color:#fff;border:2px solid #0d47a1;border-radius:8px;font-weight:bold;font-size:12px;cursor:pointer;letter-spacing:2px;flex-shrink:0;transition:background .15s;}
+#iconSelectBtn:hover,#nameSelectBtn:hover{background:#42a5f5;}
+#nameColorContent{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+body.lightTheme #iconPickerModal,body.lightTheme #nameColorModal{background:rgba(245,236,216,.98);}
+body.lightTheme #iconPickerHeader,body.lightTheme #nameColorHeader{border-bottom-color:#c0a070;background:rgba(245,236,216,.95);}
+body.lightTheme #profNameDisplay{background:#fff8e8;border-color:#a08060;color:#3a2306;}
+body.lightTheme #bigIcon{background:#fff8e8;border-color:#a08060;}
+body.lightTheme #iconSelectBtn,body.lightTheme #nameSelectBtn{background:#1976d2;color:#fff;border-color:#0d47a1;text-shadow:none;}
 
 /* PIECES MENU */
 #piecesMenuScreen{justify-content:flex-start;}
@@ -436,7 +457,20 @@ body.lightTheme .backBtn{color:#3a2306;}
 body.lightTheme .eCard,body.lightTheme .pieceCard,body.lightTheme .ppCard,body.lightTheme .setSection,body.lightTheme .repItem,body.lightTheme .friendItem,body.lightTheme #playerCard,body.lightTheme #profileBox,body.lightTheme #saveCodeBox,body.lightTheme #codeImportBox{background:#fff8e8;color:#3a2306;border-color:#a08060;}
 body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .ppCard .ppName,body.lightTheme .setSection h3,body.lightTheme .invDet .invLbl{color:#7a4e20;text-shadow:none;}
 body.lightTheme .eCard p,body.lightTheme .setRow,body.lightTheme .pcDesc,body.lightTheme .ppDesc{color:#5a3a10;}
-body.lightTheme .miniBtn,body.lightTheme #ppGo,body.lightTheme #saveProfBtn,body.lightTheme .langBtn,body.lightTheme .themeToggle button,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme .modeOpt,body.lightTheme .endBtns button,body.lightTheme #repPlayerCtrl button,body.lightTheme .acctTab,body.lightTheme #acctGoBtn,body.lightTheme #infoModalCloseBtn,body.lightTheme .exitBtn,body.lightTheme #ppCancel,body.lightTheme .fBtnSm,body.lightTheme .backBtn,body.lightTheme #lbRefreshBtn,body.lightTheme #msClose,body.lightTheme #tInfoClose,body.lightTheme #evSelectBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;text-shadow:none;}
+body.lightTheme .miniBtn,body.lightTheme #ppGo,body.lightTheme #saveProfBtn,body.lightTheme .langBtn,body.lightTheme .themeToggle button,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme .modeOpt,body.lightTheme .endBtns button,body.lightTheme #repPlayerCtrl button,body.lightTheme .acctTab,body.lightTheme #acctGoBtn,body.lightTheme #infoModalCloseBtn,body.lightTheme .exitBtn,body.lightTheme #ppCancel,body.lightTheme .fBtnSm,body.lightTheme .backBtn,body.lightTheme #lbRefreshBtn,body.lightTheme #msClose,body.lightTheme #tInfoClose,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme #startBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;text-shadow:none;}
+body.lightTheme #startBtn{background:linear-gradient(180deg,#e8f4fd,#aed0ef,#7ab0d8);color:#1a3a5c;outline-color:#4a90d9;}
+body.lightTheme #nameInput,body.lightTheme #acctNameInp,body.lightTheme #acctCodeInp,body.lightTheme #codeImportBox{background:#fff8e8;color:#3a2306;border-color:#a08060;}
+body.lightTheme #nameInput:focus{border-color:#1976d2;}
+body.lightTheme #nameHint,body.lightTheme #profNameEditHint{color:#7a5030;}
+body.lightTheme .fLbl{color:#7a5030;}
+body.lightTheme .profStat{background:#fff8e8;border-color:#a08060;}
+body.lightTheme .profStat .psNum{color:#1976d2;}
+body.lightTheme .profStat .psLbl{color:#7a5030;}
+body.lightTheme #iconBox{background:#fff8e8;border-color:#a08060;}
+body.lightTheme #profileBox #pName{text-shadow:none;}
+body.lightTheme .connServer,body.lightTheme #connFps{color:#7a5030;}
+body.lightTheme .setRow input[type=range]{accent-color:#1976d2;}
+body.lightTheme #lpsBar,body.lightTheme #classicBar,body.lightTheme #gtsBar,body.lightTheme #qocBar{background:rgba(245,236,216,.92);}
 body.lightTheme .miniBtn:hover,body.lightTheme .langBtn.on,body.lightTheme .themeToggle button.on,body.lightTheme .modeOpt.on,body.lightTheme .acctTab.on,body.lightTheme #ppGo:not(:disabled),body.lightTheme .endBtns button:hover,body.lightTheme #repPlayerCtrl button:hover{background:#f1c40f;color:#3a2306;border-color:#c89c0a;}
 body.lightTheme #infoBtn,body.lightTheme .infoBtn{background:#fff8e8;color:#1976d2;border-color:#1976d2;}
 body.lightTheme #infoModalInner,body.lightTheme #milestoneModal>div,body.lightTheme #trophyInfoInner,body.lightTheme #inviteInner,body.lightTheme #vgInner,body.lightTheme #prePickInner,body.lightTheme #acctModalInner{background:linear-gradient(180deg,#fff8e8,#f5ecd8);color:#3a2306;border-color:#7a4e20;box-shadow:0 0 30px rgba(0,0,0,.25);}
@@ -800,18 +834,51 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
 <div id="profileScreen" class="screen">
   <div class="topBar"><button class="backBtn" onclick="saveProf()">←</button><span class="topTitle" data-i18n="profile.title">PROFILE</span></div>
   <div id="profContent">
-    <div id="bigIcon">🎭</div>
+    <div id="bigIconWrap" onclick="window.openIconModal&&window.openIconModal()" title="Change icon">
+      <div id="bigIcon">🎭</div>
+      <div id="bigIconEditBadge">✎</div>
+    </div>
     <div id="profStatsRow">
       <div class="profStat"><div class="psIco">🏅</div><div class="psNum" id="profWinsNum">0</div><div class="psLbl" data-i18n="profile.wins">WINS</div></div>
       <div class="profStat"><div class="psIco">🏆</div><div class="psNum" id="profTrophiesNum">0</div><div class="psLbl" data-i18n="profile.trophies">TROPHIES</div></div>
       <div class="profStat"><div class="psIco">♟</div><div class="psNum" id="profPiecesNum">1/6</div><div class="psLbl" data-i18n="profile.pieces">PIECES</div></div>
     </div>
-    <div><div class="fLbl" data-i18n="profile.name">PLAYER NAME (MAX 10 CHARS)</div>
-    <input id="nameInput" type="text" maxlength="10" placeholder="Player 1">
-    <div id="nameHint">0 / 10</div></div>
-    <div><div class="fLbl" data-i18n="profile.color">NAME COLOR</div><div id="colorPicker"></div></div>
-    <div><div class="fLbl" data-i18n="profile.icon">PROFILE ICON</div><div id="iconPicker"></div></div>
+    <div onclick="window.openNameModal&&window.openNameModal()">
+      <div class="fLbl">PLAYER NAME — TAP TO EDIT</div>
+      <div id="profNameDisplay">Player 1</div>
+      <div id="profNameEditHint">✎ tap to change name &amp; color</div>
+    </div>
     <button id="saveProfBtn" onclick="saveProf()">✓ <span data-i18n="profile.save">SAVE</span></button>
+  </div>
+  <!-- ICON PICKER MODAL -->
+  <div id="iconPickerModal">
+    <div id="iconPickerHeader" class="topBar" style="border-bottom:1px solid #2a1200;">
+      <button class="backBtn" onclick="window.closeIconModal&&window.closeIconModal()">←</button>
+      <span class="topTitle">CHOOSE ICON</span>
+      <button id="iconSelectBtn" onclick="window.confirmIconModal&&window.confirmIconModal()">✓ SELECT</button>
+    </div>
+    <div id="iconPickerScroll">
+      <div id="iconPicker"></div>
+    </div>
+  </div>
+  <!-- NAME & COLOR MODAL -->
+  <div id="nameColorModal">
+    <div id="nameColorHeader" class="topBar" style="border-bottom:1px solid #2a1200;">
+      <button class="backBtn" onclick="window.closeNameModal&&window.closeNameModal()">←</button>
+      <span class="topTitle">NAME &amp; COLOR</span>
+      <button id="nameSelectBtn" onclick="window.confirmNameModal&&window.confirmNameModal()">✓ SELECT</button>
+    </div>
+    <div id="nameColorContent">
+      <div>
+        <div class="fLbl" data-i18n="profile.name">PLAYER NAME (MAX 10 CHARS)</div>
+        <input id="nameInput" type="text" maxlength="10" placeholder="Player 1">
+        <div id="nameHint">0 / 10</div>
+      </div>
+      <div>
+        <div class="fLbl" data-i18n="profile.color">NAME COLOR</div>
+        <div id="colorPicker"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1429,35 +1496,74 @@ function showEventOverlay(overlayId, title, onDone){
 // ═══════════════════════════════════════════
 // PROFILE
 // ═══════════════════════════════════════════
-function openProf() {
-  const ni=document.getElementById('nameInput');
-  ni.value=profile.name; ni.style.color=profile.color;
-  updateHint();
-  const cp=document.getElementById('colorPicker'); cp.innerHTML='';
+function _buildColorPicker(){
+  const cp=document.getElementById('colorPicker'); if(!cp) return;
+  cp.innerHTML='';
   PROF_COLORS.forEach(col=>{
     const d=document.createElement('div'); d.className='cDot'+(col===profile.color?' on':'');
     d.style.background=col==='#aaaaaa'?'#555':col;
     if(col==='#ffffff') d.style.border='3px solid #888';
     d.dataset.color=col;
-    d.onclick=()=>{ cp.querySelectorAll('.cDot').forEach(x=>x.classList.remove('on')); d.classList.add('on'); ni.style.color=col; };
+    d.onclick=()=>{
+      cp.querySelectorAll('.cDot').forEach(x=>x.classList.remove('on'));
+      d.classList.add('on');
+      const ni2=document.getElementById('nameInput');
+      if(ni2) ni2.style.color=col;
+    };
     cp.appendChild(d);
   });
+}
+function openProf() {
+  const nd=document.getElementById('profNameDisplay');
+  if(nd){ nd.textContent=profile.name; nd.style.color=profile.color; }
+  const ni=document.getElementById('nameInput');
+  if(ni){ ni.value=profile.name; ni.style.color=profile.color; }
+  updateHint();
+  _buildColorPicker();
 }
 document.getElementById('nameInput').addEventListener('input', updateHint);
 function updateHint(){
   const v=document.getElementById('nameInput').value;
-  document.getElementById('nameHint').textContent=v.length+' / 10';
+  const h=document.getElementById('nameHint');
+  if(h) h.textContent=v.length+' / 10';
 }
 function saveProf(){
-  const n=document.getElementById('nameInput').value.trim().substring(0,10)||'Player 1';
+  savePersistedProfile();
+  document.getElementById('pName').textContent=profile.name;
+  document.getElementById('pName').style.color=profile.color;
+  goTo('menuScreen');
+}
+window.openIconModal=function(){
+  document.getElementById('iconPickerModal').classList.add('show');
+  try{ window.renderIconPicker&&window.renderIconPicker(); }catch(e){}
+};
+window.closeIconModal=function(){
+  document.getElementById('iconPickerModal').classList.remove('show');
+};
+window.confirmIconModal=function(){
+  try{ window.applyProfileIcon&&window.applyProfileIcon(); }catch(e){}
+  window.closeIconModal();
+};
+window.openNameModal=function(){
+  const ni=document.getElementById('nameInput');
+  if(ni){ ni.value=profile.name; ni.style.color=profile.color; }
+  updateHint();
+  _buildColorPicker();
+  document.getElementById('nameColorModal').classList.add('show');
+};
+window.closeNameModal=function(){
+  document.getElementById('nameColorModal').classList.remove('show');
+};
+window.confirmNameModal=function(){
+  const n=(document.getElementById('nameInput')?.value||'').trim().substring(0,10)||'Player 1';
   const ch=document.querySelector('#colorPicker .cDot.on');
   const col=ch?ch.dataset.color:'#3498db';
   profile={name:n,color:col};
   savePersistedProfile();
-  document.getElementById('pName').textContent=n;
-  document.getElementById('pName').style.color=col;
-  goTo('menuScreen');
-}
+  const nd=document.getElementById('profNameDisplay');
+  if(nd){ nd.textContent=n; nd.style.color=col; }
+  window.closeNameModal();
+};
 
 // ═══════════════════════════════════════════
 // PIECE DRAWING ENGINE
@@ -2555,8 +2661,8 @@ function lpsNextTurn(){
   // (because there are 16 pawns on the board, harder to escape poison quickly)
   if(lpsMoves%lpsNumPlayers===0){
     lpsRounds++;
-    if(lpsMode==='pawn'){
-      if(lpsRounds>=4)lpsPoisonOn=true;
+    if(lpsMode==='pawn' || lpsChosenType==='P'){
+      if(lpsRounds>=3)lpsPoisonOn=true;
       if(lpsPoisonOn&&lpsRounds%3===0&&lpsPoisonStg<6)lpsPoisonStg++;
     } else {
       if(lpsRounds>=3)lpsPoisonOn=true;
@@ -3821,6 +3927,26 @@ function qocAiTurn(){
     const p = qocBoard[r][c]; if(!p || p.c!==aiCol) continue;
     qocGetMoves(r,c).forEach(m=>all.push({fr:r,fc:c,m}));
   }
+  // If a chain capture is in progress, ONLY allow moves from the chaining piece
+  if(qocMustChain){
+    const cr=qocMustChain.r, cc2=qocMustChain.c;
+    const chainMoves=qocGetMoves(cr,cc2).filter(m=>m.atk);
+    if(chainMoves.length===0){
+      qocMustChain=null; qocSel=null; qocValMoves=[];
+      qocTurn=qocTurn==='w'?'b':'w';
+      qocPlies++;
+      const myColX=qocPlayerColor||'w';
+      document.getElementById('qocMsg').textContent=qocTurn===myColX?'Your turn':'Opponent thinking...';
+      _qocAiBusy=false;
+      if(qocTurn!==myColX) setTimeout(qocAiTurn,600);
+      return;
+    }
+    const pick=chainMoves[Math.floor(Math.random()*chainMoves.length)];
+    _qocAiBusy=false;
+    qocDoMove(cr,cc2,pick.r,pick.c,pick);
+    if(qocMustChain&&qocTurn===aiCol) setTimeout(qocAiTurn,500);
+    return;
+  }
   if(all.length===0){
     _qocAiBusy=false;
     qocOver=true; qocRunning=false;
@@ -4297,6 +4423,7 @@ function drawThumbQOC(){
       localStorage.setItem(ACCT_KEY, myCode);
       if(j.name){ profile.name = j.name; localStorage.setItem(ACCT_NAME_KEY, j.name); savePersistedProfile(); }
       if(j.color) profile.color = j.color;
+      if(typeof j.wins==='number') applyAccountFromServer({wins:j.wins});
       const pn = $('pName'); if(pn){ pn.textContent = profile.name; pn.style.color = profile.color; }
       $('acctModal').classList.remove('show');
       updateSaveCodeUI();
@@ -4330,9 +4457,10 @@ function drawThumbQOC(){
       myCode = j.code; localStorage.setItem(ACCT_KEY,myCode);
       if(j.name){ profile.name = j.name; savePersistedProfile(); }
       if(j.color) profile.color = j.color;
+      if(typeof j.wins==='number') applyAccountFromServer({wins:j.wins});
       const pn = $('pName'); if(pn){ pn.textContent = profile.name; pn.style.color = profile.color; }
       updateSaveCodeUI();
-      showToast('Account loaded');
+      showToast('Account loaded ✓ wins synced');
       netConnect();
     } catch(e){ showToast(explainNetErr()); }
   };
@@ -4981,18 +5109,21 @@ function drawThumbQOC(){
     }
   };
 
-  // Add a "Suggest Walk" button into LPS hud area if present
-  setTimeout(()=>{
-    const lpsScreen = document.getElementById('lpsScreen');
-    if(lpsScreen && !document.getElementById('suggestWalkBtn')){
-      const b = document.createElement('button');
-      b.id='suggestWalkBtn';
-      b.textContent='🚶 SUGGEST WALK';
-      b.style.cssText='position:absolute;bottom:8px;left:8px;background:#1a0800;color:#42a5f5;border:2px solid #1976d2;border-radius:6px;padding:6px 9px;font-size:9px;font-weight:bold;letter-spacing:1px;cursor:pointer;z-index:25;';
-      b.onclick = ()=>suggestWalk();
-      lpsScreen.appendChild(b);
+  // Suggest Walk button — inject into Classic/GTS/QOC screens ONLY when mode is 2v2 or 4v4
+  function _injectWalkBtn(screenId){
+    const scr = document.getElementById(screenId);
+    if(!scr) return;
+    let wb = document.getElementById('suggestWalkBtn');
+    if(!wb){
+      wb = document.createElement('button');
+      wb.id='suggestWalkBtn';
+      wb.textContent='🚶 SUGGEST WALK';
+      wb.style.cssText='position:absolute;bottom:8px;left:8px;background:#1a0800;color:#42a5f5;border:2px solid #1976d2;border-radius:6px;padding:6px 9px;font-size:9px;font-weight:bold;letter-spacing:1px;cursor:pointer;z-index:25;';
+      wb.onclick = ()=>window.suggestWalk && window.suggestWalk();
     }
-  }, 500);
+    scr.appendChild(wb);
+  }
+  function _removeWalkBtn(){ const wb=document.getElementById('suggestWalkBtn'); if(wb) wb.remove(); }
 
   // v0.04 — initialize milestone bars and keep them visible only on the main menu
   try{ window.updateMilestones && window.updateMilestones(); }catch(e){}
@@ -5002,8 +5133,16 @@ function drawThumbQOC(){
     const ms = document.getElementById('milestoneRow');
     if(ms) ms.style.display = (id==='menuScreen') ? 'flex' : 'none';
     if(id==='menuScreen'){ try{ window.updateMilestones && window.updateMilestones(); }catch(e){} }
-    if(id==='profileScreen'){ try{ window.refreshProfileStats && window.refreshProfileStats(); window.renderIconPicker && window.renderIconPicker(); }catch(e){} }
+    if(id==='profileScreen'){ try{ window.refreshProfileStats && window.refreshProfileStats(); }catch(e){} }
     if(id==='piecesMenuScreen'){ try{ window.refreshPieceLocks && window.refreshPieceLocks(); }catch(e){} }
+    // Walk button: only in team-mode game screens
+    const teamScreens = ['classicScreen','gtsScreen','qocScreen'];
+    const isTeamMode = window.currentMode==='2v2'||window.currentMode==='4v4';
+    if(teamScreens.includes(id) && isTeamMode){
+      setTimeout(()=>_injectWalkBtn(id), 150);
+    } else {
+      _removeWalkBtn();
+    }
   };
   // Sync once more after the DOM and assets settle
   setTimeout(()=>{ try{ window.updateMilestones && window.updateMilestones(); }catch(e){} }, 300);
@@ -5103,6 +5242,7 @@ function drawThumbQOC(){
     const ib = document.getElementById('iconBox'); if(ib) ib.textContent = profileIcon;
     const big = document.getElementById('bigIcon'); if(big) big.textContent = profileIcon;
   }
+  window.applyProfileIcon = applyProfileIcon;
   window.renderIconPicker = function(){
     const grid = document.getElementById('iconPicker'); if(!grid) return;
     grid.innerHTML = '';
@@ -5114,7 +5254,14 @@ function drawThumbQOC(){
       div.className = 'iPick' + (unlocked?'':' locked') + (profileIcon===emoji?' on':'');
       div.textContent = emoji;
       div.title = unlocked ? emoji : ('Unlocks at '+need+' wins');
-      if(unlocked){ div.onclick = ()=>{ profileIcon = emoji; saveProfileIcon(); applyProfileIcon(); window.renderIconPicker(); }; }
+      if(unlocked){
+        div.onclick = ()=>{
+          profileIcon = emoji;
+          saveProfileIcon();
+          grid.querySelectorAll('.iPick').forEach(x=>x.classList.remove('on'));
+          div.classList.add('on');
+        };
+      }
       grid.appendChild(div);
     });
   };
@@ -5947,9 +6094,9 @@ function drawThumbQOC(){
   const _origSaveProf = window.saveProf;
   if(_origSaveProf){
     window.saveProf = function(){
-      _origSaveProf.apply(this, arguments);
       saveProfileIcon();
       applyProfileIcon();
+      _origSaveProf.apply(this, arguments);
     };
   }
 
@@ -6012,13 +6159,14 @@ function drawThumbQOC(){
     }
     function _autoMove(){
       try{
+        const _teamMode = window.currentMode==='2v2'||window.currentMode==='4v4';
         // Classic chess
         if(typeof classicRunning!=='undefined' && classicRunning && typeof classicTurn!=='undefined'){
           const pc = typeof classicPlayerColor!=='undefined' ? classicPlayerColor : 'w';
-          if(classicTurn !== pc){ _resetTimer(); return; }
+          if(!_teamMode && classicTurn !== pc){ _resetTimer(); return; }
           const mvs = [];
           for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-            const p = ccBoard[r][c]; if(!p||p.c!==pc) continue;
+            const p = ccBoard[r][c]; if(!p||p.c!==classicTurn) continue;
             try{ ccGetMoves(r,c,true).forEach(m=>mvs.push({fr:r,fc:c,tr:m.r,tc:m.c})); }catch(e){}
           }
           if(mvs.length){ const mv=mvs[Math.floor(Math.random()*mvs.length)]; try{ ccDoMove(mv.fr,mv.fc,mv.tr,mv.tc); }catch(e){} }
@@ -6027,10 +6175,10 @@ function drawThumbQOC(){
         // GTS
         if(typeof gtsRunning!=='undefined' && gtsRunning && typeof gtsTurn!=='undefined'){
           const pc = typeof gtsPlayerColor!=='undefined' ? gtsPlayerColor : 'w';
-          if(gtsTurn !== pc){ _resetTimer(); return; }
+          if(!_teamMode && gtsTurn !== pc){ _resetTimer(); return; }
           const mvs = [];
           for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-            const p = gtsBoard[r][c]; if(!p||p.c!==pc) continue;
+            const p = gtsBoard[r][c]; if(!p||p.c!==gtsTurn) continue;
             try{ gtsGetMoves(r,c).forEach(m=>mvs.push({fr:r,fc:c,tr:m.r,tc:m.c})); }catch(e){}
           }
           if(mvs.length){ const mv=mvs[Math.floor(Math.random()*mvs.length)]; try{ gtsDoMove(mv.fr,mv.fc,mv.tr,mv.tc); }catch(e){} }
@@ -6039,7 +6187,7 @@ function drawThumbQOC(){
         // QOC — pick random valid move for player
         if(typeof qocRunning!=='undefined' && qocRunning && !qocOver){
           const pc = typeof qocPlayerColor!=='undefined' ? qocPlayerColor : 'w';
-          if(qocTurn !== pc){ _resetTimer(); return; }
+          if(!_teamMode && qocTurn !== pc){ _resetTimer(); return; }
           const mvs = [];
           for(let r=0;r<8;r++) for(let c=0;c<8;c++){
             const p = qocBoard[r][c]; if(!p||p.c!==pc) continue;
