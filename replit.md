@@ -1,86 +1,85 @@
-# Chess Star
+# Chess Star v0.06
 
-Joc 2D de șah cu mai multe moduri (Last Piece Standing, Classic, Queens On Color, Grind The Safe). Tot codul aplicației este într-un singur folder simplu.
+Self-contained chess-themed mobile-style web game. The entire client lives in a single HTML file (`chess-star/public/index.html`) served by a small Express server (`chess-star/server.js`).
 
-## Structură (forma simplificată pentru Railway)
+## Structure
 
-```
-chess-star/
-├── package.json     # express + scriptul "start"
-├── server.js        # Express - servește jocul + /api/*
-├── Procfile         # fallback pentru hosts Heroku-style
-├── .gitignore
-├── README.md
-└── public/
-    ├── index.html   # jocul complet (~5400 linii inline) — v0.06
-    └── opengraph.jpg
-```
+- `chess-star/public/index.html` — the whole client app (UI, engine, AI, persistence, sockets, i18n)
+- `chess-star/server.js` — Express server (accounts, version, search, friends, replays)
+- `chess-star/package.json` — Node deps (express, pg)
+- `artifacts/mockup-sandbox/` — canvas mockup sandbox (design prototyping only)
 
-Pornire locală:
+## Running the App
 
-```bash
-cd chess-star
-npm install
-npm start    # http://localhost:8080
-```
+Workflow: **Start application** — `cd chess-star && node server.js` on port 8080.
 
-## Pe Replit
+## Persistence (localStorage keys)
 
-Workflow-ul `artifacts/chess-star: web` rulează `node /home/runner/workspace/chess-star/server.js` pe portul 25566, expus de proxy la `/`. Folderul `artifacts/chess-star/` conține doar `.replit-artifact/artifact.toml` (configurația de preview Replit) — restul codului e în `chess-star/` la rădăcină.
+- `chessstar_profile` — `{name, color}`
+- `chessstar_icon`    — selected emoji (1 of 20, gated by total wins)
+- `chessstar_lang`    — `'en' | 'ro' | 'ru'`
+- `chessstar_skins`   — per-piece skin id map
+- `chessstar_theme`   — `'dark' | 'light'`
+- `chessstar_wins`, `chessstar_trophies`, `chessstar_streak`, `chessstar_recent`, `chessstar_replays`
+- `claimed_wins`, `claimed_trophies` — milestone claim state
+- `acct_code`, `acct_name` — login identity
+- 13-char save code: `#NNNNNNNNCHH_` (8-char name, 1 color index, 2 hex skin bitmask, pad)
 
-`artifacts/api-server` și fișierele Vite din artifacts/chess-star/ au fost eliminate; nu mai sunt necesare. Un singur server Express acoperă atât HTML-ul cât și API-ul.
+## Skins
 
-## Persistență
+- `classic` — flat 2D web style (unicode chess silhouettes, default)
+- `wood` — realistic 3D ivory shapes in wood tones
 
-Serverul detectează la pornire dacă există variabila `DATABASE_URL`:
-- **Setată** → PostgreSQL (`pg`). Tabelul `chess_accounts` e creat automat. Conturile, prietenii și replay-urile rezistă la restart.
-- **Lipsă** → memorie (`Map`). Datele se șterg la restart. Util pentru dev local.
+## Events / Game Modes
 
-Pe Railway: `+ New → Database → Add PostgreSQL` și serverul preia singur. Pe Replit (acest workspace) baza e deja provizionată automat.
+- `lps`     — Last Piece Standing (6 or 4 players, poison ring)
+- `classic` — Classic Chess (1v1, full rules) — with AI opponent
+- `qoc`     — Queens On Color (checkers/dame with bishop promotion + 2 wheels of fortune)
+- `gts`     — Grind The Safe (drain enemy safe HP) — with AI opponent
 
-## API
+## Game modes
 
-Toate sunt JSON pe același domeniu cu jocul:
+- `1v1` / `2v2` / `4v4` — selectable on every event
+- 2v2 / 4v4 trigger the pre-game piece picker (2v2 = pick 2 pieces, 4v4 = pick 1)
 
-- `GET  /api/healthz` — health check
-- `GET  /api/version` — `{latest, required}` pentru gate-ul de versiune
-- `POST /api/account/create` — creează cont nou (in-memory)
-- `POST /api/account/upsert` — creează sau actualizează după cod
-- `POST /api/account/login` — login cu cod 13 caractere
-- `GET  /api/account/me?code=...`
-- `GET  /api/account/search?q=...`
-- `GET  /api/account/friends?code=...`
-- `POST /api/account/friend-request` / `friend-respond` / `friend-remove`
-- `POST /api/account/replay`
+## Piece progression
 
-> Persistența este în-memorie. Pentru date durabile adaugă PostgreSQL.
+- Only Pawn unlocked at start
+- Rook 5W, Knight 10W, Bishop 15W, Queen 25W, King 50W
 
-## Persistență client (localStorage)
+## Profile icons
 
-`chessstar_profile`, `chessstar_icon`, `chessstar_lang`, `chessstar_skins`, `chessstar_theme`, `chessstar_wins`, `chessstar_trophies`, `chessstar_streak`, `chessstar_recent`, `chessstar_replays`, `claimed_wins`, `claimed_trophies`, `chessstar_acct_code`, `chessstar_acct_name`.
+- 20 emoji icons; first 3 unlocked, rest gated by win counts
 
-Codul de save are 13 caractere: `#NNNNNNNNCHH_` (8 nume, 1 culoare, 2 hex skin bitmask, padding).
+## AI
 
-## Deploy pe Railway prin GitHub
+- Classic + GTS have an AI opponent (~3s think time)
+- Material + center-control + mobility scoring
 
-Vezi `GITHUB.md` — pașii sunt în română, cu varianta recomandată (push doar al folderului `chess-star/` ca repo separat) și varianta cu monorepo + Root Directory.
+## i18n
 
-## Versiune
+- English / Romanian / Russian — switch in Settings → Language
 
-`v0.06` (April 2026)
+## Backend API
 
-### Schimbări v0.06 (față de v0.05)
+- `GET  /api/healthz`                 — health check
+- `GET  /api/version`                 — `{latest, required}`
+- `POST /api/account/create`          — register new player
+- `POST /api/account/upsert`          — register/update player
+- `POST /api/account/login`           — login by code
+- `GET  /api/account/me`              — get own profile
+- `GET  /api/account/search?q=`       — fuzzy name search
+- `GET  /api/account/friends`         — friends + requests + online list
+- `POST /api/account/friend-request`  — send friend request
+- `POST /api/account/friend-respond`  — accept/decline friend request
+- `POST /api/account/friend-remove`   — remove friend
+- `POST /api/account/replay`          — save replay
 
-- **Bug fix critic**: în single-player vs AI (CC + GTS), player-ul nu mai poate da click și muta piesele AI-ului în timpul turei AI. Click-ul pe board e blocat când `ccTurn !== classicPlayerColor` (respectiv `gtsTurn !== gtsPlayerColor`).
-- **Restricție piese 2v2/4v4** (Classic Chess + Grind The Safe + Queens On Color):
-  - CC/GTS: după pre-pick (2 tipuri în 2v2, 1 tip în 4v4) player-ul deține DOAR tipurile alese + pionii de pe fișierele acelor piese (ex: alegi N → ai cailor + pionii de pe coloanele 1 și 6). Restul pieselor de aceeași culoare sunt jucate automat de AI-ul de coleg de echipă.
-  - CC: regele și regina sunt cuplate — alegând una, cealaltă vine automat (fără cost suplimentar de slot).
-  - QOC: nu există picker (toate piesele sunt de același tip "checker") — partiție automată pe coloane: 2v2 = jumătate stânga vs jumătate dreapta; 4v4 = sferturi de coloane. Player-ul controlează slotul 0 (cel mai din stânga).
-- **AI coleg de echipă**: când player-ul nu are nicio mutare legală cu piesele lui (toate blocate), AI-ul preia tura curentă și mută o piesă neowned a aceleași culori. Mesaj inline: "🤝 Teammate AI thinking...".
-- **i18n extins** (en/ro/ru):
-  - `INFO_CONTENT` complet tradus pentru toate cele 5 evenimente + 6 tipuri de piese, cu mențiuni despre regulile 2v2/4v4 și cuplajul K+Q.
-  - `showToast()` are wrapper care traduce automat ~25 de mesaje frecvente (network, queue, invitations, anti-camper, walks).
-  - Mesaje "AI thinking..." și "Teammate AI thinking..." traduse.
-  - Subtitlu pre-pick + counter "X / Y selected" localizate.
-- **Helper-i nou expuși pe `window`**: `ccPlayerOwns`, `gtsPlayerOwns`, `qocPlayerOwns`, `derivePawnFiles`, `PIECE_TO_FILES`, `currentLang`, `tr()`, `translateMsg()`, `TOAST_I18N`.
-- State per-meci pe `window`: `ccPickedTypes`/`ccPickedFiles`, `gtsPickedTypes`/`gtsPickedFiles`, `qocSlotsActive`/`qocSlotCount`. Resetat la fiecare apel `startSelectedEvent`.
+## Storage
+
+PostgreSQL when `DATABASE_URL` env var is set, otherwise in-memory (no persistence across restarts).
+
+## Version
+
+Current: **v0.06** (May 2026)
+- Restored from Chess-Star-v.0.06 zip after Bolt.new made breaking changes
