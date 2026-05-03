@@ -54,8 +54,8 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 #evLabel{font-size:9px;color:#4caf50;letter-spacing:2px;font-weight:bold;}
 #evName{font-size:11px;color:#f1c40f;font-weight:bold;margin-top:2px;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #evArrow{font-size:8px;color:#666;margin-top:2px;}
-#startBtn{flex:1;padding:16px 0;border-radius:10px;border:2px solid #000;outline:2px solid #1565c0;font-weight:bold;font-size:14px;cursor:pointer;letter-spacing:2px;color:#fff;font-family:'Verdana',sans-serif;background:linear-gradient(180deg,#42a5f5,#1976d2,#0d47a1);text-shadow:0 1px 3px rgba(0,0,0,.5);position:relative;overflow:hidden;animation:glow 2s ease-in-out infinite;}
-@keyframes glow{0%,100%{box-shadow:0 0 8px #1976d2,0 0 20px rgba(25,118,210,.4);}50%{box-shadow:0 0 18px #64b5f6,0 0 40px rgba(100,181,246,.6);}}
+#startBtn{flex:1;padding:16px 0;border-radius:10px;border:2px solid #6b3d00;outline:2px solid #c8860a;font-weight:bold;font-size:14px;cursor:pointer;letter-spacing:2px;color:#1a0800;font-family:'Verdana',sans-serif;background:linear-gradient(180deg,#f5c518,#c8860a,#7a5000);text-shadow:0 1px 0 rgba(255,255,255,.25);position:relative;overflow:hidden;animation:glow 2s ease-in-out infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 8px #c8860a,0 0 20px rgba(200,134,10,.4);}50%{box-shadow:0 0 18px #f5c518,0 0 40px rgba(245,197,24,.6);}}
 #startBtn:hover{filter:brightness(1.15);}
 #startBtn:active{filter:brightness(.9);}
 
@@ -462,11 +462,10 @@ body.lightTheme .cDesc{color:#7a4e20;}
 body.lightTheme #eventsBtn{background:#fff8e8;border-color:#a08060;}
 body.lightTheme #evLabel{color:#7a4e20;}
 body.lightTheme #evName{color:#3a2306;}
-body.lightTheme #startBtn{background:#c8860a;color:#fff;border-color:#a06000;}
+body.lightTheme #startBtn{background:linear-gradient(180deg,#f5c518,#c8860a,#7a5000)!important;color:#1a0800!important;border-color:#6b3d00!important;outline-color:#c8860a!important;text-shadow:0 1px 0 rgba(255,255,255,.25)!important;}
 body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .ppCard .ppName,body.lightTheme .setSection h3,body.lightTheme .invDet .invLbl{color:#7a4e20;text-shadow:none;}
 body.lightTheme .eCard p,body.lightTheme .setRow,body.lightTheme .pcDesc,body.lightTheme .ppDesc{color:#5a3a10;}
-body.lightTheme .miniBtn,body.lightTheme #ppGo,body.lightTheme #saveProfBtn,body.lightTheme .langBtn,body.lightTheme .themeToggle button,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme .modeOpt,body.lightTheme .endBtns button,body.lightTheme #repPlayerCtrl button,body.lightTheme .acctTab,body.lightTheme #acctGoBtn,body.lightTheme #infoModalCloseBtn,body.lightTheme .exitBtn,body.lightTheme #ppCancel,body.lightTheme .fBtnSm,body.lightTheme .backBtn,body.lightTheme #lbRefreshBtn,body.lightTheme #msClose,body.lightTheme #tInfoClose,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme #startBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;text-shadow:none;}
-body.lightTheme #startBtn{background:linear-gradient(180deg,#e8f4fd,#aed0ef,#7ab0d8);color:#1a3a5c;outline-color:#4a90d9;}
+body.lightTheme .miniBtn,body.lightTheme #ppGo,body.lightTheme #saveProfBtn,body.lightTheme .langBtn,body.lightTheme .themeToggle button,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme .modeOpt,body.lightTheme .endBtns button,body.lightTheme #repPlayerCtrl button,body.lightTheme .acctTab,body.lightTheme #acctGoBtn,body.lightTheme #infoModalCloseBtn,body.lightTheme .exitBtn,body.lightTheme #ppCancel,body.lightTheme .fBtnSm,body.lightTheme .backBtn,body.lightTheme #lbRefreshBtn,body.lightTheme #msClose,body.lightTheme #tInfoClose,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;text-shadow:none;}
 body.lightTheme #nameInput,body.lightTheme #acctNameInp,body.lightTheme #acctCodeInp,body.lightTheme #codeImportBox{background:#fff8e8;color:#3a2306;border-color:#a08060;}
 body.lightTheme #nameInput:focus{border-color:#1976d2;}
 body.lightTheme #nameHint,body.lightTheme #profNameEditHint{color:#7a5030;}
@@ -728,6 +727,13 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
 </head>
 <body>
 <div id="root">
+
+<!-- STARTUP SPLASH (appears over everything on first load) -->
+<div id="startupSplash" style="position:fixed;inset:0;background:#0a0500;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;">
+  <div id="ssStar" style="font-size:64px;opacity:0;transform:scale(0.1) rotate(-180deg);transition:none;">♛</div>
+  <div id="ssTitle" style="font-family:Georgia,serif;font-size:36px;font-weight:900;color:#f1c40f;letter-spacing:5px;text-shadow:0 0 40px rgba(241,196,15,.9),4px 4px 0 #3e1a00;opacity:0;transform:scale(0.05);transition:none;margin-top:12px;">CHESS STAR</div>
+  <div id="ssSub" style="font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;margin-top:16px;opacity:0;transition:none;">v0.06 — ONLINE</div>
+</div>
 
 <!-- MENU -->
 <div id="menuScreen" class="screen active">
@@ -1081,6 +1087,7 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
   <canvas id="qocCanvas" width="352" height="352"></canvas>
   <div class="teamLabel" id="qocBotTeam" style="color:#fff;">YOU</div>
   <div id="qocMsg">Spin to begin!</div>
+  <button id="qocWalkBtn" onclick="window.suggestWalk&&window.suggestWalk()" style="position:absolute;bottom:8px;left:8px;background:#1a0800;color:#42a5f5;border:2px solid #1976d2;border-radius:6px;padding:6px 9px;font-size:9px;font-weight:bold;letter-spacing:1px;cursor:pointer;z-index:25;display:none;">🚶 SUGGEST WALK</button>
   <div id="qocEvOverlay" class="evOverlay hidden"><div class="evOverlayInner"><div class="evOverlayTitle"></div><div class="evOverlayCount"></div></div></div>
   <div id="qocEndOverlay">
     <div class="endPanel">
@@ -4576,22 +4583,35 @@ function drawThumbQOC(){
     topRow.innerHTML = '<div style="color:#a08060;font-size:10px;letter-spacing:1px;padding:8px;">Loading…</div>';
     list.innerHTML = '';
     try{
-      const r = await fetch('/api/leaderboard?limit=100');
-      if(!r.ok){ topRow.innerHTML='<div style="color:#e74c3c;font-size:10px;padding:8px;">Failed to load</div>'; return; }
-      const j = await r.json();
-      const players = j.players || [];
+      // Fetch leaderboard + online players in parallel
+      const [lbRes, onlineRes] = await Promise.all([
+        fetch('/api/leaderboard?limit=100'),
+        myCode ? fetch('/api/account/friends?code='+myCode) : Promise.resolve(null)
+      ]);
+      if(!lbRes.ok){ topRow.innerHTML='<div style="color:#e74c3c;font-size:10px;padding:8px;">Failed to load</div>'; return; }
+      const j = await lbRes.json();
+      let players = j.players || [];
+      // Merge online players who aren't already in the leaderboard list
+      if(onlineRes && onlineRes.ok){
+        const oj = await onlineRes.json();
+        const online = oj.online || [];
+        const knownCodes = new Set(players.map(p=>p.code));
+        online.forEach(op=>{
+          if(!knownCodes.has(op.code)){
+            players.push({rank: players.length+1, code:op.code, name:op.name, color:op.color, wins:op.wins||0, _online:true});
+          }
+        });
+      }
       topRow.innerHTML = '';
       list.innerHTML = '';
       if(!players.length){
         list.innerHTML = '<div style="color:#a08060;font-size:10px;text-align:center;padding:20px;letter-spacing:1px;">No players yet — be the first!</div>';
         return;
       }
+      // Re-rank after merge
+      players.sort((a,b)=>b.wins-a.wins);
+      players.forEach((p,i)=>p.rank=i+1);
       // Podium (top 3)
-      const podOrder = [players[1], players[0], players[2]].filter(Boolean);
-      const podClasses = players[1] ? ['second','first','third'] : ['first','third'].concat([]);
-      const podEmojis = ['🥈','🥇','🥉'];
-      const podClassMap = players[1] ? podEmojis : ['🥇','🥉'];
-      let podIdx = 0;
       const podItems = [
         {p:players[1], cls:'second', ico:'🥈'},
         {p:players[0], cls:'first',  ico:'🥇'},
@@ -4605,16 +4625,23 @@ function drawThumbQOC(){
           +'<div class="lbPodWins">'+p.wins+'W</div>';
         topRow.appendChild(d);
       });
-      // Full list from rank 4+; ranks 1-3 also shown for completeness
+      // Full list
       players.forEach(p=>{
         const isMe = myCode && p.code === myCode;
         const row = document.createElement('div');
         row.className = 'lbRow'+(isMe?' me':'');
+        const onlineDot = p._online ? ' <span style="font-size:7px;color:#4caf50;">●</span>' : '';
         row.innerHTML = '<span class="lbRank">#'+p.rank+'</span>'
-          +'<span class="lbName" style="color:'+(p.color||'#f1c40f')+'">'+escapeHtml(p.name||'Player')+'</span>'
+          +'<span class="lbName" style="color:'+(p.color||'#f1c40f')+'">'+escapeHtml(p.name||'Player')+onlineDot+'</span>'
           +'<span class="lbWins">'+p.wins+'W</span>';
         list.appendChild(row);
       });
+      if(players.length === 1){
+        const note = document.createElement('div');
+        note.style.cssText='font-size:9px;color:#666;text-align:center;padding:12px 8px;letter-spacing:1px;';
+        note.textContent='Play more matches to see other players here!';
+        list.appendChild(note);
+      }
     }catch(e){
       topRow.innerHTML = '<div style="color:#e74c3c;font-size:10px;padding:8px;">Could not connect to server</div>';
     }
@@ -4650,7 +4677,7 @@ function drawThumbQOC(){
     } else if(friendsTab==='add'){
       const wrap = document.createElement('div');
       wrap.id='frAddRow';
-      wrap.innerHTML = '<input id="frAddInp" type="text" maxlength="13" placeholder="13-CHAR CODE"><button class="fBtnSm" onclick="frSendReq()">SEND</button>';
+      wrap.innerHTML = '<input id="frAddInp" type="text" maxlength="20" placeholder="SEARCH BY NAME" style="text-transform:none;"><button class="fBtnSm" onclick="frSendReq()">FIND</button>';
       body.appendChild(wrap);
       if(friendRequests.length){
         const h = document.createElement('div');
@@ -4690,13 +4717,22 @@ function drawThumbQOC(){
     showToast(p.name+' • #'+p.code+' • '+wins+'W • '+trophies+'🏆');
   }
   window.frSendReq = async function(){
-    const inp = $('frAddInp'); const cd = (inp.value||'').trim().toUpperCase();
-    if(cd.length!==13){ showToast('Code must be 13 chars'); return; }
+    const inp = $('frAddInp'); const v = (inp.value||'').trim();
+    if(!v){ showToast('Type a player name to search'); return; }
     try{
-      const r = await fetch('/api/account/friend-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,target:cd})});
-      if(r.ok){ showToast('Request sent'); inp.value=''; refreshFriends(); }
-      else { const j=await r.json().catch(()=>({})); showToast(j.error||'Failed'); }
-    }catch(e){ showToast(explainNetErr()); }
+      const r = await fetch('/api/account/search?q='+encodeURIComponent(v));
+      if(r.ok){
+        const j = await r.json();
+        const hits = j.players || [];
+        if(hits.length){ renderSearchResults(hits); return; }
+      }
+    } catch(e){}
+    // Fallback: fuzzy match against locally known online players
+    const ql = v.toLowerCase();
+    function fuzzy(str){ str=str.toLowerCase(); let i=0; for(const ch of ql){ i=str.indexOf(ch,i); if(i===-1) return false; i++; } return true; }
+    const matches = (onlinePlayers||[]).filter(p=>(p.name||'').toLowerCase().includes(ql)||fuzzy(p.name||''));
+    if(matches.length) renderSearchResults(matches);
+    else showToast('No players found for "'+v+'"');
   };
   async function frRespond(p, accept){
     try{
@@ -5320,13 +5356,16 @@ function drawThumbQOC(){
     if(id==='profileScreen'){ try{ window.refreshProfileStats && window.refreshProfileStats(); }catch(e){} }
     if(id==='piecesMenuScreen'){ try{ window.refreshPieceLocks && window.refreshPieceLocks(); }catch(e){} }
     // Walk button: only in team-mode game screens
-    const teamScreens = ['classicScreen','gtsScreen','qocScreen'];
+    const teamScreens = ['classicScreen','gtsScreen'];
     const isTeamMode = window.currentMode==='2v2'||window.currentMode==='4v4';
     if(teamScreens.includes(id) && isTeamMode){
       setTimeout(()=>_injectWalkBtn(id), 150);
-    } else {
+    } else if(id !== 'classicScreen' && id !== 'gtsScreen'){
       _removeWalkBtn();
     }
+    // QOC always shows its own dedicated walk button (only in team modes)
+    const qocWalkBtn = document.getElementById('qocWalkBtn');
+    if(qocWalkBtn) qocWalkBtn.style.display = (id==='qocScreen' && isTeamMode) ? 'block' : 'none';
   };
   // Sync once more after the DOM and assets settle
   setTimeout(()=>{ try{ window.updateMilestones && window.updateMilestones(); }catch(e){} }, 300);
@@ -6173,42 +6212,13 @@ function drawThumbQOC(){
     try{ window.netSend && window.netSend('chat', { text: emoji }); }catch(e){}
   };
 
-  // ── FUZZY FRIEND SEARCH (by name) ──
-  // The original ADD tab only takes 13-char codes. v0.05 also accepts any name string
-  // and queries the server for fuzzy matches; falls back to local match against onlinePlayers.
-  const _origFrSendReq = window.frSendReq;
-  window.frSendReq = async function(){
-    const inp = document.getElementById('frAddInp');
-    if(!inp){ return _origFrSendReq && _origFrSendReq(); }
-    const v = (inp.value||'').trim();
-    // If it looks like a code, behave as before
-    if(v.length===13 && /^[A-Z0-9]+$/i.test(v)) return _origFrSendReq && _origFrSendReq();
-    if(!v){ showToast('Type a name or code'); return; }
-    // Try server fuzzy search
-    try{
-      const r = await fetch('/api/account/search?q='+encodeURIComponent(v));
-      if(r.ok){
-        const j = await r.json();
-        const hits = j.players || j.hits || [];
-        if(hits.length){
-          renderSearchResults(hits);
-          return;
-        }
-      }
-    } catch(e){}
-    // Fallback: search the local online list
-    const ql = v.toLowerCase();
-    const matches = (onlinePlayers||[]).filter(p => (p.name||'').toLowerCase().includes(ql));
-    if(matches.length) renderSearchResults(matches);
-    else showToast('No players found matching "'+v+'"');
-  };
+  // ── FUZZY FRIEND SEARCH (by name only — code is private account backup key) ──
   function renderSearchResults(hits){
     const body = document.getElementById('friendsBody'); if(!body) return;
-    // Re-render the ADD tab with results below the search input
     body.innerHTML = '';
     const wrap = document.createElement('div');
     wrap.id='frAddRow';
-    wrap.innerHTML = '<input id="frAddInp" type="text" maxlength="20" placeholder="NAME or 13-CHAR CODE"><button class="fBtnSm" onclick="frSendReq()">FIND</button>';
+    wrap.innerHTML = '<input id="frAddInp" type="text" maxlength="20" placeholder="SEARCH BY NAME" style="text-transform:none;"><button class="fBtnSm" onclick="frSendReq()">FIND</button>';
     body.appendChild(wrap);
     const h = document.createElement('div');
     h.style.cssText='font-size:9px;color:#a08060;letter-spacing:1px;padding:8px 0 4px;';
@@ -6232,20 +6242,13 @@ function drawThumbQOC(){
       body.appendChild(div);
     });
   }
-  // Update the ADD-tab placeholder so users know they can enter a name now
+  // Update ADD-tab input styling for name-only search
   setTimeout(()=>{
-    const styleObs = new MutationObserver(()=>{
-      const inp = document.getElementById('frAddInp');
-      if(inp && inp.placeholder.indexOf('NAME') === -1){
-        inp.placeholder = 'NAME or 13-CHAR CODE';
-        inp.maxLength = 20;
-        const btn = inp.nextElementSibling;
-        if(btn) btn.textContent = 'FIND';
-      }
-    });
-    const fb = document.getElementById('friendsBody');
-    if(fb) styleObs.observe(fb, {childList:true, subtree:true});
-  }, 500);
+    const inp = document.getElementById('frAddInp');
+    if(inp){ inp.placeholder='SEARCH BY NAME'; inp.maxLength=20; inp.style.textTransform='none'; }
+    const btn = inp && inp.nextElementSibling;
+    if(btn && btn.textContent==='SEND') btn.textContent='FIND';
+  }, 600);
 
   // ── VERSION-REQUIRED GATE ──
   // Periodically asks the server which version is the minimum supported.
@@ -6415,6 +6418,35 @@ function drawThumbQOC(){
       if(el){ el.addEventListener('click', _resetTimer, {passive:true}); el.addEventListener('touchstart', _resetTimer, {passive:true}); }
     });
     _resetTimer();
+  })();
+
+  // ── STARTUP SPLASH ──────────────────────────────────────────────────
+  (function(){
+    const sp = document.getElementById('startupSplash');
+    const star = document.getElementById('ssStar');
+    const title = document.getElementById('ssTitle');
+    const sub = document.getElementById('ssSub');
+    if(!sp) return;
+    // Step 1: animate star icon in
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      star.style.transition='transform .7s cubic-bezier(.17,.67,.4,1.5),opacity .5s';
+      star.style.transform='scale(1) rotate(0deg)';
+      star.style.opacity='1';
+    }));
+    // Step 2: title + subtitle pop in
+    setTimeout(()=>{
+      title.style.transition='transform .6s cubic-bezier(.17,.67,.4,1.3),opacity .45s';
+      title.style.transform='scale(1)';
+      title.style.opacity='1';
+      sub.style.transition='opacity .6s .2s';
+      sub.style.opacity='1';
+    }, 500);
+    // Step 3: fade out and remove
+    setTimeout(()=>{
+      sp.style.transition='opacity .55s';
+      sp.style.opacity='0';
+      setTimeout(()=>{ sp.style.display='none'; }, 580);
+    }, 2400);
   })();
 
   // ── v0.06 FULL-SCREEN SCALE (9:16 for Median / phone) ─────────────
