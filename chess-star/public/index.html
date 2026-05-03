@@ -4761,6 +4761,20 @@ function drawThumbQOC(){
   };
 
   // ── v0.06 LEADERBOARD ──────────────────────────────────────────────
+  // Live leaderboard — auto-refreshes every 30s while screen is open
+  let _lbLiveTimer = null;
+  function _lbStartLive(){ if(_lbLiveTimer) return; _lbLiveTimer = setInterval(()=>{ try{ loadLeaderboard(); }catch(e){} }, 30000); }
+  function _lbStopLive(){ if(_lbLiveTimer){ clearInterval(_lbLiveTimer); _lbLiveTimer=null; } }
+  // Hook goTo to start/stop the live refresh
+  (function(){
+    const _prevGoTo = window.goTo;
+    window.goTo = function(id){
+      _prevGoTo(id);
+      if(id==='leaderboardScreen'){ _lbStartLive(); }
+      else { _lbStopLive(); }
+    };
+  })();
+
   window.openLeaderboard = function(){
     goTo('leaderboardScreen');
     loadLeaderboard();
@@ -5022,6 +5036,21 @@ function drawThumbQOC(){
       if(special){ window.totalTrophies++; localStorage.setItem('chessstar_trophies', String(window.totalTrophies)); }
       localStorage.setItem('chessstar_wins', String(window.totalWins));
       localStorage.setItem('chessstar_streak', String(window.winStreak));
+      // Sync win to server — server is the source of truth for leaderboard
+      if(myCode){
+        fetch('/api/account/win',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({code:myCode,special:special})
+        }).then(r=>r.ok?r.json():null).then(j=>{
+          if(j && j.ok && typeof j.wins==='number'){
+            // Trust server win count (handles any duplicate/missed calls)
+            window.totalWins = j.wins;
+            localStorage.setItem('chessstar_wins', String(j.wins));
+            try{ window.updateMilestones && window.updateMilestones(); }catch(e){}
+          }
+        }).catch(()=>{});
+      }
     } else if(result==='loss'){
       window.winStreak = 0;
       localStorage.setItem('chessstar_streak', '0');
@@ -5032,10 +5061,6 @@ function drawThumbQOC(){
     }
     try{ window.updateMilestones && window.updateMilestones(); }catch(e){}
     try{ window.checkMilestoneClaims && window.checkMilestoneClaims(); }catch(e){}
-    // Notify the server too so server-side wins/trophies stay in sync
-    try{
-      window.netSend && window.netSend('match_finished', { result, special });
-    }catch(e){}
   };
   // v0.04 — 10-LEVEL ADAPTIVE AI SYSTEM
   // Level 1  = passive / defense / low action (safest moves, rarely captures)
