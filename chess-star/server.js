@@ -479,6 +479,28 @@ app.post("/api/account/replay", async (req, res, next) => {
   }
 });
 
+// ── POST /api/account/sync-wins — client pushes local win count; server keeps the max ──
+app.post("/api/account/sync-wins", async (req, res, next) => {
+  try {
+    const code      = req.body && typeof req.body.code  === 'string' ? normalizeCode(req.body.code) : '';
+    const localWins = req.body && typeof req.body.wins  === 'number' ? Math.floor(req.body.wins)    : 0;
+    if (!code) return res.status(400).json({ error: 'Missing code' });
+    if (localWins < 0 || localWins > 1000000) return res.status(400).json({ error: 'Invalid wins' });
+    let a = await storage.get(code);
+    if (!a) {
+      // Unknown code — create placeholder so leaderboard works after fresh DB
+      a = newAccount(code, 'Player', '#3498db');
+      a.wins = localWins;
+    } else if (localWins > a.wins) {
+      a.wins = localWins;
+    }
+    await touch(a);
+    await storage.save(a);
+    if (localWins > 0) console.log(`[sync-wins] ${a.name} (${code}) wins=${a.wins}`);
+    res.json({ ok: true, wins: a.wins });
+  } catch(e) { next(e); }
+});
+
 // ── POST /api/account/win — atomically record a win (called by client after each match) ──
 app.post("/api/account/win", async (req, res, next) => {
   try {

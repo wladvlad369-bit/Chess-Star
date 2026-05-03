@@ -4516,7 +4516,7 @@ function drawThumbQOC(){
         resp = await fetch('/api/account/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nm,color:profile.color||'#3498db'})});
       } else {
         const cd = ($('acctCodeInp').value||'').replace(/^#+/,'').trim().toUpperCase();
-        if(cd.length!==13){ $('acctErr').textContent='Code must be exactly 13 characters (paste your full code)'; return; }
+        if(cd.length<12||cd.length>13){ $('acctErr').textContent='Invalid code — paste your full code'; return; }
         resp = await fetch('/api/account/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:cd})});
       }
       if(!resp.ok){
@@ -4533,6 +4533,10 @@ function drawThumbQOC(){
       const pn = $('pName'); if(pn){ pn.textContent = profile.name; pn.style.color = profile.color; }
       $('acctModal').classList.remove('show');
       updateSaveCodeUI();
+      // Sync local wins to server so everyone appears on leaderboard
+      if(typeof window.totalWins==='number' && window.totalWins>0){
+        fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,wins:window.totalWins})}).catch(()=>{});
+      }
       netConnect();
     } catch(e){ $('acctErr').textContent = explainNetErr(); }
   };
@@ -4555,7 +4559,7 @@ function drawThumbQOC(){
   window.loadSaveCode = async function(){
     const inp = $('codeImportBox');
     const cd = (inp.value||'').replace(/^#+/,'').trim().toUpperCase();
-    if(cd.length!==13){ showToast('Code must be 13 chars (paste your full code)'); return; }
+    if(cd.length<12||cd.length>13){ showToast('Invalid code — paste your full code'); return; }
     try{
       const r = await fetch('/api/account/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:cd})});
       if(!r.ok){ showToast('Invalid code'); return; }
@@ -4566,7 +4570,11 @@ function drawThumbQOC(){
       if(typeof j.wins==='number') applyAccountFromServer({wins:j.wins});
       const pn = $('pName'); if(pn){ pn.textContent = profile.name; pn.style.color = profile.color; }
       updateSaveCodeUI();
-      showToast('Account loaded ✓ wins synced');
+      // Sync local wins so leaderboard shows real count after loading code
+      if(typeof window.totalWins==='number' && window.totalWins>0){
+        fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,wins:window.totalWins})}).catch(()=>{});
+      }
+      showToast('Account loaded ✓');
       netConnect();
     } catch(e){ showToast(explainNetErr()); }
   };
@@ -4661,7 +4669,7 @@ function drawThumbQOC(){
   window.maLookupCode = async function(){
     const inp=$('maCodeInp'); if(!inp) return;
     const cd=inp.value.replace(/^#+/,'').trim().toUpperCase();
-    if(cd.length!==13){showToast('Code must be 13 characters');return;}
+    if(cd.length<12||cd.length>13){showToast('Invalid code — paste your full code');return;}
     try{
       const r=await fetch('/api/account/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:cd})});
       if(!r.ok){showToast('Code not found');return;}
@@ -4726,6 +4734,10 @@ function drawThumbQOC(){
       const ni = $('acctNameInp');
       if(ni && profile.name && profile.name!=='Player 1') ni.value = profile.name;
     } else {
+      // Sync local wins to server on startup so leaderboard is accurate for everyone
+      if(typeof window.totalWins==='number' && window.totalWins>0){
+        fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,wins:window.totalWins})}).catch(()=>{});
+      }
       fetch('/api/account/me?code='+encodeURIComponent(myCode)).then(r=>r.ok?r.json():null).then(j=>{
         if(j && j.name){ profile.name=j.name; savePersistedProfile(); const pn=$('pName'); if(pn){pn.textContent=j.name;pn.style.color=profile.color;} }
       }).catch(()=>{});
@@ -4841,23 +4853,27 @@ function drawThumbQOC(){
           +'<div class="lbPodWins">'+p.wins+'W</div>';
         topRow.appendChild(d);
       });
+      // Tier badge helper (24 tiers, WIN_TIERS thresholds)
+      function _lbTier(wins){
+        const T=[1,2,5,10,15,20,25,30,35,40,50,60,75,100,125,150,200,250,300,400,500,750,1000];
+        const N=['Rookie','Bronze','Iron','Silver','Gold','Platinum','Diamond','Elite','Master','Champion','Legendary','Mythic','Divine','Immortal','Celestial','Grandmaster','Supreme','Godlike','Infinite','Eternal','Cosmic','Universal','Absolute','Chess Star'];
+        const I=['🔰','🥉','⚙️','🥈','🥇','💿','💎','⚡','🏆','👑','🔥','🌟','✨','🌌','🌠','🎖️','🔮','⚜️','♾️','🕊️','🌀','🌍','💫','♟️'];
+        let i=0; while(i<T.length && wins>=T[i]) i++;
+        return {name:N[i]||'Chess Star', icon:I[i]||'♟️'};
+      }
       // Full list
       players.forEach(p=>{
         const isMe = myCode && p.code === myCode;
         const row = document.createElement('div');
         row.className = 'lbRow'+(isMe?' me':'');
         const onlineDot = p._online ? ' <span style="font-size:7px;color:#4caf50;">●</span>' : '';
+        const t = _lbTier(p.wins);
         row.innerHTML = '<span class="lbRank">#'+p.rank+'</span>'
+          +'<span style="font-size:11px;margin:0 4px;" title="'+t.name+'">'+t.icon+'</span>'
           +'<span class="lbName" style="color:'+(p.color||'#f1c40f')+'">'+escapeHtml(p.name||'Player')+onlineDot+'</span>'
-          +'<span class="lbWins">'+p.wins+'W</span>';
+          +'<span class="lbWins" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;"><span>'+p.wins+'W</span><span style="font-size:8px;color:#a08060;letter-spacing:.5px;">'+t.name+'</span></span>';
         list.appendChild(row);
       });
-      if(players.length === 1){
-        const note = document.createElement('div');
-        note.style.cssText='font-size:9px;color:#666;text-align:center;padding:12px 8px;letter-spacing:1px;';
-        note.textContent='Play more matches to see other players here!';
-        list.appendChild(note);
-      }
     }catch(e){
       topRow.innerHTML = '<div style="color:#e74c3c;font-size:10px;padding:8px;">Could not connect to server</div>';
     }
