@@ -48,14 +48,14 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .infoBtn:hover{background:#42a5f5;transform:scale(1.1);}
 #piecesBtn{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:52px;height:52px;border:2px solid #5d4037;border-radius:8px;background:#1a0800;cursor:pointer;z-index:20;display:flex;align-items:center;justify-content:center;transition:border-color .2s;}
 #piecesBtn:hover{border-color:#f1c40f;}
-#menuBottom{position:absolute;bottom:24px;left:12px;right:12px;display:flex;align-items:flex-end;gap:10px;z-index:20;}
-#eventsBtn{cursor:pointer;flex-shrink:0;}
-#eventsBtnInner{background:rgba(10,4,0,.92);border:2px solid #000;outline:2px solid #3e1a00;border-radius:10px;padding:10px 14px;min-width:145px;transition:border-color .2s;}
+#menuBottom{position:absolute;bottom:20px;left:12px;right:12px;display:flex;align-items:center;gap:8px;z-index:20;}
+#eventsBtn{cursor:pointer;flex:1;min-width:0;}
+#eventsBtnInner{background:rgba(10,4,0,.92);border:2px solid #000;outline:2px solid #3e1a00;border-radius:10px;padding:10px 12px;transition:border-color .2s;}
 #eventsBtn:hover #eventsBtnInner{border-color:#f1c40f;}
 #evLabel{font-size:9px;color:#4caf50;letter-spacing:2px;font-weight:bold;}
-#evName{font-size:11px;color:#f1c40f;font-weight:bold;margin-top:2px;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#evName{font-size:11px;color:#f1c40f;font-weight:bold;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #evArrow{font-size:8px;color:#666;margin-top:2px;}
-#startBtn{flex:1;padding:16px 0;border-radius:10px;border:2px solid #1565c0;outline:2px solid #1976d2;font-weight:bold;font-size:14px;cursor:pointer;letter-spacing:2px;color:#fff;font-family:'Verdana',sans-serif;background:linear-gradient(180deg,#42a5f5,#1565c0,#0d47a1);text-shadow:none;position:relative;overflow:hidden;animation:glow 2s ease-in-out infinite;}
+#startBtn{width:62px;height:62px;flex-shrink:0;border-radius:12px;border:2px solid #1565c0;outline:2px solid #1976d2;font-size:28px;cursor:pointer;color:#fff;background:linear-gradient(180deg,#42a5f5,#1565c0,#0d47a1);text-shadow:none;display:flex;align-items:center;justify-content:center;animation:glow 2s ease-in-out infinite;padding:0;}
 @keyframes glow{0%,100%{box-shadow:0 0 8px #1976d2,0 0 20px rgba(25,118,210,.45);}50%{box-shadow:0 0 18px #42a5f5,0 0 40px rgba(66,165,245,.65);}}
 #startBtn:hover{filter:brightness(1.15);}
 #startBtn:active{filter:brightness(.9);}
@@ -642,12 +642,12 @@ body.lightTheme .lbPodium.first{border-color:#f1c40f;background:#ffe9a0;}
 body.lightTheme .lbPodName{color:#3a2306;}
 body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;}
 /* ── v0.07 — Fire badge (streak) near Start Game ── */
-#streakFireBadge{display:none;position:absolute;left:6px;top:50%;transform:translateY(-50%);background:linear-gradient(135deg,#7f1500,#b71c1c,#7f1500);border:2px solid #ff5722;border-radius:8px;padding:4px 8px;align-items:center;gap:3px;flex-direction:column;cursor:default;z-index:5;}
+#streakFireBadge{display:none;flex-shrink:0;background:linear-gradient(135deg,#7f1500,#b71c1c,#7f1500);border:2px solid #ff5722;border-radius:10px;width:52px;height:62px;align-items:center;justify-content:center;gap:2px;flex-direction:column;cursor:default;}
 #streakFireBadge.show{display:flex;}
-#streakFireBadge .sfIco{font-size:18px;line-height:1;animation:sfPulse 1.2s ease-in-out infinite;}
-#streakFireBadge .sfNum{font-size:13px;font-weight:900;color:#ff6d00;line-height:1;}
+#streakFireBadge .sfIco{font-size:20px;line-height:1;animation:sfPulse 1.2s ease-in-out infinite;}
+#streakFireBadge .sfNum{font-size:14px;font-weight:900;color:#ff6d00;line-height:1;}
 #streakFireBadge .sfLbl{font-size:6px;color:#ff8a65;letter-spacing:1px;font-weight:bold;}
-@keyframes sfPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.18);}}
+@keyframes sfPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
 /* ── v0.07 — Leaderboard tabs ── */
 #lbTabs{display:flex;gap:4px;padding:0 10px 6px;}
 .lbTab{flex:1;padding:7px 4px;background:#1a0800;border:1px solid #5d4037;border-radius:6px;color:#a08060;font-size:9px;font-weight:bold;letter-spacing:1.5px;cursor:pointer;text-align:center;transition:all .15s;}
@@ -865,14 +865,12 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
         <div id="evArrow">▼ browse</div>
       </div>
     </div>
-    <div style="flex:1;position:relative;display:flex;align-items:stretch;">
-      <div id="streakFireBadge" title="Win Streak">
-        <span class="sfIco">🔥</span>
-        <span class="sfNum" id="sfNum">0</span>
-        <span class="sfLbl">STREAK</span>
-      </div>
-      <button id="startBtn" onclick="startSelectedEvent()" style="flex:1;">START GAME</button>
+    <div id="streakFireBadge" title="Win Streak">
+      <span class="sfIco">🔥</span>
+      <span class="sfNum" id="sfNum">0</span>
+      <span class="sfLbl">STREAK</span>
     </div>
+    <button id="startBtn" onclick="startSelectedEvent()">▶</button>
   </div>
 </div>
 
@@ -1427,7 +1425,7 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
       <div><span data-i18n="version.you">You have</span>: <b id="vgYourVer">v0.04</b></div>
       <div><span data-i18n="version.latest">Latest</span>: <b id="vgLatestVer" style="color:#4caf50;">v0.07</b></div>
     </div>
-    <button id="vgRefresh" onclick="location.reload(true)">↻ <span data-i18n="version.refresh">REFRESH NOW</span></button>
+    <button id="vgRefresh" onclick="(function(){var lv=document.getElementById('vgLatestVer');if(lv)localStorage.setItem('chessstar_vg_ack',lv.textContent);location.reload(true);})()">↻ <span data-i18n="version.refresh">REFRESH NOW</span></button>
   </div>
 </div>
 
@@ -5314,14 +5312,40 @@ function drawThumbQOC(){
     const list = $('replaysList'); if(!list) return;
     const reps = loadReplays();
     list.innerHTML = '';
-    if(!reps.length){ list.innerHTML='<div id="frEmpty">No replays saved yet.</div>'; return; }
+    if(!reps.length){
+      list.innerHTML = '<div id="frEmpty" style="text-align:center;padding:30px 16px;color:#a08060;font-size:11px;letter-spacing:1px;">No matches recorded yet.<br><span style="font-size:9px;color:#666;">Play a game to see your match history here.</span></div>';
+      return;
+    }
+    const evMap = {cc:'Classic Chess',lps:'Last Piece Standing',gts:'Grind the Safe',qoc:'Queen of Castle'};
     reps.forEach((r,i)=>{
       const div = document.createElement('div'); div.className='repItem';
       div.onclick = ()=>openReplayPlayer(i);
-      const ico = r.event==='lps'?'⚔':r.event==='qoc'?'♛':r.event==='gts'?'🔒':'♚';
-      const dt = new Date(r.t||Date.now()).toLocaleString();
+      const evIco = r.event==='lps'?'⚔️':r.event==='qoc'?'♛':r.event==='gts'?'🔒':'♚';
+      const evName = evMap[r.event] || (r.title||r.event||'Match');
+      const dt = new Date(r.t||r.date||Date.now());
+      const dateStr = dt.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+      const timeStr = dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
       const cls = r.result==='win'?'win':'loss';
-      div.innerHTML = '<div class="repIco">'+ico+'</div><div class="repInfo"><div class="repTitle">'+escapeHtml(r.title||r.event||'Match')+'</div><div class="repMeta">'+dt+' • '+(r.frames?r.frames.length:0)+' moves</div></div><div class="repResult '+cls+'">'+(r.result||'-').toUpperCase()+'</div>';
+      const resultIco = r.result==='win'?'🏆':'💀';
+      // Build stat chips
+      const chips = [];
+      if(typeof r.kills==='number') chips.push('⚔ '+r.kills+' kills');
+      if(typeof r.checks==='number' && r.checks>0) chips.push('♟ '+r.checks+' checks');
+      if(typeof r.hits==='number' && r.hits>0) chips.push('🎯 '+r.hits+' hits');
+      const moves = r.frames ? r.frames.length : 0;
+      if(moves>0) chips.push('🔄 '+moves+' moves');
+      const modeTag = r.mode ? '<span style="font-size:8px;background:#2a1200;border:1px solid #5d4037;border-radius:3px;padding:1px 5px;color:#a08060;letter-spacing:.5px;">'+r.mode.toUpperCase()+'</span>' : '';
+      div.innerHTML =
+        '<div class="repIco">'+evIco+'</div>'
+        +'<div class="repInfo">'
+          +'<div class="repTitle" style="display:flex;align-items:center;gap:5px;">'+escapeHtml(evName)+' '+modeTag+'</div>'
+          +'<div class="repMeta" style="margin-top:3px;">'+dateStr+' '+timeStr+'</div>'
+          +(chips.length ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">'+chips.map(c=>'<span style="font-size:8px;color:#c8a060;background:#1a0800;border:1px solid #3e1a00;border-radius:4px;padding:1px 5px;">'+c+'</span>').join('')+'</div>' : '')
+        +'</div>'
+        +'<div class="repResult '+cls+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;">'
+          +'<span style="font-size:16px;">'+resultIco+'</span>'
+          +'<span style="font-size:8px;letter-spacing:1px;">'+(r.result||'-').toUpperCase()+'</span>'
+        +'</div>';
       list.appendChild(div);
     });
   }
@@ -5814,12 +5838,12 @@ function drawThumbQOC(){
   //  - Version-required gate
   //  - Profile stats refresh on Profile screen open
   // ════════════════════════════════════════════════════════════════
-  const APP_VERSION = 'v0.06';
+  const APP_VERSION = 'v0.07';
 
   // ── i18n ──
   const I18N = {
     en: {
-      'menu.subtitle':'v0.06 — ONLINE — SELECT AN EVENT',
+      'menu.subtitle':'v0.07 — ONLINE — SELECT AN EVENT',
       'profile.title':'PROFILE','profile.wins':'WINS','profile.trophies':'TROPHIES','profile.pieces':'PIECES',
       'profile.name':'PLAYER NAME (MAX 10 CHARS)','profile.color':'NAME COLOR','profile.icon':'PROFILE ICON','profile.save':'SAVE',
       'settings.theme':'THEME','settings.dark':'DARK','settings.light':'LIGHT','settings.language':'LANGUAGE',
@@ -6690,6 +6714,9 @@ function drawThumbQOC(){
       if(!r.ok) return;
       const j = await r.json();
       const required = j.required || j.latest || APP_VERSION;
+      // If user already acknowledged this required version (clicked refresh), skip showing
+      const acked = localStorage.getItem('chessstar_vg_ack');
+      if(acked && !versionLessThan(acked, required)) return;
       if(versionLessThan(APP_VERSION, required)){
         const yv = document.getElementById('vgYourVer'); if(yv) yv.textContent = APP_VERSION;
         const lv = document.getElementById('vgLatestVer'); if(lv) lv.textContent = required;
