@@ -416,8 +416,8 @@ app.post("/api/account/sync-wins", async (req, res, next) => {
       if (localWins > 0) a.wins_updated_at = now;
       if (localBest > 0) a.streak_updated_at = now;
     } else {
-      // Only overwrite name if client has a real name and server has placeholder
-      if (clientName && clientName !== 'Player' && clientName !== 'Player 1' && (a.name === 'Player' || a.name === 'Player 1')) {
+      // Update name if client has a real (non-placeholder) name
+      if (clientName && clientName !== 'Player' && clientName !== 'Player 1') {
         a.name = clientName;
       }
       if (clientColor) a.color = clientColor;
@@ -439,11 +439,12 @@ app.post("/api/account/win", async (req, res, next) => {
     const a = await storage.get(code);
     if (!a) return res.status(404).json({ error: 'Not found' });
     const now = Date.now();
+    const special = req.body && req.body.special === true;
     a.wins = (a.wins || 0) + 1;
-    a.trophies = (a.trophies || 0) + 1;
+    if (special) a.trophies = (a.trophies || 0) + 1;
     a.wins_updated_at = now;
     await touch(a);
-    console.log(`[win] ${a.name} (${code}) wins=${a.wins} trophies=${a.trophies}`);
+    console.log(`[win] ${a.name} (${code}) wins=${a.wins} trophies=${a.trophies} special=${special}`);
     res.json({ ok: true, wins: a.wins, trophies: a.trophies });
   } catch (e) { next(e); }
 });

@@ -1,4 +1,4 @@
-# Chess Star v0.06 (latest batch: all bugs fixed)
+# Chess Star v0.08 (latest batch: 7 bugs fixed)
 
 Self-contained chess-themed mobile-style web game. The entire client lives in a single HTML file (`chess-star/public/index.html`) served by a small Express server (`chess-star/server.js`).
 

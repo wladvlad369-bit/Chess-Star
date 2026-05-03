@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Chess Star v0.07</title>
+<title>Chess Star v0.08</title>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -200,9 +200,9 @@ body.lightTheme #iconSelectBtn,body.lightTheme #nameSelectBtn{background:#1976d2
 .connBars .bar.bad{background:#e74c3c;}
 
 /* milestone modal */
-#milestoneModal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;justify-content:center;align-items:center;z-index:200;padding:18px;}
-#milestoneModal.show{display:flex;}
-#milestoneModalInner{background:#1a0800;border:3px solid #f1c40f;border-radius:14px;padding:18px 16px;max-width:340px;width:100%;max-height:84vh;overflow-y:auto;}
+#milestoneModal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;overflow-y:auto;z-index:200;padding:18px 12px;}
+#milestoneModal.show{display:block;}
+#milestoneModalInner{background:#1a0800;border:3px solid #f1c40f;border-radius:14px;padding:18px 16px;max-width:340px;width:100%;margin:auto;}
 #milestoneModalInner h2{color:#f1c40f;text-align:center;font-size:16px;letter-spacing:3px;margin-bottom:4px;}
 #milestoneModalInner .msSubt{color:#a08060;font-size:10px;text-align:center;letter-spacing:1.5px;margin-bottom:12px;}
 #msList{display:flex;flex-direction:column;gap:6px;}
@@ -464,7 +464,7 @@ body.lightTheme #eventsBtn{background:#fff8e8;border-color:#a08060;}
 body.lightTheme #evLabel{color:#7a4e20;}
 body.lightTheme #evName{color:#3a2306;}
 body.lightTheme #startBtn{background:linear-gradient(180deg,#42a5f5,#1565c0,#0d47a1)!important;color:#fff!important;border-color:#1565c0!important;outline-color:#1976d2!important;text-shadow:none!important;}
-body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .ppCard .ppName,body.lightTheme .setSection h3,body.lightTheme .invDet .invLbl{color:#7a4e20;text-shadow:none;}
+body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .ppCard .ppName,body.lightTheme .ppCard .ppNm,body.lightTheme .setSection h3,body.lightTheme .invDet .invLbl{color:#7a4e20;text-shadow:none;}
 body.lightTheme .eCard p,body.lightTheme .setRow,body.lightTheme .pcDesc,body.lightTheme .ppDesc{color:#5a3a10;}
 body.lightTheme .miniBtn,body.lightTheme #ppGo,body.lightTheme #saveProfBtn,body.lightTheme .langBtn,body.lightTheme .themeToggle button,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme .modeOpt,body.lightTheme .endBtns button,body.lightTheme #repPlayerCtrl button,body.lightTheme .acctTab,body.lightTheme #acctGoBtn,body.lightTheme #infoModalCloseBtn,body.lightTheme .exitBtn,body.lightTheme #ppCancel,body.lightTheme .fBtnSm,body.lightTheme .backBtn,body.lightTheme #lbRefreshBtn,body.lightTheme #msClose,body.lightTheme #tInfoClose,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;text-shadow:none;}
 body.lightTheme #nameInput,body.lightTheme #acctNameInp,body.lightTheme #acctCodeInp,body.lightTheme #codeImportBox{background:#fff8e8;color:#3a2306;border-color:#a08060;}
@@ -641,14 +641,14 @@ body.lightTheme .lbPodium{background:#fff8e8;border-color:#a08060;}
 body.lightTheme .lbPodium.first{border-color:#f1c40f;background:#ffe9a0;}
 body.lightTheme .lbPodName{color:#3a2306;}
 body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;}
-/* ── v0.07 — Fire badge (streak) near Start Game ── */
+/* ── v0.08 — Fire badge (streak) near Start Game ── */
 #streakFireBadge{display:none;flex-shrink:0;background:linear-gradient(135deg,#7f1500,#b71c1c,#7f1500);border:2px solid #ff5722;border-radius:10px;width:52px;height:62px;align-items:center;justify-content:center;gap:2px;flex-direction:column;cursor:default;}
 #streakFireBadge.show{display:flex;}
 #streakFireBadge .sfIco{font-size:20px;line-height:1;animation:sfPulse 1.2s ease-in-out infinite;}
 #streakFireBadge .sfNum{font-size:14px;font-weight:900;color:#ff6d00;line-height:1;}
 #streakFireBadge .sfLbl{font-size:6px;color:#ff8a65;letter-spacing:1px;font-weight:bold;}
 @keyframes sfPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
-/* ── v0.07 — Leaderboard tabs ── */
+/* ── v0.08 — Leaderboard tabs ── */
 #lbTabs{display:flex;gap:4px;padding:0 10px 6px;}
 .lbTab{flex:1;padding:7px 4px;background:#1a0800;border:1px solid #5d4037;border-radius:6px;color:#a08060;font-size:9px;font-weight:bold;letter-spacing:1.5px;cursor:pointer;text-align:center;transition:all .15s;}
 .lbTab.on{background:#f1c40f;color:#000;border-color:#f1c40f;}
@@ -795,13 +795,13 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
 <div id="startupSplash" style="position:fixed;inset:0;background:#0a0500;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;">
   <div id="ssStar" style="font-size:64px;color:#f1c40f;opacity:0;transform:scale(0.1) rotate(-180deg);transition:none;text-shadow:0 0 30px rgba(241,196,15,.9);">♛</div>
   <div id="ssTitle" style="font-family:Georgia,serif;font-size:36px;font-weight:900;color:#f1c40f;letter-spacing:5px;text-shadow:0 0 40px rgba(241,196,15,.9),4px 4px 0 #3e1a00;opacity:0;transform:scale(0.05);transition:none;margin-top:12px;">CHESS STAR</div>
-  <div id="ssSub" style="font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;margin-top:16px;opacity:0;transition:none;">v0.07 — ONLINE</div>
+  <div id="ssSub" style="font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;margin-top:16px;opacity:0;transition:none;">v0.08 — ONLINE</div>
 </div>
 
 <!-- MENU -->
 <div id="menuScreen" class="screen active">
   <canvas id="menuBg" width="360" height="600"></canvas>
-  <div id="titleBlock"><h1>CHESS STAR</h1><p data-i18n="menu.subtitle">v0.07 — ONLINE — SELECT AN EVENT</p></div>
+  <div id="titleBlock"><h1>CHESS STAR</h1><p data-i18n="menu.subtitle">v0.08 — ONLINE — SELECT AN EVENT</p></div>
   <!-- v0.04 — MILESTONE BARS (Wins + Trophies) -->
   <div id="milestoneRow">
     <div id="winsBar" class="msBtn" onclick="openMilestone('wins')" title="Wins milestones">
@@ -1231,7 +1231,7 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
       <h3>VERSION</h3>
       <div id="versionRow">
         <div class="setRow"><span>Game</span><span style="color:#f1c40f;font-weight:bold;letter-spacing:2px;">CHESS STAR</span></div>
-        <div class="setRow"><span>Build</span><span id="versionLabel" style="color:#4caf50;font-weight:bold;letter-spacing:2px;">v0.07</span></div>
+        <div class="setRow"><span>Build</span><span id="versionLabel" style="color:#4caf50;font-weight:bold;letter-spacing:2px;">v0.08</span></div>
         <div class="setRow"><span>Realtime</span><span style="color:#42a5f5;letter-spacing:1px;">Socket.io</span></div>
       </div>
     </div>
@@ -1291,7 +1291,7 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
 <div id="acctModal">
   <div id="acctModalInner">
     <div id="acctTitle">CHESS STAR</div>
-    <div id="acctSub">v0.07 — Sign in or create your account</div>
+    <div id="acctSub">v0.08 — Sign in or create your account</div>
     <div class="acctTabRow">
       <div class="acctTab on" data-acct="create" onclick="acctSwitch('create')">CREATE</div>
       <div class="acctTab" data-acct="login" onclick="acctSwitch('login')">LOGIN</div>
@@ -1423,7 +1423,7 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
     <p data-i18n="version.body">A newer version of Chess Star is available. Please refresh the page to continue playing.</p>
     <div id="vgVersions">
       <div><span data-i18n="version.you">You have</span>: <b id="vgYourVer">v0.04</b></div>
-      <div><span data-i18n="version.latest">Latest</span>: <b id="vgLatestVer" style="color:#4caf50;">v0.07</b></div>
+      <div><span data-i18n="version.latest">Latest</span>: <b id="vgLatestVer" style="color:#4caf50;">v0.08</b></div>
     </div>
     <button id="vgRefresh" onclick="(function(){var lv=document.getElementById('vgLatestVer');if(lv)localStorage.setItem('chessstar_vg_ack',lv.textContent);location.reload(true);})()">↻ <span data-i18n="version.refresh">REFRESH NOW</span></button>
   </div>
@@ -2921,7 +2921,7 @@ function lpsEnd(alive){
   document.getElementById('lpsKills').textContent=lpsStats.kills;
   document.getElementById('lpsKillerTxt').textContent=won?'Nobody':lpsStats.killer;
   document.getElementById('lpsEndOverlay').classList.add('show');
-  try{ window.notifyMatchFinished && window.notifyMatchFinished(won?'win':'loss'); }catch(e){}
+  try{ window.notifyMatchFinished && window.notifyMatchFinished(won?'win':'loss',{noStreakReset:!won}); }catch(e){}
   try{
     window.saveReplay && window.saveReplay({
       event:'lps', mode:'1v1', date:Date.now(),
@@ -3255,7 +3255,7 @@ function ccEndMove(){
     document.getElementById('ccStatKills').textContent  = window.ccPlayerKills||0;
     document.getElementById('ccStatChecks').textContent = window.ccPlayerChecks||0;
     document.getElementById('classicEndOverlay').classList.add('show');
-    try{ window.notifyMatchFinished && window.notifyMatchFinished(youWon?'win':'loss'); }catch(e){}
+    try{ window.notifyMatchFinished && window.notifyMatchFinished(youWon?'win':'loss',{noStreakReset:!youWon}); }catch(e){}
     try{ window.saveReplay && window.saveReplay({event:'classic',mode:'1v1',date:Date.now(),result:youWon?'win':'loss',kills:window.ccPlayerKills||0,checks:window.ccPlayerChecks||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
   } else if(st==='stalemate'){
     ccGameOver=true;
@@ -3600,7 +3600,7 @@ function gtsDoMove(fr,fc,tr,tc,mv){
       document.getElementById('gtsStatKills').textContent = window.gtsPlayerKills||0;
       document.getElementById('gtsStatHits').textContent  = window.gtsPlayerHits||0;
       document.getElementById('gtsEndOverlay').classList.add('show');gtsRunning=false;
-      try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss'); }catch(e){}
+      try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss',{noStreakReset:!_won}); }catch(e){}
       try{ window.saveReplay && window.saveReplay({event:'gts',mode:'1v1',date:Date.now(),result:_won?'win':'loss',kills:window.gtsPlayerKills||0,hits:window.gtsPlayerHits||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
       return;
     }
@@ -3613,7 +3613,7 @@ function gtsDoMove(fr,fc,tr,tc,mv){
       document.getElementById('gtsStatKills').textContent = window.gtsPlayerKills||0;
       document.getElementById('gtsStatHits').textContent  = window.gtsPlayerHits||0;
       document.getElementById('gtsEndOverlay').classList.add('show');gtsRunning=false;
-      try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss'); }catch(e){}
+      try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss',{noStreakReset:!_won}); }catch(e){}
       try{ window.saveReplay && window.saveReplay({event:'gts',mode:'1v1',date:Date.now(),result:_won?'win':'loss',kills:window.gtsPlayerKills||0,hits:window.gtsPlayerHits||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
       return;
     }
@@ -4076,7 +4076,7 @@ function qocDoMove(fr,fc,tr,tc,mv){
     document.getElementById('qocStatKills').textContent  = window.qocPlayerKills||0;
     document.getElementById('qocStatQueens').textContent = window.qocPlayerQueens||0;
     document.getElementById('qocEndOverlay').classList.add('show');
-    try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss'); }catch(e){}
+    try{ window.notifyMatchFinished && window.notifyMatchFinished(_won?'win':'loss',{noStreakReset:!_won}); }catch(e){}
     try{ window.saveReplay && window.saveReplay({event:'qoc',mode:'1v1',date:Date.now(),result:_won?'win':'loss',kills:window.qocPlayerKills||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
     return;
   }
@@ -4969,12 +4969,29 @@ function drawThumbQOC(){
         }
       });
 
-      // Re-sort by active tab metric
+      // Remove placeholder-named accounts with no wins from display
+      players = players.filter(p => {
+        const n = (p.name||'').trim();
+        if((n==='Player'||n==='Player 1') && !(p.wins||0) && !(p.best_streak||0)) return false;
+        return true;
+      });
+
+      // Deduplicate by name — keep highest-scored entry per unique name
+      const seenNames = new Map();
       function _sortVal(p){
         if(type==='streaks') return p.best_streak||0;
         if(type==='trophies') return p.trophies||0;
         return p.wins||0;
       }
+      players.sort((a,b)=>_sortVal(b)-_sortVal(a));
+      players = players.filter(p=>{
+        const key = (p.name||'').toLowerCase().trim();
+        if(!key) return true;
+        if(seenNames.has(key)) return false;
+        seenNames.set(key, true);
+        return true;
+      });
+
       players.sort((a,b)=>_sortVal(b)-_sortVal(a));
       players.forEach((p,i)=>p.rank=i+1);
 
@@ -5201,16 +5218,20 @@ function drawThumbQOC(){
   function saveReplay(rep){
     let arr = loadReplays();
     arr.unshift(rep);
-    arr = arr.slice(0,5);
+    arr = arr.slice(0,10);
     try{ localStorage.setItem('chessstar_replays', JSON.stringify(arr)); }catch(e){}
     if(myCode){
       fetch('/api/account/replay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,replay:rep})}).catch(()=>{});
     }
     window._repFrames = [];
   }
+  // Expose so game modules can call window.saveReplay(...)
+  window.saveReplay  = saveReplay;
+  window.loadReplays = loadReplays;
   window.notifyMatchFinished = function(result, opts){
     opts = opts || {};
-    const special = !!opts.special;
+    const special       = !!opts.special;
+    const noStreakReset = !!opts.noStreakReset; // local AI games pass this to keep streak alive
     if(result==='win'){
       window.totalWins++;
       window.winStreak++;
@@ -5233,14 +5254,15 @@ function drawThumbQOC(){
             try{ window.updateMilestones && window.updateMilestones(); }catch(e){}
           }
         }).catch(()=>{});
-        // Sync best streak to server
         fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({code:myCode,wins:window.totalWins,best_streak:window.bestStreak,trophies:window.totalTrophies,name:profile.name,color:profile.color})
         }).catch(()=>{});
       }
     } else if(result==='loss'){
-      window.winStreak = 0;
-      localStorage.setItem('chessstar_streak', '0');
+      if(!noStreakReset){
+        window.winStreak = 0;
+        localStorage.setItem('chessstar_streak', '0');
+      }
       if(special){
         window.totalTrophies = Math.max(0, window.totalTrophies - 1);
         localStorage.setItem('chessstar_trophies', String(window.totalTrophies));
@@ -5838,12 +5860,12 @@ function drawThumbQOC(){
   //  - Version-required gate
   //  - Profile stats refresh on Profile screen open
   // ════════════════════════════════════════════════════════════════
-  const APP_VERSION = 'v0.07';
+  const APP_VERSION = 'v0.08';
 
   // ── i18n ──
   const I18N = {
     en: {
-      'menu.subtitle':'v0.07 — ONLINE — SELECT AN EVENT',
+      'menu.subtitle':'v0.08 — ONLINE — SELECT AN EVENT',
       'profile.title':'PROFILE','profile.wins':'WINS','profile.trophies':'TROPHIES','profile.pieces':'PIECES',
       'profile.name':'PLAYER NAME (MAX 10 CHARS)','profile.color':'NAME COLOR','profile.icon':'PROFILE ICON','profile.save':'SAVE',
       'settings.theme':'THEME','settings.dark':'DARK','settings.light':'LIGHT','settings.language':'LANGUAGE',
