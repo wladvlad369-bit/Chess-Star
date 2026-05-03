@@ -143,6 +143,23 @@ function createPgStorage(databaseUrl) {
       await pool.query(
         `CREATE INDEX IF NOT EXISTS chess_accounts_last_seen_idx ON chess_accounts (last_seen DESC);`,
       );
+      // One-time migration: strip '#' prefix from any legacy codes
+      try {
+        const dirty = await pool.query(`SELECT code FROM chess_accounts WHERE code LIKE '#%'`);
+        for (const row of dirty.rows) {
+          const clean = row.code.replace(/^#+/, '');
+          const exists = await pool.query(`SELECT 1 FROM chess_accounts WHERE code=$1`, [clean]);
+          if (exists.rowCount === 0) {
+            await pool.query(`UPDATE chess_accounts SET code=$1 WHERE code=$2`, [clean, row.code]);
+            console.log(`[migration] stripped # from code: ${row.code} → ${clean}`);
+          } else {
+            // Clean code already exists — merge wins, then delete old row
+            await pool.query(`UPDATE chess_accounts SET wins = wins + (SELECT wins FROM chess_accounts WHERE code=$1) WHERE code=$2`, [row.code, clean]);
+            await pool.query(`DELETE FROM chess_accounts WHERE code=$1`, [row.code]);
+            console.log(`[migration] merged duplicate: ${row.code} → ${clean}`);
+          }
+        }
+      } catch(migErr) { console.warn('[migration] skipped:', migErr.message); }
       console.log("[storage] schema ready");
     },
     async get(code) {
@@ -229,6 +246,11 @@ function sanitizeName(raw) {
   return typeof raw === "string" ? raw.trim().slice(0, 20) : "";
 }
 
+// Strip leading '#' signs and uppercase — codes are always stored without '#'
+function normalizeCode(raw) {
+  return typeof raw === "string" ? raw.replace(/^#+/, "").trim().toUpperCase() : "";
+}
+
 async function genUniqueCode() {
   for (let i = 0; i < 10; i += 1) {
     const c = randomCode();
@@ -273,7 +295,7 @@ app.post("/api/account/upsert", async (req, res, next) => {
         : "#3498db";
     const incoming =
       req.body && typeof req.body.code === "string"
-        ? req.body.code.trim().toUpperCase()
+        ? normalizeCode(req.body.code)
         : "";
 
     if (incoming) {
@@ -305,10 +327,10 @@ app.post("/api/account/login", async (req, res, next) => {
   try {
     const code =
       req.body && typeof req.body.code === "string"
-        ? req.body.code.trim().toUpperCase()
+        ? normalizeCode(req.body.code)
         : "";
-    if (code.length !== 13) {
-      return res.status(400).json({ error: "Code must be 13 chars" });
+    if (code.length < 12 || code.length > 13) {
+      return res.status(400).json({ error: "Invalid code length" });
     }
     let a = await storage.get(code);
     if (!a) {
@@ -327,7 +349,7 @@ app.post("/api/account/login", async (req, res, next) => {
 app.get("/api/account/me", async (req, res, next) => {
   try {
     const code =
-      typeof req.query.code === "string" ? req.query.code.toUpperCase() : "";
+      typeof req.query.code === "string" ? normalizeCode(req.query.code) : "";
     const a = await storage.get(code);
     if (!a) return res.status(404).json({ error: "Not found" });
     await touch(a);
@@ -352,7 +374,7 @@ app.get("/api/account/search", async (req, res, next) => {
 app.get("/api/account/friends", async (req, res, next) => {
   try {
     const code =
-      typeof req.query.code === "string" ? req.query.code.toUpperCase() : "";
+      typeof req.query.code === "string" ? normalizeCode(req.query.code) : "";
     const me = await storage.get(code);
     if (!me) return res.json({ friends: [], requests: [], online: [] });
     await touch(me);
@@ -369,11 +391,11 @@ app.post("/api/account/friend-request", async (req, res, next) => {
   try {
     const code =
       req.body && typeof req.body.code === "string"
-        ? req.body.code.toUpperCase()
+        ? normalizeCode(req.body.code)
         : "";
     const target =
       req.body && typeof req.body.target === "string"
-        ? req.body.target.toUpperCase()
+        ? normalizeCode(req.body.target)
         : "";
     const me = await storage.get(code);
     const them = await storage.get(target);
@@ -392,11 +414,11 @@ app.post("/api/account/friend-respond", async (req, res, next) => {
   try {
     const code =
       req.body && typeof req.body.code === "string"
-        ? req.body.code.toUpperCase()
+        ? normalizeCode(req.body.code)
         : "";
     const from =
       req.body && typeof req.body.from === "string"
-        ? req.body.from.toUpperCase()
+        ? normalizeCode(req.body.from)
         : "";
     const accept = Boolean(req.body && req.body.accept);
     const me = await storage.get(code);
@@ -419,11 +441,11 @@ app.post("/api/account/friend-remove", async (req, res, next) => {
   try {
     const code =
       req.body && typeof req.body.code === "string"
-        ? req.body.code.toUpperCase()
+        ? normalizeCode(req.body.code)
         : "";
     const target =
       req.body && typeof req.body.target === "string"
-        ? req.body.target.toUpperCase()
+        ? normalizeCode(req.body.target)
         : "";
     const me = await storage.get(code);
     const them = await storage.get(target);
@@ -442,7 +464,7 @@ app.post("/api/account/replay", async (req, res, next) => {
   try {
     const code =
       req.body && typeof req.body.code === "string"
-        ? req.body.code.toUpperCase()
+        ? normalizeCode(req.body.code)
         : "";
     const me = await storage.get(code);
     if (!me) return res.status(404).json({ error: "Not found" });
@@ -455,6 +477,21 @@ app.post("/api/account/replay", async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+});
+
+// ── POST /api/account/win — atomically record a win (called by client after each match) ──
+app.post("/api/account/win", async (req, res, next) => {
+  try {
+    const code = req.body && typeof req.body.code === 'string' ? normalizeCode(req.body.code) : '';
+    if (!code) return res.status(400).json({ error: 'Missing code' });
+    const a = await storage.get(code);
+    if (!a) return res.status(404).json({ error: 'Not found' });
+    a.wins = (a.wins || 0) + 1;
+    await touch(a);
+    await storage.save(a);
+    console.log(`[win] ${a.name} (${code}) wins=${a.wins}`);
+    res.json({ ok: true, wins: a.wins });
+  } catch (e) { next(e); }
 });
 
 // ── v0.06 — QUEUE TRACKER (in-memory; shows real player count in matchmaking) ──
