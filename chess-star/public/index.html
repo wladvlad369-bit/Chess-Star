@@ -587,7 +587,11 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #lbContent{width:100%;flex:1;overflow-y:auto;padding:0 10px 12px;}
 #lbTopRow{display:flex;gap:6px;padding:10px;justify-content:center;}
 .lbPodium{flex:1;max-width:90px;border:2px solid #5d4037;border-radius:8px;background:#1a0800;display:flex;flex-direction:column;align-items:center;padding:8px 4px;gap:3px;}
-.lbPodium.first{border-color:#f1c40f;background:#2a1800;}
+.lbPodium.first{border-color:#f1c40f;background:#2a1800;animation:lbPod1Glow 2s ease-in-out infinite;}
+@keyframes lbPod1Glow{
+  0%,100%{box-shadow:0 0 10px #f1c40f,0 0 28px rgba(241,196,15,.5);}
+  50%{box-shadow:0 0 22px #f1c40f,0 0 55px rgba(241,196,15,.85),0 0 80px rgba(241,196,15,.3);}
+}
 .lbPodium.second{border-color:#a0a0a0;}
 .lbPodium.third{border-color:#cd7f32;}
 .lbPodRank{font-size:18px;line-height:1;}
@@ -596,15 +600,42 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #lbList{width:100%;}
 .lbRow{display:flex;align-items:center;gap:8px;padding:7px 8px;border:1px solid #2a1200;border-radius:6px;background:#140800;margin-bottom:4px;}
 .lbRow.me{border-color:#f1c40f;background:#2a1800;}
+.lbRow.rank1{border:2px solid #f1c40f;background:linear-gradient(135deg,#2a1800,#1a0f00,#2a1800);animation:lbRow1Glow 2s ease-in-out infinite;position:relative;overflow:hidden;}
+.lbRow.rank1::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(241,196,15,.08),transparent);animation:lbRow1Shine 2.5s linear infinite;}
+@keyframes lbRow1Glow{
+  0%,100%{box-shadow:0 0 8px rgba(241,196,15,.6),inset 0 0 12px rgba(241,196,15,.08);}
+  50%{box-shadow:0 0 20px rgba(241,196,15,.95),0 0 40px rgba(241,196,15,.4),inset 0 0 20px rgba(241,196,15,.15);}
+}
+@keyframes lbRow1Shine{
+  0%{transform:translateX(-100%);}
+  100%{transform:translateX(100%);}
+}
+.lbRow.rank1 .lbRank{color:#f1c40f;font-size:12px;}
+.lbRow.rank1 .lbName{color:#ffe066;text-shadow:0 0 8px rgba(241,196,15,.7);}
 .lbRank{width:22px;font-size:10px;color:#a08060;font-weight:bold;text-align:right;flex-shrink:0;}
 .lbName{flex:1;font-size:11px;color:#f1c40f;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .lbWins{font-size:10px;color:#4caf50;font-weight:bold;flex-shrink:0;}
+/* ── "Your Rank" sticky banner ── */
+#lbMyRankBanner{display:none;width:100%;margin-bottom:8px;border-radius:8px;border:2px solid #1976d2;background:linear-gradient(135deg,#0d1a2e,#0a1520,#0d1a2e);padding:10px 12px;box-sizing:border-box;cursor:default;position:relative;overflow:hidden;}
+#lbMyRankBanner::before{content:'YOUR RANK';position:absolute;top:4px;right:8px;font-size:7px;color:rgba(66,165,245,.6);letter-spacing:2px;font-weight:bold;}
+#lbMyRankBanner .yrRank{font-size:22px;font-weight:900;color:#42a5f5;line-height:1;flex-shrink:0;}
+#lbMyRankBanner .yrTier{font-size:18px;flex-shrink:0;}
+#lbMyRankBanner .yrName{flex:1;font-size:12px;font-weight:bold;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#lbMyRankBanner .yrRight{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;}
+#lbMyRankBanner .yrWins{font-size:14px;font-weight:bold;color:#4caf50;}
+#lbMyRankBanner .yrTierName{font-size:9px;color:#42a5f5;letter-spacing:1px;}
+#lbMyRankBanner.me1{border-color:#f1c40f;background:linear-gradient(135deg,#2a1800,#1a0f00,#2a1800);animation:lbRow1Glow 2s ease-in-out infinite;}
+#lbMyRankBanner.me1 .yrRank{color:#f1c40f;}
+#lbMyRankBanner.me1 .yrTierName{color:#f1c40f;}
+body.lightTheme #lbMyRankBanner{background:linear-gradient(135deg,#e8f4fd,#dff0fb,#e8f4fd);border-color:#1976d2;}
+body.lightTheme #lbMyRankBanner .yrName{color:#1a3a5c;}
 #lbRefreshBtn{display:block;width:calc(100% - 20px);margin:0 10px 10px;padding:10px;background:#1a0800;color:#f1c40f;border:2px solid #5d4037;border-radius:8px;font-weight:bold;font-size:11px;cursor:pointer;letter-spacing:2px;}
 #lbRefreshBtn:hover{background:#f1c40f;color:#000;}
 body.lightTheme #leaderboardBtn{background:#fff8e8;border-color:#a08060;}
 body.lightTheme #leaderboardBtnLbl{color:#7a4e20;}
 body.lightTheme .lbRow{background:#fff8e8;border-color:#c8a870;color:#3a2306;}
 body.lightTheme .lbRow.me{border-color:#f1c40f;background:#ffe9a0;}
+body.lightTheme .lbRow.rank1{background:linear-gradient(135deg,#fff7d6,#fffbe8,#fff7d6);}
 body.lightTheme .lbName{color:#3a2306;}
 body.lightTheme .lbPodium{background:#fff8e8;border-color:#a08060;}
 body.lightTheme .lbPodium.first{border-color:#f1c40f;background:#ffe9a0;}
@@ -1190,6 +1221,7 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
   <div class="topBar"><button class="backBtn" onclick="goTo('menuScreen')">←</button><span class="topTitle">LEADERBOARD</span></div>
   <button id="lbRefreshBtn" onclick="loadLeaderboard()">↺ REFRESH</button>
   <div id="lbContent">
+    <div id="lbMyRankBanner"></div>
     <div id="lbTopRow"></div>
     <div id="lbList"></div>
   </div>
@@ -4861,14 +4893,34 @@ function drawThumbQOC(){
         let i=0; while(i<T.length && wins>=T[i]) i++;
         return {name:N[i]||'Chess Star', icon:I[i]||'♟️'};
       }
-      // Full list
+      // "Your Rank" sticky banner
+      const banner = document.getElementById('lbMyRankBanner');
+      if(banner){
+        const me = players.find(p=>myCode && p.code===myCode);
+        if(me){
+          const mt = _lbTier(me.wins);
+          const isFirst = me.rank===1;
+          banner.className = isFirst ? 'me1' : '';
+          banner.style.display='flex';
+          banner.style.alignItems='center';
+          banner.style.gap='10px';
+          banner.innerHTML = '<span class="yrRank">#'+me.rank+'</span>'
+            +'<span class="yrTier">'+mt.icon+'</span>'
+            +'<span class="yrName">'+escapeHtml(me.name||'Player')+'</span>'
+            +'<span class="yrRight"><span class="yrWins">'+me.wins+'W</span><span class="yrTierName">'+mt.name+'</span></span>';
+        } else {
+          banner.style.display='none';
+        }
+      }
+      // Full list — add rank1 glow class to first place
       players.forEach(p=>{
         const isMe = myCode && p.code === myCode;
+        const isFirst = p.rank === 1;
         const row = document.createElement('div');
-        row.className = 'lbRow'+(isMe?' me':'');
+        row.className = 'lbRow'+(isFirst?' rank1':'')+(isMe?' me':'');
         const onlineDot = p._online ? ' <span style="font-size:7px;color:#4caf50;">●</span>' : '';
         const t = _lbTier(p.wins);
-        row.innerHTML = '<span class="lbRank">#'+p.rank+'</span>'
+        row.innerHTML = '<span class="lbRank">'+(isFirst?'👑':'#'+p.rank)+'</span>'
           +'<span style="font-size:11px;margin:0 4px;" title="'+t.name+'">'+t.icon+'</span>'
           +'<span class="lbName" style="color:'+(p.color||'#f1c40f')+'">'+escapeHtml(p.name||'Player')+onlineDot+'</span>'
           +'<span class="lbWins" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;"><span>'+p.wins+'W</span><span style="font-size:8px;color:#a08060;letter-spacing:.5px;">'+t.name+'</span></span>';
