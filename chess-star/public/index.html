@@ -5495,6 +5495,8 @@ function drawThumbQOC(){
       localStorage.setItem('chessstar_trophies', String(window.totalTrophies));
     }
     try{ window.updateMilestones && window.updateMilestones(); }catch(e){}
+    // Request notification permission after account is confirmed
+    try{ window._csNotifRequestPerm && window._csNotifRequestPerm(); }catch(e){}
   }
   function netConnect(){
     if(!myCode) return;
@@ -5539,7 +5541,7 @@ function drawThumbQOC(){
       sock.on('player_left',(m)=> showToast('Player left ('+m.reason+')'));
       sock.on('suggest_walk',(m)=>{ try{ openWalkModal && openWalkModal(m); }catch(e){} });
       sock.on('suggest_walk_response',(m)=> showToast('Walk '+(m.accepted?'accepted':'declined')+(m.ai?' (bot)':'')));
-      sock.on('friend_invite',(m)=> showToast(m.fromName+' invites you to '+m.event+' '+m.mode));
+      sock.on('friend_invite',(m)=>{ showToast(m.fromName+' invites you to '+m.event+' '+m.mode); try{ window._csNotifFire && window._csNotifFire('⚔️ Team Invite!', (m.fromName||'A friend')+' invites you to '+m.event+' '+m.mode,'invite'); }catch(e){} });
       sock.on('friend_invite_response',(m)=> showToast('Invite '+(m.accepted?'accepted':'declined')));
     }catch(e){
       console.warn('socket.io connect failed', e);
@@ -6691,6 +6693,154 @@ function drawThumbQOC(){
     scaleRoot();
     window.addEventListener('resize', scaleRoot);
     window.addEventListener('orientationchange', function(){ setTimeout(scaleRoot, 120); });
+  })();
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // v0.06 — PUSH NOTIFICATIONS
+  //   Triggers: friend online · friend request · team invite · tier up
+  // ══════════════════════════════════════════════════════════════════════════
+  (function(){
+    // Tier names aligned to WIN_TIERS thresholds (0 = below first threshold)
+    const _TIER_NAMES = ['Rookie','Bronze','Iron','Silver','Gold','Platinum',
+      'Diamond','Elite','Master','Champion','Legendary','Mythic',
+      'Divine','Immortal','Celestial','Grandmaster','Supreme',
+      'Godlike','Infinite','Eternal','Cosmic','Universal','Absolute','Chess Star ⭐'];
+    const _TIER_ICONS = ['🔰','🥉','⚙️','🥈','🥇','💿','💎','⚡','🏆','👑',
+      '🔥','🌟','✨','🌌','🌠','🎖️','🔮','⚜️','♾️','🕊️','🌀','🌍','💫','♟️'];
+
+    // ── OS Notification permission ────────────────────────────────────────
+    let _granted = typeof Notification !== 'undefined' && Notification.permission === 'granted';
+    function _requestPerm(){
+      if(typeof Notification === 'undefined') return;
+      if(Notification.permission === 'default'){
+        Notification.requestPermission().then(p => { _granted = p === 'granted'; });
+      } else {
+        _granted = Notification.permission === 'granted';
+      }
+    }
+    window._csNotifRequestPerm = _requestPerm;
+
+    // ── Fire an OS notification ────────────────────────────────────────────
+    function _fireOS(title, body, tag){
+      if(!_granted || typeof Notification === 'undefined') return;
+      try{
+        new Notification(title, { body, tag: tag||'chess-star', icon:'/favicon.ico', silent:false });
+      }catch(e){}
+    }
+
+    // ── Combined notifier: in-app toast + OS notification ─────────────────
+    function _notify(title, body, tag){
+      const msg = body ? title + ': ' + body : title;
+      try{ window.showToast && window.showToast(msg); }catch(e){}
+      _fireOS(title, body, tag||'chess-star');
+    }
+    window._csNotifFire = _notify;
+
+    // ── Tier detection ────────────────────────────────────────────────────
+    const _WIN_TIERS = [1,2,5,10,15,20,25,30,35,40,50,60,75,100,125,150,200,250,300,400,500,750,1000];
+    function _tierIdx(wins){
+      let i = 0; while(i < _WIN_TIERS.length && wins >= _WIN_TIERS[i]) i++; return i;
+    }
+    let _lastTierIdx = -1;
+    function _checkTier(wins){
+      const idx = _tierIdx(wins);
+      if(_lastTierIdx === -1){ _lastTierIdx = idx; return; }
+      if(idx > _lastTierIdx){
+        const name = _TIER_NAMES[Math.min(idx, _TIER_NAMES.length-1)];
+        const icon = _TIER_ICONS[Math.min(idx, _TIER_ICONS.length-1)];
+        _lastTierIdx = idx;
+        _notify(icon + ' Tier Up! ' + name, 'You reached the '+name+' tier!', 'tier-up');
+      } else if(idx < _lastTierIdx){
+        _lastTierIdx = idx;
+      }
+    }
+
+    // ── State tracking ────────────────────────────────────────────────────
+    let _knownOnline   = new Set(); // friend codes we last saw online
+    let _knownRequests = new Set(); // request codes we've already notified about
+    let _initialized   = false;
+
+    function _loadState(){
+      try{ _knownRequests = new Set(JSON.parse(localStorage.getItem('cs_notif_req')||'[]')); }catch(e){}
+    }
+    function _saveState(){
+      localStorage.setItem('cs_notif_req', JSON.stringify([..._knownRequests]));
+    }
+
+    // ── Friend poll ───────────────────────────────────────────────────────
+    async function _pollFriends(){
+      if(typeof myCode === 'undefined' || !myCode) return;
+      try{
+        const r = await fetch('/api/account/friends?code='+encodeURIComponent(myCode));
+        if(!r.ok) return;
+        const j = await r.json();
+        const friends  = j.friends  || [];
+        const requests = j.requests || [];
+
+        // 1. Friend came online
+        const nowOnline = new Set(friends.filter(f=>f.online).map(f=>f.code));
+        if(_initialized){
+          for(const code of nowOnline){
+            if(!_knownOnline.has(code)){
+              const f = friends.find(x=>x.code===code);
+              _notify('🟢 '+(f&&f.name||'Friend')+' is online', 'Tap Friends to invite them!', 'online-'+code);
+            }
+          }
+        }
+        _knownOnline = nowOnline;
+
+        // 2. New friend request
+        if(_initialized){
+          for(const req of requests){
+            if(!_knownRequests.has(req.code)){
+              _knownRequests.add(req.code);
+              _notify('👋 Friend Request', (req.name||'Someone')+' wants to be friends!', 'req-'+req.code);
+            }
+          }
+          _saveState();
+        } else {
+          // First poll — just record what we already know (don't spam old requests)
+          requests.forEach(rq=>_knownRequests.add(rq.code));
+          _saveState();
+        }
+
+        _initialized = true;
+      }catch(e){}
+    }
+
+    // ── Hook into notifyMatchFinished to detect tier crossing ─────────────
+    const _prevNMF = window.notifyMatchFinished;
+    window.notifyMatchFinished = function(result, opts){
+      if(_prevNMF) _prevNMF.call(this, result, opts);
+      if(result === 'win'){
+        setTimeout(()=>{ _checkTier(typeof window.totalWins==='number'?window.totalWins:0); }, 300);
+      }
+    };
+
+    // ── Hook into refreshFriends to piggyback notification checks ─────────
+    const _prevRF = window.refreshFriends;
+    window.refreshFriends = async function(){
+      if(_prevRF) await _prevRF.apply(this, arguments);
+      try{ _pollFriends(); }catch(e){}
+    };
+
+    // ── Startup: wait for myCode to be set, then init ─────────────────────
+    function _init(){
+      _loadState();
+      _lastTierIdx = _tierIdx(typeof window.totalWins==='number'?window.totalWins:0);
+      _requestPerm();
+      _pollFriends();
+      setInterval(_pollFriends, 45000); // background poll every 45s
+    }
+
+    let _attempts = 0;
+    const _waitAcct = setInterval(()=>{
+      if(typeof myCode !== 'undefined' && myCode){
+        clearInterval(_waitAcct);
+        _init();
+      } else if(++_attempts > 60){ clearInterval(_waitAcct); }
+    }, 1000);
+
   })();
 
 })();
