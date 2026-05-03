@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Chess Star v0.06</title>
+<title>Chess Star v0.07</title>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -641,6 +641,22 @@ body.lightTheme .lbPodium{background:#fff8e8;border-color:#a08060;}
 body.lightTheme .lbPodium.first{border-color:#f1c40f;background:#ffe9a0;}
 body.lightTheme .lbPodName{color:#3a2306;}
 body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;}
+/* ── v0.07 — Fire badge (streak) near Start Game ── */
+#streakFireBadge{display:none;position:absolute;left:6px;top:50%;transform:translateY(-50%);background:linear-gradient(135deg,#7f1500,#b71c1c,#7f1500);border:2px solid #ff5722;border-radius:8px;padding:4px 8px;align-items:center;gap:3px;flex-direction:column;cursor:default;z-index:5;}
+#streakFireBadge.show{display:flex;}
+#streakFireBadge .sfIco{font-size:18px;line-height:1;animation:sfPulse 1.2s ease-in-out infinite;}
+#streakFireBadge .sfNum{font-size:13px;font-weight:900;color:#ff6d00;line-height:1;}
+#streakFireBadge .sfLbl{font-size:6px;color:#ff8a65;letter-spacing:1px;font-weight:bold;}
+@keyframes sfPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.18);}}
+/* ── v0.07 — Leaderboard tabs ── */
+#lbTabs{display:flex;gap:4px;padding:0 10px 6px;}
+.lbTab{flex:1;padding:7px 4px;background:#1a0800;border:1px solid #5d4037;border-radius:6px;color:#a08060;font-size:9px;font-weight:bold;letter-spacing:1.5px;cursor:pointer;text-align:center;transition:all .15s;}
+.lbTab.on{background:#f1c40f;color:#000;border-color:#f1c40f;}
+.lbTab:not(.on):hover{border-color:#f1c40f;color:#f1c40f;}
+body.lightTheme .lbTab{background:#fff8e8;border-color:#a08060;color:#7a4e20;}
+body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;}
+/* ── Player color avatar circle ── */
+.lbAvatar{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.15);flex-shrink:0;}
 
 /* v0.03 — FRIENDS SCREEN */
 #friendsScreen{justify-content:flex-start;}
@@ -779,13 +795,13 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
 <div id="startupSplash" style="position:fixed;inset:0;background:#0a0500;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;">
   <div id="ssStar" style="font-size:64px;color:#f1c40f;opacity:0;transform:scale(0.1) rotate(-180deg);transition:none;text-shadow:0 0 30px rgba(241,196,15,.9);">♛</div>
   <div id="ssTitle" style="font-family:Georgia,serif;font-size:36px;font-weight:900;color:#f1c40f;letter-spacing:5px;text-shadow:0 0 40px rgba(241,196,15,.9),4px 4px 0 #3e1a00;opacity:0;transform:scale(0.05);transition:none;margin-top:12px;">CHESS STAR</div>
-  <div id="ssSub" style="font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;margin-top:16px;opacity:0;transition:none;">v0.06 — ONLINE</div>
+  <div id="ssSub" style="font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;margin-top:16px;opacity:0;transition:none;">v0.07 — ONLINE</div>
 </div>
 
 <!-- MENU -->
 <div id="menuScreen" class="screen active">
   <canvas id="menuBg" width="360" height="600"></canvas>
-  <div id="titleBlock"><h1>CHESS STAR</h1><p data-i18n="menu.subtitle">v0.06 — ONLINE — SELECT AN EVENT</p></div>
+  <div id="titleBlock"><h1>CHESS STAR</h1><p data-i18n="menu.subtitle">v0.07 — ONLINE — SELECT AN EVENT</p></div>
   <!-- v0.04 — MILESTONE BARS (Wins + Trophies) -->
   <div id="milestoneRow">
     <div id="winsBar" class="msBtn" onclick="openMilestone('wins')" title="Wins milestones">
@@ -849,7 +865,14 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
         <div id="evArrow">▼ browse</div>
       </div>
     </div>
-    <button id="startBtn" onclick="startSelectedEvent()">START GAME</button>
+    <div style="flex:1;position:relative;display:flex;align-items:stretch;">
+      <div id="streakFireBadge" title="Win Streak">
+        <span class="sfIco">🔥</span>
+        <span class="sfNum" id="sfNum">0</span>
+        <span class="sfLbl">STREAK</span>
+      </div>
+      <button id="startBtn" onclick="startSelectedEvent()" style="flex:1;">START GAME</button>
+    </div>
   </div>
 </div>
 
@@ -910,9 +933,10 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
       <div id="bigIconEditBadge">✎</div>
     </div>
     <div id="profStatsRow">
-      <div class="profStat"><div class="psIco">🏅</div><div class="psNum" id="profWinsNum">0</div><div class="psLbl" data-i18n="profile.wins">WINS</div></div>
-      <div class="profStat"><div class="psIco">🏆</div><div class="psNum" id="profTrophiesNum">0</div><div class="psLbl" data-i18n="profile.trophies">TROPHIES</div></div>
-      <div class="profStat"><div class="psIco">♟</div><div class="psNum" id="profPiecesNum">1/6</div><div class="psLbl" data-i18n="profile.pieces">PIECES</div></div>
+      <div class="profStat"><div class="psIco">🏅</div><div class="psNum" id="profWinsNum">0</div><div class="psLbl">WINS</div><div class="psRank" id="profWinsRank" style="font-size:8px;color:#42a5f5;letter-spacing:.5px;margin-top:1px;"></div></div>
+      <div class="profStat"><div class="psIco">🔥</div><div class="psNum" id="profBestStreakNum">0</div><div class="psLbl">BEST STREAK</div><div class="psRank" id="profStreakRank" style="font-size:8px;color:#ff8a65;letter-spacing:.5px;margin-top:1px;"></div></div>
+      <div class="profStat"><div class="psIco">🏆</div><div class="psNum" id="profTrophiesNum">0</div><div class="psLbl">TROPHIES</div><div class="psRank" id="profTrophyRank" style="font-size:8px;color:#a0c040;letter-spacing:.5px;margin-top:1px;"></div></div>
+      <div class="profStat"><div class="psIco">♟</div><div class="psNum" id="profPiecesNum">1/6</div><div class="psLbl">PIECES</div></div>
     </div>
     <div onclick="window.openNameModal&&window.openNameModal()">
       <div class="fLbl">PLAYER NAME — TAP TO EDIT</div>
@@ -1209,7 +1233,7 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
       <h3>VERSION</h3>
       <div id="versionRow">
         <div class="setRow"><span>Game</span><span style="color:#f1c40f;font-weight:bold;letter-spacing:2px;">CHESS STAR</span></div>
-        <div class="setRow"><span>Build</span><span id="versionLabel" style="color:#4caf50;font-weight:bold;letter-spacing:2px;">v0.06</span></div>
+        <div class="setRow"><span>Build</span><span id="versionLabel" style="color:#4caf50;font-weight:bold;letter-spacing:2px;">v0.07</span></div>
         <div class="setRow"><span>Realtime</span><span style="color:#42a5f5;letter-spacing:1px;">Socket.io</span></div>
       </div>
     </div>
@@ -1220,6 +1244,11 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
 <div id="leaderboardScreen" class="screen">
   <div class="topBar"><button class="backBtn" onclick="goTo('menuScreen')">←</button><span class="topTitle">LEADERBOARD</span></div>
   <button id="lbRefreshBtn" onclick="loadLeaderboard()">↺ REFRESH</button>
+  <div id="lbTabs">
+    <button class="lbTab on" data-lbtype="wins"    onclick="switchLbTab('wins')">🏅 WINS</button>
+    <button class="lbTab"    data-lbtype="streaks"  onclick="switchLbTab('streaks')">🔥 STREAKS</button>
+    <button class="lbTab"    data-lbtype="trophies" onclick="switchLbTab('trophies')">🏆 TROPHIES</button>
+  </div>
   <div id="lbContent">
     <div id="lbMyRankBanner"></div>
     <div id="lbTopRow"></div>
@@ -1264,7 +1293,7 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
 <div id="acctModal">
   <div id="acctModalInner">
     <div id="acctTitle">CHESS STAR</div>
-    <div id="acctSub">v0.06 — Sign in or create your account</div>
+    <div id="acctSub">v0.07 — Sign in or create your account</div>
     <div class="acctTabRow">
       <div class="acctTab on" data-acct="create" onclick="acctSwitch('create')">CREATE</div>
       <div class="acctTab" data-acct="login" onclick="acctSwitch('login')">LOGIN</div>
@@ -1307,6 +1336,14 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
       </div>
     </div>
     <button onclick="maShowAddBox()" style="background:none;border:1px dashed #5d4037;color:#a08060;padding:8px;border-radius:6px;font-size:10px;font-weight:bold;letter-spacing:2px;cursor:pointer;">+ ADD ACCOUNT</button>
+    <div style="border-top:1px solid #2a1200;padding-top:10px;display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:9px;color:#888;letter-spacing:1px;">NOTIFICATIONS</div>
+      <div id="maNotifsStatus" style="font-size:10px;color:#a08060;padding:6px 0;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="maNotifsRequest()" id="maNotifsEnableBtn" style="flex:1;background:#1a0800;border:2px solid #5d4037;color:#f1c40f;padding:8px;border-radius:6px;font-size:9px;font-weight:bold;letter-spacing:1px;cursor:pointer;">🔔 ENABLE</button>
+        <button onclick="maNotifsTest()" style="flex:1;background:#1a0800;border:2px solid #5d4037;color:#a08060;padding:8px;border-radius:6px;font-size:9px;font-weight:bold;letter-spacing:1px;cursor:pointer;">🧪 TEST</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1388,7 +1425,7 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
     <p data-i18n="version.body">A newer version of Chess Star is available. Please refresh the page to continue playing.</p>
     <div id="vgVersions">
       <div><span data-i18n="version.you">You have</span>: <b id="vgYourVer">v0.04</b></div>
-      <div><span data-i18n="version.latest">Latest</span>: <b id="vgLatestVer" style="color:#4caf50;">v0.06</b></div>
+      <div><span data-i18n="version.latest">Latest</span>: <b id="vgLatestVer" style="color:#4caf50;">v0.07</b></div>
     </div>
     <button id="vgRefresh" onclick="location.reload(true)">↻ <span data-i18n="version.refresh">REFRESH NOW</span></button>
   </div>
@@ -4358,8 +4395,9 @@ function drawThumbQOC(){
   window.qocPlayerColor = 'w';
   window.qocBoardCol = 'w';
   window.currentMode = '1v1';
-  window.winStreak = parseInt(localStorage.getItem('chessstar_streak')||'0',10);
-  window.totalWins = parseInt(localStorage.getItem('chessstar_wins')||'0',10);
+  window.winStreak  = parseInt(localStorage.getItem('chessstar_streak')||'0',10);
+  window.bestStreak = parseInt(localStorage.getItem('chessstar_best_streak')||'0',10);
+  window.totalWins  = parseInt(localStorage.getItem('chessstar_wins')||'0',10);
   window.totalTrophies = parseInt(localStorage.getItem('chessstar_trophies')||'0',10);
   window.lpsRemoteNames = {};
 
@@ -4410,6 +4448,15 @@ function drawThumbQOC(){
     const tBtn = document.getElementById('trophyBar');
     if(wBtn) wBtn.classList.toggle('claimable', hasClaimable(WIN_TIERS, window.totalWins, claimedWins));
     if(tBtn) tBtn.classList.toggle('claimable', hasClaimable(TROPHY_TIERS, window.totalTrophies, claimedTrophy));
+    // Fire badge near Start Game button
+    const sfb = document.getElementById('streakFireBadge');
+    const sfn = document.getElementById('sfNum');
+    if(sfb) sfb.classList.toggle('show', (window.winStreak||0) > 0);
+    if(sfn) sfn.textContent = window.winStreak||0;
+    // Profile stats sync
+    const pbsn = document.getElementById('profBestStreakNum'); if(pbsn) pbsn.textContent = window.bestStreak||0;
+    const pwnn = document.getElementById('profWinsNum');       if(pwnn) pwnn.textContent = window.totalWins||0;
+    const ptnn = document.getElementById('profTrophiesNum');   if(ptnn) ptnn.textContent = window.totalTrophies||0;
   };
   window.openMilestone = function(kind){
     const modal = document.getElementById('milestoneModal');
@@ -4565,10 +4612,8 @@ function drawThumbQOC(){
       const pn = $('pName'); if(pn){ pn.textContent = profile.name; pn.style.color = profile.color; }
       $('acctModal').classList.remove('show');
       updateSaveCodeUI();
-      // Sync local wins to server so everyone appears on leaderboard
-      if(typeof window.totalWins==='number' && window.totalWins>0){
-        fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,wins:window.totalWins})}).catch(()=>{});
-      }
+      // Sync local wins + streak + trophies to server
+      fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,wins:window.totalWins||0,best_streak:window.bestStreak||0,trophies:window.totalTrophies||0,name:profile.name,color:profile.color})}).catch(()=>{});
       netConnect();
     } catch(e){ $('acctErr').textContent = explainNetErr(); }
   };
@@ -4602,10 +4647,7 @@ function drawThumbQOC(){
       if(typeof j.wins==='number') applyAccountFromServer({wins:j.wins});
       const pn = $('pName'); if(pn){ pn.textContent = profile.name; pn.style.color = profile.color; }
       updateSaveCodeUI();
-      // Sync local wins so leaderboard shows real count after loading code
-      if(typeof window.totalWins==='number' && window.totalWins>0){
-        fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,wins:window.totalWins})}).catch(()=>{});
-      }
+      fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,wins:window.totalWins||0,best_streak:window.bestStreak||0,trophies:window.totalTrophies||0,name:profile.name,color:profile.color})}).catch(()=>{});
       showToast('Account loaded ✓');
       netConnect();
     } catch(e){ showToast(explainNetErr()); }
@@ -4630,12 +4672,36 @@ function drawThumbQOC(){
   window.openManageAccounts = function(){
     _maSyncCurrent();
     const el = $('manageAcctsModal'); if(!el) return;
-    // Update current code display
     const cc = $('maCurCode'); if(cc) cc.textContent = myCode ? '#'+myCode : '#OFFLINE-MODE';
     el.style.display='flex';
     $('maAllAcctsList').style.display='none';
     $('maAddBox').style.display='none';
     const btn = $('maAllAcctsBtn'); if(btn) btn.textContent='▼ ALL ACCOUNTS';
+    // Refresh notification status
+    const ns = $('maNotifsStatus');
+    if(ns){
+      if(typeof Notification === 'undefined') ns.textContent = 'Notifications not supported on this device.';
+      else if(Notification.permission === 'granted') ns.textContent = '✅ Enabled — you will get alerts for friend activity, invites & tier-ups.';
+      else if(Notification.permission === 'denied') ns.textContent = '🚫 Blocked — go to your browser/app settings to allow notifications.';
+      else ns.textContent = '⚪ Not set — tap Enable to turn on notifications.';
+    }
+    const enBtn = $('maNotifsEnableBtn');
+    if(enBtn) enBtn.disabled = typeof Notification !== 'undefined' && Notification.permission === 'granted';
+  };
+  window.maNotifsRequest = function(){
+    try{ window._csNotifRequestPerm && window._csNotifRequestPerm(); }catch(e){}
+    if(typeof Notification !== 'undefined' && Notification.permission !== 'granted'){
+      Notification.requestPermission().then(()=>{ window.openManageAccounts(); });
+    } else { window.openManageAccounts(); }
+  };
+  window.maNotifsTest = function(){
+    try{
+      if(window._csNotifFire){
+        window._csNotifFire('🧪 Test Notification', 'Chess Star notifications are working!', 'test');
+      } else {
+        showToast('Enable notifications first');
+      }
+    }catch(e){ showToast('Notification test failed'); }
   };
   window.closeManageAccounts = function(){
     const el=$('manageAcctsModal'); if(el) el.style.display='none';
@@ -4766,12 +4832,10 @@ function drawThumbQOC(){
       const ni = $('acctNameInp');
       if(ni && profile.name && profile.name!=='Player 1') ni.value = profile.name;
     } else {
-      // Sync local wins to server on startup so leaderboard is accurate for everyone
-      if(typeof window.totalWins==='number' && window.totalWins>0){
-        fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,wins:window.totalWins})}).catch(()=>{});
-      }
+      // Sync local stats to server on startup
+      fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:myCode,wins:window.totalWins||0,best_streak:window.bestStreak||0,trophies:window.totalTrophies||0,name:profile.name,color:profile.color})}).catch(()=>{});
       fetch('/api/account/me?code='+encodeURIComponent(myCode)).then(r=>r.ok?r.json():null).then(j=>{
-        if(j && j.name){ profile.name=j.name; savePersistedProfile(); const pn=$('pName'); if(pn){pn.textContent=j.name;pn.style.color=profile.color;} }
+        if(j) applyAccountFromServer(j);
       }).catch(()=>{});
       netConnect();
     }
@@ -4809,68 +4873,120 @@ function drawThumbQOC(){
   let _lbLiveTimer = null;
   function _lbStartLive(){ if(_lbLiveTimer) return; _lbLiveTimer = setInterval(()=>{ try{ loadLeaderboard(); }catch(e){} }, 30000); }
   function _lbStopLive(){ if(_lbLiveTimer){ clearInterval(_lbLiveTimer); _lbLiveTimer=null; } }
-  // Hook goTo to start/stop the live refresh
+  // Hook goTo to start/stop the live refresh + load profile ranks
   (function(){
     const _prevGoTo = window.goTo;
     window.goTo = function(id){
       _prevGoTo(id);
       if(id==='leaderboardScreen'){ _lbStartLive(); }
       else { _lbStopLive(); }
+      if(id==='profileScreen'){ try{ _loadProfileRanks(); }catch(e){} }
     };
   })();
+
+  // ── Profile rank loading ─────────────────────────────────────────────────
+  async function _loadProfileRanks(){
+    if(!myCode) return;
+    try{
+      const [r1,r2,r3] = await Promise.all([
+        fetch('/api/leaderboard?limit=200&type=wins'),
+        fetch('/api/leaderboard?limit=200&type=streaks'),
+        fetch('/api/leaderboard?limit=200&type=trophies'),
+      ]);
+      function findRank(j){ const p=(j.players||[]).find(x=>x.code===myCode); return p?p.rank:null; }
+      const [jw,js,jt] = await Promise.all([r1.json(),r2.json(),r3.json()]);
+      const rW=findRank(jw), rS=findRank(js), rT=findRank(jt);
+      const el1=$('profWinsRank');   if(el1) el1.textContent = rW ? 'RANK #'+rW : '';
+      const el2=$('profStreakRank'); if(el2) el2.textContent = rS ? 'RANK #'+rS : '';
+      const el3=$('profTrophyRank');if(el3) el3.textContent = rT ? 'RANK #'+rT : '';
+    }catch(e){}
+  }
 
   window.openLeaderboard = function(){
     goTo('leaderboardScreen');
     loadLeaderboard();
   };
+
+  // ── Tier helper (shared) ─────────────────────────────────────────────────
+  function _lbTier(wins){
+    const T=[1,2,5,10,15,20,25,30,35,40,50,60,75,100,125,150,200,250,300,400,500,750,1000];
+    const N=['Rookie','Bronze','Iron','Silver','Gold','Platinum','Diamond','Elite','Master','Champion','Legendary','Mythic','Divine','Immortal','Celestial','Grandmaster','Supreme','Godlike','Infinite','Eternal','Cosmic','Universal','Absolute','Chess Star'];
+    const I=['🌱','🥉','⚙️','🥈','🥇','🔷','💎','⚡','🏆','👑','🔥','🌟','✨','🌌','🌠','🎖️','🔮','⚜️','♾️','🕊️','🌀','🌍','💫','♟️'];
+    let i=0; while(i<T.length && wins>=T[i]) i++;
+    return {name:N[i]||'Chess Star', icon:I[i]||'♟️'};
+  }
+  window._lbTierHelper = _lbTier;
+
+  let _lbCurrentType = 'wins';
+  window.switchLbTab = function(type){
+    _lbCurrentType = type;
+    document.querySelectorAll('.lbTab').forEach(el=>el.classList.toggle('on', el.dataset.lbtype===type));
+    loadLeaderboard();
+  };
+
   window.loadLeaderboard = async function(){
     const topRow = document.getElementById('lbTopRow');
     const list   = document.getElementById('lbList');
     if(!topRow || !list) return;
+    const type = _lbCurrentType || 'wins';
     topRow.innerHTML = '<div style="color:#a08060;font-size:10px;letter-spacing:1px;padding:8px;">Loading…</div>';
     list.innerHTML = '';
     try{
-      // Fetch leaderboard + online players in parallel
       const [lbRes, onlineRes] = await Promise.all([
-        fetch('/api/leaderboard?limit=100'),
+        fetch('/api/leaderboard?limit=100&type='+type),
         myCode ? fetch('/api/account/friends?code='+myCode) : Promise.resolve(null)
       ]);
       if(!lbRes.ok){ topRow.innerHTML='<div style="color:#e74c3c;font-size:10px;padding:8px;">Failed to load</div>'; return; }
       const j = await lbRes.json();
       let players = j.players || [];
       const knownCodes = new Set(players.map(p=>p.code));
-      // Always inject current user from local data if not in list
+
+      // Inject current user from local data if not already in list
       if(myCode && !knownCodes.has(myCode)){
-        players.push({rank:999,code:myCode,name:profile.name||'Player',color:profile.color||'#3498db',wins:typeof window.totalWins==='number'?window.totalWins:0,_me:true});
+        players.push({
+          rank:999, code:myCode,
+          name:profile.name||'Player', color:profile.color||'#3498db',
+          wins:window.totalWins||0, streak:window.winStreak||0,
+          best_streak:window.bestStreak||0, trophies:window.totalTrophies||0,
+          _me:true
+        });
         knownCodes.add(myCode);
       }
-      // Merge online players who aren't already in the leaderboard list
+      // Merge online players
       if(onlineRes && onlineRes.ok){
         const oj = await onlineRes.json();
-        const online = oj.online || [];
-        online.forEach(op=>{
+        (oj.online||[]).forEach(op=>{
           if(!knownCodes.has(op.code)){
-            players.push({rank: players.length+1, code:op.code, name:op.name, color:op.color, wins:op.wins||0, _online:true});
+            players.push({rank:players.length+1,code:op.code,name:op.name,color:op.color,
+              wins:op.wins||0,streak:op.streak||0,best_streak:op.best_streak||0,trophies:op.trophies||0,_online:true});
             knownCodes.add(op.code);
           }
         });
       }
-      // Also pull any recently-seen online players from the local onlinePlayers cache
       (onlinePlayers||[]).forEach(op=>{
         if(!knownCodes.has(op.code)){
-          players.push({rank:999,code:op.code,name:op.name,color:op.color,wins:op.wins||0,_online:true});
+          players.push({rank:999,code:op.code,name:op.name,color:op.color,
+            wins:op.wins||0,streak:op.streak||0,best_streak:op.best_streak||0,trophies:op.trophies||0,_online:true});
           knownCodes.add(op.code);
         }
       });
+
+      // Re-sort by active tab metric
+      function _sortVal(p){
+        if(type==='streaks') return p.best_streak||0;
+        if(type==='trophies') return p.trophies||0;
+        return p.wins||0;
+      }
+      players.sort((a,b)=>_sortVal(b)-_sortVal(a));
+      players.forEach((p,i)=>p.rank=i+1);
+
       topRow.innerHTML = '';
       list.innerHTML = '';
       if(!players.length){
         list.innerHTML = '<div style="color:#a08060;font-size:10px;text-align:center;padding:20px;letter-spacing:1px;">No players yet — be the first!</div>';
         return;
       }
-      // Re-rank after merge
-      players.sort((a,b)=>b.wins-a.wins);
-      players.forEach((p,i)=>p.rank=i+1);
+
       // Podium (top 3)
       const podItems = [
         {p:players[1], cls:'second', ico:'🥈'},
@@ -4880,50 +4996,49 @@ function drawThumbQOC(){
       podItems.forEach(({p,cls,ico})=>{
         const d = document.createElement('div');
         d.className = 'lbPodium '+cls;
+        const val = type==='streaks'?(p.best_streak||0)+' streak':type==='trophies'?(p.trophies||0)+' TR':(p.wins||0)+'W';
         d.innerHTML = '<div class="lbPodRank">'+ico+'</div>'
           +'<div class="lbPodName">'+escapeHtml(p.name||'Player')+'</div>'
-          +'<div class="lbPodWins">'+p.wins+'W</div>';
+          +'<div class="lbPodWins">'+val+'</div>';
         topRow.appendChild(d);
       });
-      // Tier badge helper (24 tiers, WIN_TIERS thresholds)
-      function _lbTier(wins){
-        const T=[1,2,5,10,15,20,25,30,35,40,50,60,75,100,125,150,200,250,300,400,500,750,1000];
-        const N=['Rookie','Bronze','Iron','Silver','Gold','Platinum','Diamond','Elite','Master','Champion','Legendary','Mythic','Divine','Immortal','Celestial','Grandmaster','Supreme','Godlike','Infinite','Eternal','Cosmic','Universal','Absolute','Chess Star'];
-        const I=['🔰','🥉','⚙️','🥈','🥇','💿','💎','⚡','🏆','👑','🔥','🌟','✨','🌌','🌠','🎖️','🔮','⚜️','♾️','🕊️','🌀','🌍','💫','♟️'];
-        let i=0; while(i<T.length && wins>=T[i]) i++;
-        return {name:N[i]||'Chess Star', icon:I[i]||'♟️'};
-      }
+
       // "Your Rank" sticky banner
       const banner = document.getElementById('lbMyRankBanner');
       if(banner){
         const me = players.find(p=>myCode && p.code===myCode);
         if(me){
-          const mt = _lbTier(me.wins);
+          const mv   = _sortVal(me);
+          const mt   = _lbTier(me.wins);
           const isFirst = me.rank===1;
+          const valStr = type==='streaks'?mv+' streak':type==='trophies'?mv+' TR':mv+'W';
           banner.className = isFirst ? 'me1' : '';
-          banner.style.display='flex';
-          banner.style.alignItems='center';
-          banner.style.gap='10px';
+          banner.style.display='flex'; banner.style.alignItems='center'; banner.style.gap='10px';
           banner.innerHTML = '<span class="yrRank">#'+me.rank+'</span>'
             +'<span class="yrTier">'+mt.icon+'</span>'
             +'<span class="yrName">'+escapeHtml(me.name||'Player')+'</span>'
-            +'<span class="yrRight"><span class="yrWins">'+me.wins+'W</span><span class="yrTierName">'+mt.name+'</span></span>';
-        } else {
-          banner.style.display='none';
-        }
+            +'<span class="yrRight"><span class="yrWins">'+valStr+'</span><span class="yrTierName">'+mt.name+'</span></span>';
+        } else { banner.style.display='none'; }
       }
-      // Full list — add rank1 glow class to first place
+
+      // Full list — rank1 glow + player color avatar + tier icon
       players.forEach(p=>{
-        const isMe = myCode && p.code === myCode;
+        const isMe    = myCode && p.code === myCode;
         const isFirst = p.rank === 1;
-        const row = document.createElement('div');
+        const row     = document.createElement('div');
         row.className = 'lbRow'+(isFirst?' rank1':'')+(isMe?' me':'');
         const onlineDot = p._online ? ' <span style="font-size:7px;color:#4caf50;">●</span>' : '';
-        const t = _lbTier(p.wins);
-        row.innerHTML = '<span class="lbRank">'+(isFirst?'👑':'#'+p.rank)+'</span>'
-          +'<span style="font-size:11px;margin:0 4px;" title="'+t.name+'">'+t.icon+'</span>'
+        const t   = _lbTier(p.wins);
+        const val = type==='streaks'?(p.best_streak||0)+' streak':type==='trophies'?(p.trophies||0)+' TR':(p.wins||0)+'W';
+        row.innerHTML =
+          '<span class="lbRank">'+(isFirst?'👑':'#'+p.rank)+'</span>'
+          +'<span class="lbAvatar" style="background:'+(p.color||'#3498db')+';"></span>'
+          +'<span style="font-size:11px;margin:0 2px;" title="'+t.name+'">'+t.icon+'</span>'
           +'<span class="lbName" style="color:'+(p.color||'#f1c40f')+'">'+escapeHtml(p.name||'Player')+onlineDot+'</span>'
-          +'<span class="lbWins" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;"><span>'+p.wins+'W</span><span style="font-size:8px;color:#a08060;letter-spacing:.5px;">'+t.name+'</span></span>';
+          +'<span class="lbWins" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">'
+            +'<span>'+val+'</span>'
+            +'<span style="font-size:8px;color:#a08060;letter-spacing:.5px;">'+t.name+'</span>'
+          +'</span>';
         list.appendChild(row);
       });
     }catch(e){
@@ -5097,14 +5212,17 @@ function drawThumbQOC(){
   }
   window.notifyMatchFinished = function(result, opts){
     opts = opts || {};
-    const special = !!opts.special; // trophies move ±1 only in special events
+    const special = !!opts.special;
     if(result==='win'){
       window.totalWins++;
       window.winStreak++;
+      if(window.winStreak > (window.bestStreak||0)){
+        window.bestStreak = window.winStreak;
+        localStorage.setItem('chessstar_best_streak', String(window.bestStreak));
+      }
       if(special){ window.totalTrophies++; localStorage.setItem('chessstar_trophies', String(window.totalTrophies)); }
       localStorage.setItem('chessstar_wins', String(window.totalWins));
       localStorage.setItem('chessstar_streak', String(window.winStreak));
-      // Sync win to server — server is the source of truth for leaderboard
       if(myCode){
         fetch('/api/account/win',{
           method:'POST',
@@ -5112,11 +5230,14 @@ function drawThumbQOC(){
           body:JSON.stringify({code:myCode,special:special})
         }).then(r=>r.ok?r.json():null).then(j=>{
           if(j && j.ok && typeof j.wins==='number'){
-            // Trust server win count (handles any duplicate/missed calls)
             window.totalWins = j.wins;
             localStorage.setItem('chessstar_wins', String(j.wins));
             try{ window.updateMilestones && window.updateMilestones(); }catch(e){}
           }
+        }).catch(()=>{});
+        // Sync best streak to server
+        fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({code:myCode,wins:window.totalWins,best_streak:window.bestStreak,trophies:window.totalTrophies,name:profile.name,color:profile.color})
         }).catch(()=>{});
       }
     } else if(result==='loss'){
@@ -5554,16 +5675,29 @@ function drawThumbQOC(){
   window.currentMatch = null;
   function applyAccountFromServer(account){
     if(!account) return;
+    // Only update name if server has a real name (not a placeholder)
+    if(account.name && account.name !== 'Player' && account.name !== 'Player 1'){
+      if(profile.name === 'Player 1' || profile.name === 'Player'){
+        profile.name = account.name;
+        savePersistedProfile();
+        const pn = document.getElementById('pName'); if(pn){ pn.textContent = account.name; pn.style.color = profile.color; }
+        const nd = document.getElementById('profNameDisplay'); if(nd) nd.textContent = account.name;
+      }
+    }
+    if(account.color) profile.color = account.color;
     if(typeof account.wins === 'number'){
       window.totalWins = Math.max(window.totalWins, account.wins);
       localStorage.setItem('chessstar_wins', String(window.totalWins));
     }
-    if(typeof account.trophies === 'number'){
+    if(typeof account.best_streak === 'number' && account.best_streak > (window.bestStreak||0)){
+      window.bestStreak = account.best_streak;
+      localStorage.setItem('chessstar_best_streak', String(window.bestStreak));
+    }
+    if(typeof account.trophies === 'number' && account.trophies > (window.totalTrophies||0)){
       window.totalTrophies = account.trophies;
       localStorage.setItem('chessstar_trophies', String(window.totalTrophies));
     }
     try{ window.updateMilestones && window.updateMilestones(); }catch(e){}
-    // Request notification permission after account is confirmed
     try{ window._csNotifRequestPerm && window._csNotifRequestPerm(); }catch(e){}
   }
   function netConnect(){
@@ -6773,7 +6907,7 @@ function drawThumbQOC(){
       'Diamond','Elite','Master','Champion','Legendary','Mythic',
       'Divine','Immortal','Celestial','Grandmaster','Supreme',
       'Godlike','Infinite','Eternal','Cosmic','Universal','Absolute','Chess Star ⭐'];
-    const _TIER_ICONS = ['🔰','🥉','⚙️','🥈','🥇','💿','💎','⚡','🏆','👑',
+    const _TIER_ICONS = ['🌱','🥉','⚙️','🥈','🥇','🔷','💎','⚡','🏆','👑',
       '🔥','🌟','✨','🌌','🌠','🎖️','🔮','⚜️','♾️','🕊️','🌀','🌍','💫','♟️'];
 
     // ── OS Notification permission ────────────────────────────────────────
