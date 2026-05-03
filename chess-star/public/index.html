@@ -10,6 +10,7 @@
 html,body{width:100%;height:100%;margin:0;padding:0;background:#0a0500;font-family:'Verdana',sans-serif;color:#fff;overflow:hidden;touch-action:none;-webkit-tap-highlight-color:transparent;}
 *{-webkit-tap-highlight-color:transparent;outline:none;}
 button,div,canvas{-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;}
 #root{position:fixed;width:360px;height:600px;overflow:hidden;background:#0a0500;border:2px solid #3e2723;box-shadow:0 0 40px rgba(0,0,0,.9);transform-origin:top left;}
 body.lightTheme{background:#e8e0d0;color:#1a0500;}
 body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
@@ -54,8 +55,8 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 #evLabel{font-size:9px;color:#4caf50;letter-spacing:2px;font-weight:bold;}
 #evName{font-size:11px;color:#f1c40f;font-weight:bold;margin-top:2px;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #evArrow{font-size:8px;color:#666;margin-top:2px;}
-#startBtn{flex:1;padding:16px 0;border-radius:10px;border:2px solid #6b3d00;outline:2px solid #c8860a;font-weight:bold;font-size:14px;cursor:pointer;letter-spacing:2px;color:#1a0800;font-family:'Verdana',sans-serif;background:linear-gradient(180deg,#f5c518,#c8860a,#7a5000);text-shadow:0 1px 0 rgba(255,255,255,.25);position:relative;overflow:hidden;animation:glow 2s ease-in-out infinite;}
-@keyframes glow{0%,100%{box-shadow:0 0 8px #c8860a,0 0 20px rgba(200,134,10,.4);}50%{box-shadow:0 0 18px #f5c518,0 0 40px rgba(245,197,24,.6);}}
+#startBtn{flex:1;padding:16px 0;border-radius:10px;border:2px solid #1565c0;outline:2px solid #1976d2;font-weight:bold;font-size:14px;cursor:pointer;letter-spacing:2px;color:#fff;font-family:'Verdana',sans-serif;background:linear-gradient(180deg,#42a5f5,#1565c0,#0d47a1);text-shadow:none;position:relative;overflow:hidden;animation:glow 2s ease-in-out infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 8px #1976d2,0 0 20px rgba(25,118,210,.45);}50%{box-shadow:0 0 18px #42a5f5,0 0 40px rgba(66,165,245,.65);}}
 #startBtn:hover{filter:brightness(1.15);}
 #startBtn:active{filter:brightness(.9);}
 
@@ -462,7 +463,7 @@ body.lightTheme .cDesc{color:#7a4e20;}
 body.lightTheme #eventsBtn{background:#fff8e8;border-color:#a08060;}
 body.lightTheme #evLabel{color:#7a4e20;}
 body.lightTheme #evName{color:#3a2306;}
-body.lightTheme #startBtn{background:linear-gradient(180deg,#f5c518,#c8860a,#7a5000)!important;color:#1a0800!important;border-color:#6b3d00!important;outline-color:#c8860a!important;text-shadow:0 1px 0 rgba(255,255,255,.25)!important;}
+body.lightTheme #startBtn{background:linear-gradient(180deg,#42a5f5,#1565c0,#0d47a1)!important;color:#fff!important;border-color:#1565c0!important;outline-color:#1976d2!important;text-shadow:none!important;}
 body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .ppCard .ppName,body.lightTheme .setSection h3,body.lightTheme .invDet .invLbl{color:#7a4e20;text-shadow:none;}
 body.lightTheme .eCard p,body.lightTheme .setRow,body.lightTheme .pcDesc,body.lightTheme .ppDesc{color:#5a3a10;}
 body.lightTheme .miniBtn,body.lightTheme #ppGo,body.lightTheme #saveProfBtn,body.lightTheme .langBtn,body.lightTheme .themeToggle button,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn,body.lightTheme .modeOpt,body.lightTheme .endBtns button,body.lightTheme #repPlayerCtrl button,body.lightTheme .acctTab,body.lightTheme #acctGoBtn,body.lightTheme #infoModalCloseBtn,body.lightTheme .exitBtn,body.lightTheme #ppCancel,body.lightTheme .fBtnSm,body.lightTheme .backBtn,body.lightTheme #lbRefreshBtn,body.lightTheme #msClose,body.lightTheme #tInfoClose,body.lightTheme #evSelectBtn,body.lightTheme .menuSmBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;text-shadow:none;}
@@ -489,6 +490,21 @@ body.lightTheme .endPanel .statBox{background:rgba(255,248,232,.85);color:#3a230
 body.lightTheme .endPanel .statBox small{color:#7a4e20;}
 body.lightTheme .teamLabel,body.lightTheme #classicInfo,body.lightTheme #gtsInfo,body.lightTheme #qocInfo,body.lightTheme #classicMsg,body.lightTheme #gtsMsg,body.lightTheme #qocMsg,body.lightTheme #lpsBar,body.lightTheme #classicBar,body.lightTheme #gtsBar,body.lightTheme #qocBar{color:#3a2306;text-shadow:0 1px 0 rgba(255,255,255,.6);}
 body.lightTheme #serverBadge,body.lightTheme #serverBadgeMini{background:rgba(255,248,232,.92);color:#7a4e20;border-color:#a08060;}
+body.lightTheme #settingsBtn{background:#fff8e8;border-color:#a08060;}
+body.lightTheme #settingsBtn svg{fill:#7a4e20;}
+body.lightTheme #leaderboardBtn,body.lightTheme #piecesBtn,body.lightTheme #friendsBtn{background:#fff8e8;border-color:#a08060;}
+body.lightTheme #leaderboardBtnLbl,body.lightTheme #friendsBtnLbl{color:#7a4e20;}
+body.lightTheme #leaderboardBtnIco,body.lightTheme #friendsBtnIco,body.lightTheme #fpsLbl{color:#7a4e20;}
+body.lightTheme .msBtn{background:rgba(255,248,232,.92);border-color:#a08060;}
+body.lightTheme .msLbl{color:#7a4e20;}
+body.lightTheme .msTrack{background:#d9c8a0;border-color:#a08060;}
+body.lightTheme .msFill{background:linear-gradient(90deg,#5a8a20,#1976d2);}
+body.lightTheme .msPrev,body.lightTheme .msNext{color:#7a4e20;}
+body.lightTheme #trophyInfo{color:#1976d2;}
+body.lightTheme #winsCount,body.lightTheme #trophyCount{color:#3a2306;}
+body.lightTheme #winsProg,body.lightTheme #trophyProg{color:#1976d2!important;}
+body.lightTheme #iconBox{background:#fff8e8;border-color:#a08060;}
+body.lightTheme #eventsBtn #eventsBtnInner{background:rgba(255,248,232,.92);border-color:#a08060;outline-color:#a08060;}
 body.lightTheme #toast{background:rgba(255,248,232,.97);color:#7a4e20;border-color:#c89c0a;}
 body.lightTheme #pName,body.lightTheme #profName,body.lightTheme .repTitle{text-shadow:0 1px 0 #fff;}
 /* subtle outlines so light text stays readable on light backgrounds */
@@ -730,7 +746,7 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
 
 <!-- STARTUP SPLASH (appears over everything on first load) -->
 <div id="startupSplash" style="position:fixed;inset:0;background:#0a0500;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;">
-  <div id="ssStar" style="font-size:64px;opacity:0;transform:scale(0.1) rotate(-180deg);transition:none;">♛</div>
+  <div id="ssStar" style="font-size:64px;color:#f1c40f;opacity:0;transform:scale(0.1) rotate(-180deg);transition:none;text-shadow:0 0 30px rgba(241,196,15,.9);">♛</div>
   <div id="ssTitle" style="font-family:Georgia,serif;font-size:36px;font-weight:900;color:#f1c40f;letter-spacing:5px;text-shadow:0 0 40px rgba(241,196,15,.9),4px 4px 0 #3e1a00;opacity:0;transform:scale(0.05);transition:none;margin-top:12px;">CHESS STAR</div>
   <div id="ssSub" style="font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;margin-top:16px;opacity:0;transition:none;">v0.06 — ONLINE</div>
 </div>
@@ -1132,16 +1148,12 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
       <div class="setRow"><span>Effects</span><input type="range" id="volSfx" min="0" max="100" value="80"></div>
     </div>
     <div class="setSection">
-      <h3>SAVE PROGRESS</h3>
-      <div class="setRow" style="font-size:9px;color:#888;margin-bottom:4px;">Your code stores profile + skin choices.</div>
+      <h3>ACCOUNT</h3>
       <div id="saveCodeRow">
         <div id="saveCodeBox">#000000000000</div>
-        <button class="miniBtn" onclick="copySaveCode()">📋</button>
+        <button class="miniBtn" title="Copy code" onclick="copySaveCode()">📋</button>
       </div>
-      <div class="setRow" style="margin-top:10px;">
-        <input id="codeImportBox" type="text" placeholder="#PASTE CODE HERE" maxlength="13">
-      </div>
-      <button class="miniBtn" style="width:100%;margin-top:6px;" onclick="loadSaveCode()">↺ LOAD CODE</button>
+      <button class="miniBtn" style="width:100%;margin-top:8px;" onclick="openManageAccounts()">🗂 MANAGE ACCOUNTS</button>
     </div>
     <div class="setSection">
       <h3 data-i18n="replays.title">MATCHES REPLAY</h3>
@@ -1229,11 +1241,40 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
       <input id="acctNameInp" type="text" maxlength="10" placeholder="Player name (max 10)">
     </div>
     <div id="acctLoginBox" style="display:none;">
-      <input id="acctCodeInp" type="text" maxlength="13" placeholder="13-CHAR CODE">
+      <input id="acctCodeInp" type="text" maxlength="14" placeholder="PASTE YOUR CODE">
     </div>
     <button id="acctGoBtn" onclick="acctSubmit()">CONTINUE →</button>
     <div id="acctErr"></div>
     <div id="acctSkip" onclick="acctSkip()">Skip — play offline</div>
+  </div>
+</div>
+
+<!-- MANAGE ACCOUNTS MODAL -->
+<div id="manageAcctsModal" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.93);z-index:210;flex-direction:column;align-items:center;justify-content:flex-start;padding:14px 12px;overflow-y:auto;">
+  <div id="maInner" style="background:linear-gradient(180deg,#1a0a04,#0a0500);border:2px solid #f1c40f;border-radius:12px;padding:16px;width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:12px;font-weight:bold;color:#f1c40f;letter-spacing:2px;">MANAGE ACCOUNTS</span>
+      <button onclick="closeManageAccounts()" style="background:none;border:1px solid #5d4037;color:#f1c40f;font-size:13px;padding:3px 8px;border-radius:4px;cursor:pointer;">✕</button>
+    </div>
+    <div style="font-size:9px;color:#888;letter-spacing:1px;">YOUR CURRENT CODE (tap to copy)</div>
+    <div id="maCurCode" onclick="copySaveCode();showToast('Code copied')" style="background:#0a0500;border:2px solid #5d4037;border-radius:6px;padding:10px;font-size:13px;color:#f1c40f;font-family:monospace;font-weight:bold;letter-spacing:2px;text-align:center;cursor:pointer;">#OFFLINE-MODE</div>
+    <button onclick="maToggleAllAccounts()" id="maAllAcctsBtn" style="background:#1a0800;border:2px solid #5d4037;color:#f1c40f;padding:9px;border-radius:6px;font-size:10px;font-weight:bold;letter-spacing:2px;cursor:pointer;">▼ ALL ACCOUNTS</button>
+    <div id="maAllAcctsList" style="display:none;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;"></div>
+    <div id="maAddBox" style="display:none;flex-direction:column;gap:8px;">
+      <div style="font-size:9px;color:#888;letter-spacing:1px;padding-top:4px;border-top:1px solid #2a1200;">ADD ACCOUNT BY CODE</div>
+      <input id="maCodeInp" type="text" maxlength="14" placeholder="PASTE CODE (#AAABBBCCCDDDD)" style="background:#0a0500;border:2px solid #5d4037;border-radius:6px;padding:9px;font-size:12px;color:#f1c40f;font-family:monospace;letter-spacing:1px;width:100%;text-transform:uppercase;">
+      <button onclick="maLookupCode()" style="background:#1a0800;border:2px solid #5d4037;color:#f1c40f;padding:8px;border-radius:6px;font-size:10px;font-weight:bold;letter-spacing:2px;cursor:pointer;">🔍 LOOK UP CODE</button>
+      <div id="maPreview" style="display:none;background:#0a0500;border:1px solid #5d4037;border-radius:6px;padding:10px;text-align:center;">
+        <div id="maPreviewIco" style="font-size:28px;margin-bottom:4px;">🎭</div>
+        <div id="maPreviewName" style="font-size:13px;font-weight:bold;color:#f1c40f;"></div>
+        <div id="maPreviewWins" style="font-size:10px;color:#a08060;margin-top:2px;"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button onclick="maCancelAdd()" style="flex:1;background:#1a0800;border:2px solid #5d4037;color:#a08060;padding:8px;border-radius:6px;font-size:10px;font-weight:bold;cursor:pointer;">CANCEL</button>
+          <button onclick="maConfirmAdd()" style="flex:1;background:#1565c0;border:2px solid #1976d2;color:#fff;padding:8px;border-radius:6px;font-size:10px;font-weight:bold;cursor:pointer;">✓ SWITCH TO THIS</button>
+        </div>
+      </div>
+    </div>
+    <button onclick="maShowAddBox()" style="background:none;border:1px dashed #5d4037;color:#a08060;padding:8px;border-radius:6px;font-size:10px;font-weight:bold;letter-spacing:2px;cursor:pointer;">+ ADD ACCOUNT</button>
   </div>
 </div>
 
@@ -2468,8 +2509,27 @@ function paintParticles(ctx,arr){
 // ═══════════════════════════════════════════
 function launchLPS(type){
   lpsChosenType=type;
-  // v0.06 — AI first kick happens in the overlay's onDone callback, preventing AI moving under the countdown
-  startLoading('Last Piece Standing',()=>{ initLPS(type); showEventOverlay('lpsEvOverlay','LAST PIECE STANDING',()=>{ if(lpsTurn!==0 && lpsRunning) setTimeout(lpsAiTurn, 380); }); });
+  // Show matchmaking overlay first with correct player count (4 for P/Q, 6 for others)
+  const needed = (type==='P'||type==='Q') ? 4 : 6;
+  const pieceIcons={P:'♟',R:'♜',N:'♞',B:'♝',Q:'♛',K:'♚'};
+  const ov=document.getElementById('matchmakingOverlay');
+  const mmNeed=document.getElementById('mmNeeded');
+  const mmIco=document.getElementById('mmPlayerIco');
+  const mmCnt=document.getElementById('mmPlayerCount');
+  const mmSub=document.getElementById('mmSub');
+  const mmSecs=document.getElementById('mmCountSecs');
+  if(ov){
+    if(mmNeed) mmNeed.textContent=needed;
+    if(mmIco) mmIco.textContent=pieceIcons[type]||'♟';
+    if(mmCnt) mmCnt.textContent='1';
+    if(mmSub) mmSub.textContent='LAST PIECE STANDING';
+    if(mmSecs) mmSecs.textContent='3';
+    ov.classList.add('show');
+    let s=3; const tick=setInterval(()=>{ s--; if(mmSecs)mmSecs.textContent=s; if(s<=0){ clearInterval(tick); ov.classList.remove('show'); startLoading('Last Piece Standing',()=>{ initLPS(type); showEventOverlay('lpsEvOverlay','LAST PIECE STANDING',()=>{ if(lpsTurn!==0 && lpsRunning) setTimeout(lpsAiTurn, 380); }); }); } }, 1000);
+  } else {
+    // Fallback: start directly
+    startLoading('Last Piece Standing',()=>{ initLPS(type); showEventOverlay('lpsEvOverlay','LAST PIECE STANDING',()=>{ if(lpsTurn!==0 && lpsRunning) setTimeout(lpsAiTurn, 380); }); });
+  }
 }
 function lpsGoMenu(){
   lpsRunning=false;
@@ -4455,8 +4515,8 @@ function drawThumbQOC(){
         if(!nm){ $('acctErr').textContent='Enter a name'; return; }
         resp = await fetch('/api/account/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nm,color:profile.color||'#3498db'})});
       } else {
-        const cd = ($('acctCodeInp').value||'').trim().toUpperCase();
-        if(cd.length!==13){ $('acctErr').textContent='Code must be 13 chars'; return; }
+        const cd = ($('acctCodeInp').value||'').replace(/^#+/,'').trim().toUpperCase();
+        if(cd.length!==13){ $('acctErr').textContent='Code must be exactly 13 characters (paste your full code)'; return; }
         resp = await fetch('/api/account/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:cd})});
       }
       if(!resp.ok){
@@ -4494,8 +4554,8 @@ function drawThumbQOC(){
   };
   window.loadSaveCode = async function(){
     const inp = $('codeImportBox');
-    const cd = (inp.value||'').replace(/^#/,'').trim().toUpperCase();
-    if(cd.length!==13){ showToast('Code must be 13 chars'); return; }
+    const cd = (inp.value||'').replace(/^#+/,'').trim().toUpperCase();
+    if(cd.length!==13){ showToast('Code must be 13 chars (paste your full code)'); return; }
     try{
       const r = await fetch('/api/account/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:cd})});
       if(!r.ok){ showToast('Invalid code'); return; }
@@ -4510,6 +4570,135 @@ function drawThumbQOC(){
       netConnect();
     } catch(e){ showToast(explainNetErr()); }
   };
+
+  // ── MANAGE ACCOUNTS ──────────────────────────────────────────────────
+  const MA_SAVED_KEY = 'chessstar_saved_accts';
+  let _maSavedAccts = JSON.parse(localStorage.getItem(MA_SAVED_KEY)||'[]'); // [{code,name,color,wins}]
+  let _maLookedUp = null; // preview account from lookup
+
+  function _maSave(){ localStorage.setItem(MA_SAVED_KEY, JSON.stringify(_maSavedAccts)); }
+  function _maAddOrUpdate(a){
+    const i = _maSavedAccts.findIndex(x=>x.code===a.code);
+    if(i>=0) _maSavedAccts[i]=a; else _maSavedAccts.push(a);
+    _maSave();
+  }
+  // Persist current account into saved list
+  function _maSyncCurrent(){
+    if(myCode) _maAddOrUpdate({code:myCode,name:profile.name||'Player',color:profile.color||'#3498db',wins:window.totalWins||0});
+  }
+
+  window.openManageAccounts = function(){
+    _maSyncCurrent();
+    const el = $('manageAcctsModal'); if(!el) return;
+    // Update current code display
+    const cc = $('maCurCode'); if(cc) cc.textContent = myCode ? '#'+myCode : '#OFFLINE-MODE';
+    el.style.display='flex';
+    $('maAllAcctsList').style.display='none';
+    $('maAddBox').style.display='none';
+    const btn = $('maAllAcctsBtn'); if(btn) btn.textContent='▼ ALL ACCOUNTS';
+  };
+  window.closeManageAccounts = function(){
+    const el=$('manageAcctsModal'); if(el) el.style.display='none';
+  };
+  window.maToggleAllAccounts = function(){
+    const list = $('maAllAcctsList');
+    const btn = $('maAllAcctsBtn');
+    const isOpen = list.style.display!=='none';
+    if(isOpen){ list.style.display='none'; btn.textContent='▼ ALL ACCOUNTS'; return; }
+    // Build list
+    list.innerHTML='';
+    _maSyncCurrent();
+    const all = _maSavedAccts.slice().sort((a,b)=>a.code===myCode?-1:b.code===myCode?1:0);
+    if(!all.length){
+      list.innerHTML='<div style="font-size:10px;color:#888;text-align:center;padding:8px;">No saved accounts yet</div>';
+    }
+    all.forEach(a=>{
+      const row=document.createElement('div');
+      const isCur=a.code===myCode;
+      row.style.cssText='display:flex;align-items:center;gap:8px;background:'+(isCur?'rgba(25,118,210,.2)':'#0a0500')+';border:1px solid '+(isCur?'#1976d2':'#5d4037')+';border-radius:6px;padding:8px;cursor:'+(isCur?'default':'pointer')+';';
+      row.innerHTML='<div style="font-size:20px;">🎭</div>'
+        +'<div style="flex:1;min-width:0;">'
+          +'<div style="font-size:11px;font-weight:bold;color:'+(a.color||'#f1c40f')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHtml(a.name||'Player')+(isCur?' <span style="font-size:9px;color:#4caf50;">(active)</span>':' ')+'</div>'
+          +'<div style="font-size:9px;color:#888;">'+a.wins+' wins</div>'
+        +'</div>';
+      if(!isCur){
+        const sw=document.createElement('button');
+        sw.textContent='SWITCH';
+        sw.style.cssText='background:#1565c0;border:1px solid #1976d2;color:#fff;font-size:9px;font-weight:bold;padding:5px 8px;border-radius:4px;cursor:pointer;flex-shrink:0;';
+        sw.onclick=(()=>{
+          const code=a.code;
+          return async function(){
+            try{
+              const r=await fetch('/api/account/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
+              const j=await r.json();
+              myCode=j.code; localStorage.setItem(ACCT_KEY,myCode);
+              if(j.name){profile.name=j.name;savePersistedProfile();}
+              if(j.color)profile.color=j.color;
+              if(typeof j.wins==='number')applyAccountFromServer({wins:j.wins});
+              const pn=$('pName');if(pn){pn.textContent=profile.name;pn.style.color=profile.color;}
+              updateSaveCodeUI();
+              const cc=$('maCurCode');if(cc)cc.textContent='#'+myCode;
+              netConnect();
+              showToast('Switched to '+profile.name);
+              window.maToggleAllAccounts();window.maToggleAllAccounts();
+            }catch(e){showToast('Could not switch account');}
+          };
+        })();
+        row.appendChild(sw);
+      }
+      list.appendChild(row);
+    });
+    list.style.display='flex';
+    btn.textContent='▲ ALL ACCOUNTS';
+  };
+  window.maShowAddBox = function(){
+    const ab=$('maAddBox'); if(!ab) return;
+    ab.style.display=ab.style.display==='none'?'flex':'none';
+    $('maPreview').style.display='none';
+    const inp=$('maCodeInp'); if(inp)inp.value='';
+    _maLookedUp=null;
+  };
+  window.maLookupCode = async function(){
+    const inp=$('maCodeInp'); if(!inp) return;
+    const cd=inp.value.replace(/^#+/,'').trim().toUpperCase();
+    if(cd.length!==13){showToast('Code must be 13 characters');return;}
+    try{
+      const r=await fetch('/api/account/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:cd})});
+      if(!r.ok){showToast('Code not found');return;}
+      const j=await r.json();
+      _maLookedUp=j;
+      $('maPreviewIco').textContent='🎭';
+      $('maPreviewName').textContent=j.name||'Player';
+      $('maPreviewName').style.color=j.color||'#f1c40f';
+      $('maPreviewWins').textContent=(j.wins||0)+' wins';
+      $('maPreview').style.display='block';
+    }catch(e){showToast('Server error — try again');}
+  };
+  window.maCancelAdd = function(){
+    $('maAddBox').style.display='none';
+    $('maPreview').style.display='none';
+    _maLookedUp=null;
+  };
+  window.maConfirmAdd = async function(){
+    if(!_maLookedUp){showToast('Look up a code first');return;}
+    const j=_maLookedUp;
+    const cd=j.code;
+    myCode=cd; localStorage.setItem(ACCT_KEY,cd);
+    if(j.name){profile.name=j.name;savePersistedProfile();}
+    if(j.color)profile.color=j.color;
+    if(typeof j.wins==='number')applyAccountFromServer({wins:j.wins});
+    _maAddOrUpdate({code:cd,name:j.name||'Player',color:j.color||'#f1c40f',wins:j.wins||0});
+    const pn=$('pName');if(pn){pn.textContent=profile.name;pn.style.color=profile.color;}
+    updateSaveCodeUI();
+    const cc=$('maCurCode');if(cc)cc.textContent='#'+cd;
+    netConnect();
+    showToast('Switched to '+profile.name+' ✓');
+    window.maCancelAdd();
+    window.closeManageAccounts();
+    _maLookedUp=null;
+  };
+  // Sync current account to saved list on login
+  setTimeout(_maSyncCurrent, 3000);
 
   // Server reachability probe — shows the badge state immediately
   function probeServer(){
@@ -4591,17 +4780,30 @@ function drawThumbQOC(){
       if(!lbRes.ok){ topRow.innerHTML='<div style="color:#e74c3c;font-size:10px;padding:8px;">Failed to load</div>'; return; }
       const j = await lbRes.json();
       let players = j.players || [];
+      const knownCodes = new Set(players.map(p=>p.code));
+      // Always inject current user from local data if not in list
+      if(myCode && !knownCodes.has(myCode)){
+        players.push({rank:999,code:myCode,name:profile.name||'Player',color:profile.color||'#3498db',wins:typeof window.totalWins==='number'?window.totalWins:0,_me:true});
+        knownCodes.add(myCode);
+      }
       // Merge online players who aren't already in the leaderboard list
       if(onlineRes && onlineRes.ok){
         const oj = await onlineRes.json();
         const online = oj.online || [];
-        const knownCodes = new Set(players.map(p=>p.code));
         online.forEach(op=>{
           if(!knownCodes.has(op.code)){
             players.push({rank: players.length+1, code:op.code, name:op.name, color:op.color, wins:op.wins||0, _online:true});
+            knownCodes.add(op.code);
           }
         });
       }
+      // Also pull any recently-seen online players from the local onlinePlayers cache
+      (onlinePlayers||[]).forEach(op=>{
+        if(!knownCodes.has(op.code)){
+          players.push({rank:999,code:op.code,name:op.name,color:op.color,wins:op.wins||0,_online:true});
+          knownCodes.add(op.code);
+        }
+      });
       topRow.innerHTML = '';
       list.innerHTML = '';
       if(!players.length){
