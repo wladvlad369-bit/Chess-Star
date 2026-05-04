@@ -2825,10 +2825,12 @@ function lpsNextTurn(){
     lpsRounds++;
     if(lpsMode==='pawn' || lpsChosenType==='P'){
       if(lpsRounds>=3)lpsPoisonOn=true;
-      if(lpsPoisonOn&&lpsRounds%3===0&&lpsPoisonStg<6)lpsPoisonStg++;
+      // Level 0 = warning (ring visible, no damage). Stage advances every 3 rounds, starting round 4.
+      if(lpsPoisonOn&&lpsRounds>=4&&lpsRounds%3===0&&lpsPoisonStg<6)lpsPoisonStg++;
     } else {
       if(lpsRounds>=3)lpsPoisonOn=true;
-      if(lpsPoisonOn&&lpsRounds%2===0&&lpsPoisonStg<6)lpsPoisonStg++;
+      // Level 0 = warning. Stage advances every 2 rounds, starting round 4.
+      if(lpsPoisonOn&&lpsRounds>=4&&lpsRounds%2===0&&lpsPoisonStg<6)lpsPoisonStg++;
     }
   }
   lpsBoard.forEach((row,y)=>row.forEach((p,x)=>{
@@ -6884,7 +6886,7 @@ function drawThumbQOC(){
             const myPieces=[];
             for(let y=0;y<8;y++) for(let x=0;x<8;x++){ const p=lpsBoard[y][x]; if(p&&p.player===0) myPieces.push({x,y,p}); }
             const allMvs=[];
-            myPieces.forEach(({x,y})=>{ try{ lpsGetMoves(lpsBoard[y][x]).forEach(m=>allMvs.push({fx:x,fy:y,tx:m.x,ty:m.y})); }catch(e){} });
+            myPieces.forEach(({x,y})=>{ try{ lpsGetMoves(x,y).forEach(m=>allMvs.push({fx:x,fy:y,tx:m.x,ty:m.y})); }catch(e){} });
             if(allMvs.length){ const mv=allMvs[Math.floor(Math.random()*allMvs.length)]; try{ lpsDoMove(mv.fx,mv.fy,mv.tx,mv.ty); }catch(e){} }
           }catch(e){}
           _resetTimer(); return;
@@ -7095,6 +7097,731 @@ function drawThumbQOC(){
   })();
 
 })();
+
+/* ═══════════════════════════════════════════════════════
+   v0.08 PATCH — All feature requests
+   ═══════════════════════════════════════════════════════ */
+(function v08Patch(){
+
+// ── HELPERS ──
+function $$(id){ return document.getElementById(id); }
+function _esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ─────────────────────────────────────────────────────────
+// 1. STREAK FIRE — always visible (gray when streak = 0)
+// ─────────────────────────────────────────────────────────
+const _origUM = window.updateMilestones;
+window.updateMilestones = function(){
+  if(_origUM) _origUM.apply(this, arguments);
+  const sfb = $$('streakFireBadge');
+  if(sfb){
+    sfb.classList.add('show');
+    sfb.classList.toggle('v08StreakZero', (window.winStreak||0)===0);
+  }
+  _v08RefreshBadges();
+};
+
+// ─────────────────────────────────────────────────────────
+// 2. CONFIRM DIALOG (generic)
+// ─────────────────────────────────────────────────────────
+let _v08ConfirmCb = null;
+window._v08Confirm = function(msg, onYes){
+  _v08ConfirmCb = onYes;
+  const el = $$('v08ConfirmMsg'); if(el) el.innerHTML = msg;
+  $$('v08Confirm').classList.add('show');
+};
+window._v08ConfirmYes = function(){
+  $$('v08Confirm').classList.remove('show');
+  if(_v08ConfirmCb){ _v08ConfirmCb(); _v08ConfirmCb=null; }
+};
+window._v08ConfirmNo = function(){
+  $$('v08Confirm').classList.remove('show');
+  _v08ConfirmCb=null;
+};
+
+// ─────────────────────────────────────────────────────────
+// 3. FRIEND PROFILE MODAL (SEE-ACC)
+// ─────────────────────────────────────────────────────────
+window.showAccDetails = function(p){
+  const ico = (p.icon && p.icon.length<8) ? p.icon : '🎭';
+  $$('v08FrProfIco').textContent = ico;
+  $$('v08FrProfName').textContent = p.name||'Player';
+  $$('v08FrProfName').style.color = p.color||'#f1c40f';
+  $$('v08FrProfWins').textContent = p.wins!=null ? p.wins : '—';
+  $$('v08FrProfTrophies').textContent = p.trophies!=null ? p.trophies : '—';
+  $$('v08FrProfStreak').textContent = p.best_streak!=null ? p.best_streak : (p.streak!=null ? p.streak : '—');
+  $$('v08FrProfStatus').textContent = p.online ? '🟢 Online' : '⚫ Offline';
+  $$('v08FrProfileModal').classList.add('show');
+};
+window.v08CloseFrProfile = function(){ $$('v08FrProfileModal').classList.remove('show'); };
+
+// ─────────────────────────────────────────────────────────
+// 4. FRIEND LIST — hide code, show real icon + status
+//    + CONFIRM for remove
+//    + INVITE with in-match/in-menu status
+// ─────────────────────────────────────────────────────────
+function _v08MakeFriendItem(p, btns){
+  const div = document.createElement('div'); div.className='fItem';
+  const ico = document.createElement('div'); ico.className='fIco';
+  ico.textContent = (p.icon && p.icon.length<8) ? p.icon : '🎭';
+  const info = document.createElement('div'); info.className='fInfo';
+  const dotCls = p.online ? 'fDot on' : 'fDot';
+  const statusStr = p.online ? (p.inMatch?'⚔ In Match':'🟢 Online') : '⚫ Offline';
+  const sub = (p.wins!=null ? p.wins+'W • ' : '') + statusStr;
+  info.innerHTML = '<div class="fName"><span class="'+dotCls+'"></span>'+_esc(p.name||'Player')+'</div><div class="fSub">'+sub+'</div>';
+  const bw = document.createElement('div'); bw.className='fBtns';
+  btns.forEach(b=>{
+    const btn = document.createElement('button'); btn.className='fBtnSm';
+    if(b==='see'){
+      btn.textContent='SEE-ACC';
+      btn.onclick=()=>window.showAccDetails(p);
+    }
+    if(b==='invite'){
+      btn.textContent='INVITE';
+      btn.onclick=()=>{
+        if(p.inMatch){ window.showToast&&window.showToast(p.name+' is currently in a match'); return; }
+        _v08Invite(p);
+      };
+    }
+    if(b==='remove'){
+      btn.textContent='REMOVE';
+      btn.onclick=()=>_v08ConfirmRemove(p);
+    }
+    if(b==='accept'){
+      btn.textContent='ACCEPT'; btn.classList.add('acc');
+      btn.onclick=()=>_v08Respond(p,true);
+    }
+    if(b==='decline'){
+      btn.textContent='DECLINE'; btn.classList.add('dec');
+      btn.onclick=()=>_v08Respond(p,false);
+    }
+    bw.appendChild(btn);
+  });
+  div.appendChild(ico); div.appendChild(info); div.appendChild(bw);
+  return div;
+}
+
+function _v08Invite(p){
+  const wsRef = (typeof ws!=='undefined') ? ws : null;
+  if(!wsRef||wsRef.readyState!==1){ window.showToast&&window.showToast('Not connected'); return; }
+  wsRef.send(JSON.stringify({type:'invite',target:p.code,event:(typeof currentEvent!=='undefined'?currentEvent:'lps'),mode:window.currentMode||'1v1'}));
+  window.showToast&&window.showToast('Invite sent to '+p.name);
+}
+
+function _v08ConfirmRemove(p){
+  window._v08Confirm('Remove <b>'+_esc(p.name||'Player')+'</b> from friends?', async ()=>{
+    try{
+      const mc = (typeof myCode!=='undefined')?myCode:'';
+      await fetch('/api/account/friend-remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:mc,target:p.code})});
+      if(window.refreshFriends) window.refreshFriends();
+    }catch(e){}
+  });
+}
+
+function _v08Respond(p, accept){
+  const mc = (typeof myCode!=='undefined')?myCode:'';
+  fetch('/api/account/friend-respond',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:mc,from:p.code,accept})})
+    .then(()=>{ if(window.refreshFriends) window.refreshFriends(); }).catch(()=>{});
+}
+
+// Override renderFriends via MutationObserver + full override
+setTimeout(()=>{
+  // Override renderFriends globally
+  const _origRF = window.renderFriends;
+  window.renderFriends = function(){
+    const body = $$('friendsBody'); if(!body){ if(_origRF) _origRF(); return; }
+    body.innerHTML='';
+    const tab = (typeof friendsTab!=='undefined')?friendsTab:'online';
+    const fList = (typeof friendsList!=='undefined')?friendsList:[];
+    const fReqs = (typeof friendRequests!=='undefined')?friendRequests:[];
+    const fOnline = (typeof onlinePlayers!=='undefined')?onlinePlayers:[];
+    const mc = (typeof myCode!=='undefined')?myCode:null;
+    if(tab==='online'){
+      const items = fOnline.filter(p=>p.code!==mc);
+      if(!items.length){ body.innerHTML='<div id="frEmpty">No players online right now.</div>'; return; }
+      items.forEach(p=>body.appendChild(_v08MakeFriendItem(p,['see','invite'])));
+    } else if(tab==='add'){
+      const wrap=document.createElement('div'); wrap.id='frAddRow';
+      wrap.innerHTML='<input id="frAddInp" type="text" maxlength="20" placeholder="SEARCH BY NAME" style="text-transform:none;"><button class="fBtnSm" onclick="frSendReq()">FIND</button>';
+      body.appendChild(wrap);
+      if(fReqs.length){
+        const h=document.createElement('div'); h.style.cssText='font-size:9px;color:#a08060;letter-spacing:1px;padding:8px 0 4px;'; h.textContent='INCOMING REQUESTS';
+        body.appendChild(h);
+        fReqs.forEach(p=>body.appendChild(_v08MakeFriendItem(p,['accept','decline'])));
+      }
+    } else {
+      if(!fList.length){ body.innerHTML='<div id="frEmpty">No friends yet — search by name in the ADD tab.</div>'; return; }
+      fList.forEach(p=>body.appendChild(_v08MakeFriendItem(p,['see','invite','remove'])));
+    }
+    _v08RefreshFriendsBadge();
+  };
+}, 300);
+
+// Override search results to hide code
+window.renderSearchResults = function(hits){
+  const body=$$('friendsBody'); if(!body) return;
+  body.innerHTML='';
+  const wrap=document.createElement('div'); wrap.id='frAddRow';
+  wrap.innerHTML='<input id="frAddInp" type="text" maxlength="20" placeholder="SEARCH BY NAME" style="text-transform:none;"><button class="fBtnSm" onclick="frSendReq()">FIND</button>';
+  body.appendChild(wrap);
+  const h=document.createElement('div'); h.style.cssText='font-size:9px;color:#a08060;letter-spacing:1px;padding:8px 0 4px;';
+  h.textContent='SEARCH RESULTS ('+hits.length+')';
+  body.appendChild(h);
+  hits.forEach(p=>{
+    const div=document.createElement('div'); div.className='fItem';
+    const ico=document.createElement('div'); ico.className='fIco'; ico.textContent=(p.icon&&p.icon.length<8)?p.icon:'🎭';
+    const info=document.createElement('div'); info.className='fInfo';
+    // Security: do NOT show the 13-char code in search results
+    info.innerHTML='<div class="fName">'+_esc(p.name||'Player')+'</div><div class="fSub">'+(p.wins!=null?p.wins+'W':'—')+'</div>';
+    const bw=document.createElement('div'); bw.className='fBtns';
+    const btn=document.createElement('button'); btn.className='fBtnSm'; btn.textContent='+ ADD';
+    btn.onclick=async()=>{
+      try{
+        const mc=(typeof myCode!=='undefined')?myCode:'';
+        const r=await fetch('/api/account/friend-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:mc,target:p.code})});
+        if(r.ok) window.showToast&&window.showToast('Request sent to '+p.name); else window.showToast&&window.showToast('Failed');
+      }catch(e){ window.showToast&&window.showToast('Server unreachable'); }
+    };
+    bw.appendChild(btn);
+    div.appendChild(ico); div.appendChild(info); div.appendChild(bw);
+    body.appendChild(div);
+  });
+};
+
+// ─────────────────────────────────────────────────────────
+// 5. INVITE — better toasts ("Your invite rejected" / "Friend joined")
+// ─────────────────────────────────────────────────────────
+setTimeout(()=>{
+  const wsRef = (typeof ws!=='undefined')?ws:null;
+  if(!wsRef) return;
+  const _prevOM = wsRef.onmessage;
+  wsRef.onmessage = function(ev){
+    try{
+      const msg = JSON.parse(ev.data);
+      if(msg && msg.type==='invite_declined'){
+        window.showToast&&window.showToast('❌ Your invite was rejected by '+(msg.fromName||'Friend'));
+        return;
+      }
+      if(msg && msg.type==='invite_accepted'){
+        window.showToast&&window.showToast('✅ Friend joined your team!');
+        return;
+      }
+    }catch(e){}
+    if(_prevOM) _prevOM.call(this,ev);
+  };
+}, 600);
+
+// ─────────────────────────────────────────────────────────
+// 6. PER-ACCOUNT CLAIMED REWARDS (rewards don't re-claim on switch)
+// ─────────────────────────────────────────────────────────
+function _v08ClaimedKey(kind){
+  const mc = (typeof myCode!=='undefined'&&myCode)?myCode:'local';
+  return 'chessstar_claimed_'+kind+'_'+mc;
+}
+function _v08LoadClaimed(kind){ try{ return new Set(JSON.parse(localStorage.getItem(_v08ClaimedKey(kind))||'[]')); }catch(e){ return new Set(); } }
+function _v08SaveClaimed(kind,s){ localStorage.setItem(_v08ClaimedKey(kind),JSON.stringify(Array.from(s))); }
+
+// Patch openMilestone to use per-account keys + renamed title "PROGRESSIVE"
+const _origOpenMS = window.openMilestone;
+window.openMilestone = function(kind){
+  const WIN_TIERS    = [1,2,5,10,15,20,25,30,35,40,50,60,75,100,125,150,200,250,300,400,500,750,1000];
+  const TROPHY_TIERS = [1,2,3,5,7,10,13,15,17,20,25,30,35,40,50,60,75,100];
+  const modal=$$('milestoneModal'); if(!modal) return;
+  const title=$$('msTitle'),subt=$$('msSubtitle'),list=$$('msList');
+  if(!list) return;
+  const isWins=kind==='wins';
+  const tiers=isWins?WIN_TIERS:TROPHY_TIERS;
+  const value=isWins?(window.totalWins||0):(window.totalTrophies||0);
+  const claimed=_v08LoadClaimed(kind);
+  title.textContent = isWins ? '🏅 PROGRESSIVE WINS' : '🏆 PROGRESSIVE TROPHIES';
+  subt.textContent  = isWins ? ('You have '+value+' wins. Wins are forever.') : ('You have '+value+' trophies.');
+  list.innerHTML='';
+  for(const t of tiers){
+    const reached=value>=t, isClaimed=claimed.has(t), claimable=reached&&!isClaimed;
+    const cls=claimable?'claim':(reached?'reached':'future');
+    const action=claimable?'TAP TO CLAIM':(isClaimed?'✓ CLAIMED':(reached?'✓ REACHED':'LOCKED'));
+    const div=document.createElement('div'); div.className='msTier '+cls;
+    div.innerHTML='<span class="tval">'+(isWins?'🏅 ':'🏆 ')+t+'</span><span class="tact">'+action+'</span>';
+    if(claimable){
+      div.onclick=()=>{
+        claimed.add(t);
+        _v08SaveClaimed(kind,claimed);
+        window.showToast&&window.showToast('Claimed '+t+(isWins?' wins':' trophies')+'!');
+        window.openMilestone(kind);
+        window.updateMilestones&&window.updateMilestones();
+      };
+    }
+    list.appendChild(div);
+  }
+  modal.classList.add('show');
+};
+
+// ─────────────────────────────────────────────────────────
+// 7. ACCOUNT SWITCHING — reload icon + rewards on switch
+// ─────────────────────────────────────────────────────────
+function _v08OnSwitch(acctData){
+  // Apply icon from server data
+  if(acctData && acctData.icon && window.profile){
+    window.profile.icon = acctData.icon;
+    localStorage.setItem('chessstar_profile_icon', acctData.icon);
+  }
+  // Apply wins from server
+  if(acctData && typeof acctData.wins==='number' && window.applyAccountFromServer){
+    window.applyAccountFromServer(acctData);
+  }
+  // Refresh all UI
+  if(window.applyProfileIcon) window.applyProfileIcon();
+  if(window.updateMilestones) window.updateMilestones();
+  if(window.refreshPieceLocks) window.refreshPieceLocks();
+  if(window.refreshProfileStats) window.refreshProfileStats();
+  const pn=$$('pName');
+  if(pn&&window.profile){ pn.textContent=window.profile.name||'Player'; pn.style.color=window.profile.color||'#f1c40f'; }
+  // Sync icon to server
+  _v08SyncIconToServer();
+}
+
+// Patch maConfirmAdd (switch via code)
+const _origMCA = window.maConfirmAdd;
+window.maConfirmAdd = async function(){
+  if(_origMCA) await _origMCA.apply(this,arguments);
+  // Load fresh data for new account
+  try{
+    const mc=(typeof myCode!=='undefined')?myCode:'';
+    if(mc){
+      const r=await fetch('/api/account/me?code='+encodeURIComponent(mc));
+      if(r.ok){ const j=await r.json(); _v08OnSwitch(j); }
+    }
+  }catch(e){}
+};
+
+// Patch loadSaveCode
+const _origLSC = window.loadSaveCode;
+window.loadSaveCode = async function(){
+  if(_origLSC) await _origLSC.apply(this,arguments);
+  try{
+    const mc=(typeof myCode!=='undefined')?myCode:'';
+    if(mc){
+      const r=await fetch('/api/account/me?code='+encodeURIComponent(mc));
+      if(r.ok){ const j=await r.json(); _v08OnSwitch(j); }
+    }
+  }catch(e){}
+};
+
+// Sync icon to server whenever it changes
+function _v08SyncIconToServer(){
+  try{
+    const mc=(typeof myCode!=='undefined')?myCode:'';
+    if(!mc) return;
+    const icon=localStorage.getItem('chessstar_profile_icon')||'';
+    fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      code:mc, wins:window.totalWins||0, best_streak:window.bestStreak||0,
+      trophies:window.totalTrophies||0, name:(window.profile&&window.profile.name)||'Player',
+      color:(window.profile&&window.profile.color)||'#3498db', icon
+    })}).catch(()=>{});
+  }catch(e){}
+}
+
+// ─────────────────────────────────────────────────────────
+// 8. DELETE ACCOUNT FROM DEVICE (with confirm, can't delete if only one)
+// ─────────────────────────────────────────────────────────
+const _origMaToggle = window.maToggleAllAccounts;
+window.maToggleAllAccounts = function(){
+  const list=$$('maAllAcctsList'), btn=$$('maAllAcctsBtn');
+  const isOpen = list&&list.style.display!=='none';
+  if(isOpen){ if(list)list.style.display='none'; if(btn)btn.textContent='▼ ALL ACCOUNTS'; return; }
+  if(btn)btn.textContent='▲ ALL ACCOUNTS';
+  _v08RenderAccountsList();
+};
+
+function _v08RenderAccountsList(){
+  const list=$$('maAllAcctsList'); if(!list) return;
+  const SA_KEY='chessstar_saved_accts';
+  let saved=[]; try{ saved=JSON.parse(localStorage.getItem(SA_KEY)||'[]'); }catch(e){}
+  const mc=(typeof myCode!=='undefined')?myCode:null;
+  // Sync current account
+  if(mc&&window.profile){
+    const idx=saved.findIndex(x=>x.code===mc);
+    const cur={code:mc,name:window.profile.name||'Player',color:window.profile.color||'#f1c40f',wins:window.totalWins||0};
+    if(idx>=0)saved[idx]=cur; else saved.push(cur);
+    localStorage.setItem(SA_KEY,JSON.stringify(saved));
+  }
+  list.innerHTML='';
+  if(!saved.length){ list.innerHTML='<div style="font-size:10px;color:#888;text-align:center;padding:8px;">No saved accounts yet</div>'; list.style.display='flex'; return; }
+  const all=saved.slice().sort((a,b)=>a.code===mc?-1:b.code===mc?1:0);
+  all.forEach(a=>{
+    const isCur=a.code===mc;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;background:'+(isCur?'rgba(25,118,210,.2)':'#0a0500')+';border:1px solid '+(isCur?'#1976d2':'#5d4037')+';border-radius:6px;padding:8px;margin-bottom:4px;';
+    const ico=document.createElement('div'); ico.style.cssText='font-size:20px;flex-shrink:0;'; ico.textContent='🎭';
+    const info=document.createElement('div'); info.style.cssText='flex:1;min-width:0;';
+    info.innerHTML='<div style="font-size:11px;font-weight:bold;color:'+(a.color||'#f1c40f')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(a.name||'Player')+(isCur?' <span style="font-size:9px;color:#4caf50;">(active)</span>':'')+'</div><div style="font-size:9px;color:#888;">'+(a.wins||0)+' wins</div>';
+    row.appendChild(ico); row.appendChild(info);
+    if(!isCur){
+      const sw=document.createElement('button');
+      sw.textContent='SWITCH'; sw.style.cssText='background:#1565c0;border:1px solid #1976d2;color:#fff;font-size:9px;font-weight:bold;padding:5px 8px;border-radius:4px;cursor:pointer;flex-shrink:0;';
+      const code_=a.code;
+      sw.onclick=async()=>{
+        try{
+          const r=await fetch('/api/account/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code_})});
+          const j=await r.json();
+          if(typeof myCode!=='undefined') window.myCode=j.code;
+          localStorage.setItem('chessstar_acct_code',j.code);
+          if(window.profile){ if(j.name)window.profile.name=j.name; if(j.color)window.profile.color=j.color; }
+          _v08OnSwitch(j);
+          if(window.updateSaveCodeUI)window.updateSaveCodeUI();
+          const cc=$$('maCurCode'); if(cc)cc.textContent='#'+j.code;
+          if(window.netConnect)window.netConnect();
+          window.showToast&&window.showToast('Switched to '+(j.name||'Player'));
+          window.closeManageAccounts&&window.closeManageAccounts();
+        }catch(e){ window.showToast&&window.showToast('Could not switch account'); }
+      };
+      row.appendChild(sw);
+    }
+    // Delete from device button
+    const del=document.createElement('button');
+    del.textContent='✕'; del.title='Remove from this device';
+    del.style.cssText='background:#3a0000;border:1px solid #e74c3c;color:#e74c3c;font-size:11px;font-weight:bold;padding:4px 7px;border-radius:4px;cursor:pointer;flex-shrink:0;margin-left:2px;';
+    const code_=a.code, name_=a.name;
+    del.onclick=()=>{
+      if(saved.length<=1){ window.showToast&&window.showToast('Cannot remove the only account on device'); return; }
+      if(isCur){ window.showToast&&window.showToast('Switch to another account first'); return; }
+      window._v08Confirm('Remove <b>'+_esc(name_||'Player')+'</b> from this device?<br><small style="color:#a08060;">Your data stays on the server — just removes it from this device.</small>', ()=>{
+        let arr=[]; try{ arr=JSON.parse(localStorage.getItem(SA_KEY)||'[]'); }catch(e){}
+        arr=arr.filter(x=>x.code!==code_);
+        localStorage.setItem(SA_KEY,JSON.stringify(arr));
+        window.showToast&&window.showToast(_esc(name_||'Account')+' removed from device');
+        _v08RenderAccountsList();
+      });
+    };
+    row.appendChild(del);
+    list.appendChild(row);
+  });
+  list.style.display='flex'; list.style.flexDirection='column';
+}
+
+// ─────────────────────────────────────────────────────────
+// 9. LPS PIECE PICKER (appears BEFORE matchmaking in 1v1)
+// ─────────────────────────────────────────────────────────
+let _v08LpsPickCb=null, _v08LpsPickSel=null;
+
+window.openLpsPick = function(onConfirm){
+  _v08LpsPickCb=onConfirm; _v08LpsPickSel=null;
+  const grid=$$('v08LpsPickGrid'); if(!grid) return;
+  grid.innerHTML='';
+  const PIECES=[
+    {t:'P',icon:'♟',name:'PAWN',wins:0},
+    {t:'R',icon:'♜',name:'ROOK',wins:5},
+    {t:'N',icon:'♞',name:'KNIGHT',wins:10},
+    {t:'B',icon:'♝',name:'BISHOP',wins:15},
+    {t:'Q',icon:'♛',name:'QUEEN',wins:25},
+    {t:'K',icon:'♚',name:'KING',wins:50},
+  ];
+  const totalWins=window.totalWins||0;
+  PIECES.forEach(p=>{
+    const owned=totalWins>=p.wins;
+    const card=document.createElement('div');
+    card.className='ppCard'+(owned?'':' locked');
+    card.innerHTML='<div class="ppIco">'+p.icon+'</div><div class="ppNm">'+p.name+'</div>'+(owned?'':'<div style="font-size:8px;color:#e74c3c;margin-top:2px;">🔒 '+p.wins+'W</div>');
+    if(owned){
+      card.onclick=()=>{
+        grid.querySelectorAll('.ppCard').forEach(c=>c.classList.remove('on'));
+        card.classList.add('on'); _v08LpsPickSel=p.t;
+        const gb=$$('v08LpsPickGo'); if(gb) gb.disabled=false;
+      };
+    }
+    grid.appendChild(card);
+  });
+  const gb=$$('v08LpsPickGo'); if(gb) gb.disabled=true;
+  $$('v08LpsPickModal').classList.add('show');
+};
+window.v08CloseLpsPick=function(){
+  $$('v08LpsPickModal').classList.remove('show');
+  _v08LpsPickCb=null; _v08LpsPickSel=null;
+};
+window.v08ConfirmLpsPick=function(){
+  if(!_v08LpsPickSel){ window.showToast&&window.showToast('Pick a piece first'); return; }
+  window.lpsChosenType=_v08LpsPickSel;
+  $$('v08LpsPickModal').classList.remove('show');
+  const cb=_v08LpsPickCb; _v08LpsPickCb=null;
+  if(cb) cb(window.lpsChosenType);
+};
+
+// Override startSelectedEvent for LPS — piece picker BEFORE matchmaking
+const _origSSE = window.startSelectedEvent;
+window.startSelectedEvent = function(){
+  const ev=(typeof currentEvent!=='undefined')?currentEvent:'';
+  const mode=window.currentMode||'1v1';
+  if(ev==='lps'){
+    window.openLpsPick((chosenType)=>{
+      window.lpsChosenType=chosenType;
+      const needed=6;
+      if(window.showMatchmaking){
+        window.showMatchmaking('LAST PIECE STANDING',()=>{ if(_origSSE)_origSSE.apply(this,arguments); },needed);
+      } else {
+        if(_origSSE) _origSSE.apply(this,arguments);
+      }
+    });
+    return;
+  }
+  if(_origSSE) _origSSE.apply(this,arguments);
+};
+
+// ─────────────────────────────────────────────────────────
+// 10. NOTIFICATION BADGES (red circles)
+// ─────────────────────────────────────────────────────────
+function _v08EnsureBadge(parentId, badgeId){
+  let b=$$( badgeId);
+  if(!b){
+    const par=$$( parentId); if(!par) return null;
+    par.style.position='relative';
+    b=document.createElement('div'); b.id=badgeId; b.className='v08Badge'; b.textContent='!';
+    par.appendChild(b);
+  }
+  return b;
+}
+
+function _v08RefreshBadges(){
+  _v08RefreshRewardsBadge();
+  _v08RefreshFriendsBadge();
+  _v08RefreshLbBadge();
+}
+
+function _v08RefreshRewardsBadge(){
+  const WIN_TIERS=[1,2,5,10,15,20,25,30,35,40,50,60,75,100,125,150,200,250,300,400,500,750,1000];
+  const TROPHY_TIERS=[1,2,3,5,7,10,13,15,17,20,25,30,35,40,50,60,75,100];
+  const cW=_v08LoadClaimed('wins'), cT=_v08LoadClaimed('trophies');
+  const hasW=WIN_TIERS.some(t=>(window.totalWins||0)>=t&&!cW.has(t));
+  const hasT=TROPHY_TIERS.some(t=>(window.totalTrophies||0)>=t&&!cT.has(t));
+  const bW=_v08EnsureBadge('winsBar','v08WinsBadge');
+  if(bW) bW.classList.toggle('show',hasW);
+  const bT=_v08EnsureBadge('trophyBar','v08TrophyBadge');
+  if(bT) bT.classList.toggle('show',hasT);
+}
+
+function _v08RefreshFriendsBadge(){
+  const reqCount=(typeof friendRequests!=='undefined')?friendRequests.length:0;
+  const b=_v08EnsureBadge('friendsBtn','v08FriendsBadge');
+  if(b){ b.textContent=reqCount||'!'; b.classList.toggle('show',reqCount>0); }
+}
+
+function _v08RefreshLbBadge(){
+  const lastCheck=parseInt(localStorage.getItem('cs_lb_last_check')||'0',10);
+  const lastWin=parseInt(localStorage.getItem('cs_wins_changed_at')||'0',10);
+  const b=_v08EnsureBadge('leaderboardBtn','v08LbBadge');
+  if(b) b.classList.toggle('show',lastWin>lastCheck&&lastWin>0);
+}
+
+// Clear badges when navigating
+const _prevGoTo8=window.goTo;
+window.goTo=function(id){
+  if(_prevGoTo8) _prevGoTo8.apply(this,arguments);
+  if(id==='leaderboardScreen'){
+    localStorage.setItem('cs_lb_last_check',Date.now().toString());
+    const b=$$('v08LbBadge'); if(b) b.classList.remove('show');
+  }
+  if(id==='friendsScreen'){
+    const b=$$('v08FriendsBadge'); if(b) b.classList.remove('show');
+  }
+};
+
+// Track wins changes for badge
+const _prevNMF8=window.notifyMatchFinished;
+window.notifyMatchFinished=function(result,opts){
+  if(_prevNMF8) _prevNMF8.apply(this,arguments);
+  if(result==='win'){
+    localStorage.setItem('cs_wins_changed_at',Date.now().toString());
+    setTimeout(_v08RefreshBadges,500);
+  }
+};
+
+// ─────────────────────────────────────────────────────────
+// 11. FULL SAVE — send icon to server on sync-wins calls
+// ─────────────────────────────────────────────────────────
+// Wrap all sync-wins calls to include icon
+const _origSyncWinsCall = window.acctSubmit;
+// Hook into saveProf so icon gets sent to server when profile is saved
+const _origSP=window.saveProf;
+window.saveProf=function(){
+  if(_origSP) _origSP.apply(this,arguments);
+  setTimeout(_v08SyncIconToServer, 200);
+};
+
+// ─────────────────────────────────────────────────────────
+// 12. APPLY ACCOUNT FROM SERVER — also load icon
+// ─────────────────────────────────────────────────────────
+const _origAAFS=window.applyAccountFromServer;
+window.applyAccountFromServer=function(j){
+  if(_origAAFS) _origAAFS.apply(this,arguments);
+  if(j&&j.icon&&j.icon.length>0&&window.profile){
+    window.profile.icon=j.icon;
+    localStorage.setItem('chessstar_profile_icon',j.icon);
+    if(window.applyProfileIcon) window.applyProfileIcon();
+  }
+};
+
+// ─────────────────────────────────────────────────────────
+// 13. EMAIL INFO MODAL
+// ─────────────────────────────────────────────────────────
+window.v08OpenEmailInfo=function(){ $$('v08EmailInfoModal').classList.add('show'); };
+window.v08CloseEmailInfo=function(){ $$('v08EmailInfoModal').classList.remove('show'); };
+
+// Add email info button to profile save area
+setTimeout(()=>{
+  const scb=$$('saveCodeBox');
+  if(scb&&scb.parentElement&&!$$('v08EmailBtn')){
+    const btn=document.createElement('button'); btn.id='v08EmailBtn'; btn.className='miniBtn';
+    btn.textContent='📧 Email save?'; btn.style.marginTop='6px'; btn.style.width='100%';
+    btn.onclick=()=>window.v08OpenEmailInfo();
+    scb.parentElement.appendChild(btn);
+  }
+},1200);
+
+// ─────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────
+setTimeout(()=>{
+  // Force-show streak fire
+  const sfb=$$('streakFireBadge');
+  if(sfb){ sfb.classList.add('show'); sfb.classList.toggle('v08StreakZero',(window.winStreak||0)===0); }
+  // Initial badges
+  _v08RefreshBadges();
+  // Refresh accounts list override (remove old click handler from maAllAcctsBtn)
+  const maBtn=$$('maAllAcctsBtn');
+  if(maBtn){
+    const newBtn=maBtn.cloneNode(true);
+    newBtn.onclick=()=>window.maToggleAllAccounts();
+    maBtn.parentNode.replaceChild(newBtn,maBtn);
+  }
+  // Send icon on startup
+  _v08SyncIconToServer();
+},900);
+
+// Refresh badges when refreshFriends completes
+const _origRF8=window.refreshFriends;
+window.refreshFriends=async function(){
+  if(_origRF8) await _origRF8.apply(this,arguments);
+  setTimeout(_v08RefreshFriendsBadge,300);
+};
+
+})();
 </script>
+
+<!-- ═══════════════════════════════════════════════ v0.08 HTML MODALS ═══ -->
+<style>
+/* Streak fire: gray when 0 */
+#streakFireBadge.v08StreakZero { filter:grayscale(1); opacity:.45; }
+/* Notification badges */
+.v08Badge { position:absolute;top:-5px;right:-5px;background:#e74c3c;color:#fff;font-size:8px;font-weight:bold;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 3px;z-index:15;border:1.5px solid #fff;pointer-events:none; }
+.v08Badge.show { display:flex; }
+/* Generic confirm dialog */
+#v08Confirm { position:absolute;inset:0;background:rgba(0,0,0,.93);z-index:300;display:none;align-items:center;justify-content:center;padding:20px; }
+#v08Confirm.show { display:flex; }
+#v08ConfirmInner { background:linear-gradient(180deg,#1a0a04,#0a0500);border:3px solid #e74c3c;border-radius:12px;padding:20px;max-width:280px;width:100%;text-align:center; }
+#v08ConfirmMsg { color:#fff;font-size:12px;letter-spacing:.5px;line-height:1.5;margin-bottom:16px; }
+#v08ConfirmBtns { display:flex;gap:8px; }
+#v08ConfirmBtns button { flex:1;padding:10px;border-radius:6px;font-weight:bold;letter-spacing:2px;cursor:pointer;font-size:10px;border:2px solid; }
+#v08CfmYes { background:#3a0000;color:#e74c3c;border-color:#e74c3c; }
+#v08CfmYes:hover { background:#e74c3c;color:#fff; }
+#v08CfmNo  { background:#1a0800;color:#a08060;border-color:#5d4037; }
+/* Friend profile modal */
+#v08FrProfileModal { position:absolute;inset:0;background:rgba(0,0,0,.92);z-index:290;display:none;align-items:center;justify-content:center;padding:16px; }
+#v08FrProfileModal.show { display:flex; }
+#v08FrProfileInner { background:linear-gradient(180deg,#1a0a04,#0a0500);border:3px solid #f1c40f;border-radius:14px;padding:20px 16px;max-width:300px;width:100%;display:flex;flex-direction:column;gap:10px;align-items:center; }
+#v08FrProfIco { font-size:52px;line-height:1;text-align:center; }
+#v08FrProfName { font-size:17px;font-weight:bold;letter-spacing:2px;text-align:center; }
+.v08FrStat { display:flex;justify-content:space-between;padding:7px 10px;background:#0a0500;border:1px solid #3e1a00;border-radius:6px;font-size:11px;width:100%; }
+.v08FrStat .v08FrLbl { color:#a08060;letter-spacing:1px; }
+.v08FrStat .v08FrVal { color:#f1c40f;font-weight:bold; }
+#v08FrProfClose { width:100%;padding:10px;background:#1a0800;color:#f1c40f;border:2px solid #5d4037;border-radius:8px;font-weight:bold;letter-spacing:2px;cursor:pointer;font-size:11px; }
+#v08FrProfClose:hover { background:#f1c40f;color:#000; }
+/* LPS piece picker */
+#v08LpsPickModal { position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;justify-content:center;align-items:center;z-index:250;padding:14px; }
+#v08LpsPickModal.show { display:flex; }
+#v08LpsPickInner { background:#1a0800;border:3px solid #f1c40f;border-radius:14px;padding:16px 14px;max-width:340px;width:100%; }
+#v08LpsPickInner h2 { color:#f1c40f;text-align:center;font-size:14px;letter-spacing:3px;margin-bottom:6px; }
+#v08LpsPickSub { color:#a08060;font-size:10px;text-align:center;letter-spacing:1px;margin-bottom:12px;line-height:1.4; }
+#v08LpsPickGrid { display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px; }
+#v08LpsPickBtns { display:flex;gap:8px; }
+#v08LpsPickBtns button { flex:1;padding:10px;border-radius:6px;font-weight:bold;letter-spacing:2px;cursor:pointer;font-size:11px;border:2px solid; }
+#v08LpsPickCancel { background:#1a0800;color:#a08060;border-color:#5d4037; }
+#v08LpsPickGo { background:#1a3a05;color:#4caf50;border-color:#4caf50; }
+#v08LpsPickGo:disabled { opacity:.4;cursor:not-allowed; }
+#v08LpsPickGo:not(:disabled):hover { background:#4caf50;color:#000; }
+/* Email info modal */
+#v08EmailInfoModal { position:absolute;inset:0;background:rgba(0,0,0,.92);z-index:295;display:none;align-items:center;justify-content:center;padding:16px; }
+#v08EmailInfoModal.show { display:flex; }
+#v08EmailInfoInner { background:linear-gradient(180deg,#1a0a04,#0a0500);border:3px solid #1976d2;border-radius:14px;padding:20px 16px;max-width:300px;width:100%; }
+#v08EmailInfoInner h3 { color:#42a5f5;font-size:13px;letter-spacing:2px;margin-bottom:12px;text-align:center; }
+#v08EmailInfoInner p { color:#ccc;font-size:10px;line-height:1.6;margin-bottom:8px; }
+#v08EmailInfoInner ul { color:#a08060;font-size:10px;line-height:1.7;padding-left:14px;margin-bottom:8px; }
+#v08EmailInfoInner b { color:#f1c40f; }
+#v08EmailInfoClose { width:100%;padding:10px;background:#1976d2;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;letter-spacing:1px;font-size:11px;margin-top:4px; }
+body.lightTheme #v08FrProfileInner,body.lightTheme #v08ConfirmInner,body.lightTheme #v08LpsPickInner,body.lightTheme #v08EmailInfoInner { background:linear-gradient(180deg,#fff8e8,#f5ecd8);border-color:#7a4e20; }
+body.lightTheme #v08FrProfName,body.lightTheme #v08ConfirmMsg { color:#1a0500; }
+body.lightTheme .v08FrStat { background:#fff8e8;border-color:#a08060; }
+body.lightTheme .v08FrStat .v08FrLbl { color:#7a5030; }
+body.lightTheme .v08FrStat .v08FrVal { color:#1976d2; }
+</style>
+
+<!-- Generic Confirm Dialog -->
+<div id="v08Confirm" onclick="if(event.target.id==='v08Confirm')_v08ConfirmNo()">
+  <div id="v08ConfirmInner">
+    <div id="v08ConfirmMsg">Are you sure?</div>
+    <div id="v08ConfirmBtns">
+      <button id="v08CfmYes" onclick="_v08ConfirmYes()">CONFIRM</button>
+      <button id="v08CfmNo" onclick="_v08ConfirmNo()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- Friend Profile Modal -->
+<div id="v08FrProfileModal" onclick="if(event.target.id==='v08FrProfileModal')v08CloseFrProfile()">
+  <div id="v08FrProfileInner">
+    <div id="v08FrProfIco">🎭</div>
+    <div id="v08FrProfName" style="color:#f1c40f;">Player</div>
+    <div class="v08FrStat"><span class="v08FrLbl">WINS</span><span class="v08FrVal" id="v08FrProfWins">—</span></div>
+    <div class="v08FrStat"><span class="v08FrLbl">TROPHIES</span><span class="v08FrVal" id="v08FrProfTrophies">—</span></div>
+    <div class="v08FrStat"><span class="v08FrLbl">BEST STREAK</span><span class="v08FrVal" id="v08FrProfStreak">—</span></div>
+    <div class="v08FrStat"><span class="v08FrLbl">STATUS</span><span class="v08FrVal" id="v08FrProfStatus">—</span></div>
+    <button id="v08FrProfClose" onclick="v08CloseFrProfile()">CLOSE</button>
+  </div>
+</div>
+
+<!-- LPS Piece Picker -->
+<div id="v08LpsPickModal">
+  <div id="v08LpsPickInner">
+    <h2>CHOOSE YOUR PIECE</h2>
+    <div id="v08LpsPickSub">Pick one piece type for Last Piece Standing.<br>Only pieces you own can be selected.</div>
+    <div id="v08LpsPickGrid"></div>
+    <div id="v08LpsPickBtns">
+      <button id="v08LpsPickCancel" onclick="v08CloseLpsPick()">CANCEL</button>
+      <button id="v08LpsPickGo" onclick="v08ConfirmLpsPick()" disabled>CONFIRM</button>
+    </div>
+  </div>
+</div>
+
+<!-- Email Info Modal -->
+<div id="v08EmailInfoModal" onclick="if(event.target.id==='v08EmailInfoModal')v08CloseEmailInfo()">
+  <div id="v08EmailInfoInner">
+    <h3>📧 EMAIL-BASED SAVE</h3>
+    <p>Right now your progress is saved with a <b>13-character code</b>. Here's what adding an email system would mean:</p>
+    <p><b>What you'd gain:</b></p>
+    <ul>
+      <li>Password reset via email</li>
+      <li>Login with email + password (no code to paste)</li>
+      <li>Easier account recovery if code is lost</li>
+    </ul>
+    <p><b>What you'd lose / risks:</b></p>
+    <ul>
+      <li>Email stored on server — <b>privacy risk</b> if hacked</li>
+      <li>Requires email verification &amp; password setup</li>
+      <li>GDPR compliance needed for EU players</li>
+      <li>Current system is <b>100% anonymous</b> — no email = no personal data leak</li>
+    </ul>
+    <p style="color:#f1c40f;font-size:9px;margin-top:4px;">💡 Your 13-char code IS your password. Copy it and store it somewhere safe!</p>
+    <button id="v08EmailInfoClose" onclick="v08CloseEmailInfo()">GOT IT</button>
+  </div>
+</div>
+
 </body>
 </html>

@@ -3,7 +3,7 @@ const express = require("express");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const APP_VERSION = "v0.07";
+const APP_VERSION = "v0.08";
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"] }));
@@ -25,6 +25,7 @@ function newAccount(code, name, color) {
     code,
     name,
     color: color || "#3498db",
+    icon: "",
     wins: 0,
     streak: 0,
     best_streak: 0,
@@ -43,6 +44,7 @@ function publicView(a) {
     code: a.code,
     name: a.name,
     color: a.color,
+    icon: a.icon || "",
     wins: a.wins,
     streak: a.streak || 0,
     best_streak: a.best_streak || 0,
@@ -107,6 +109,7 @@ function createPgStorage(databaseUrl) {
       code: r.code,
       name: r.name,
       color: r.color,
+      icon: r.icon || "",
       wins: r.wins,
       streak: r.streak || 0,
       best_streak: r.best_streak || 0,
@@ -128,6 +131,7 @@ function createPgStorage(databaseUrl) {
           code              TEXT PRIMARY KEY,
           name              TEXT NOT NULL,
           color             TEXT NOT NULL DEFAULT '#3498db',
+          icon              TEXT NOT NULL DEFAULT '',
           wins              INTEGER NOT NULL DEFAULT 0,
           streak            INTEGER NOT NULL DEFAULT 0,
           best_streak       INTEGER NOT NULL DEFAULT 0,
@@ -147,6 +151,7 @@ function createPgStorage(databaseUrl) {
         "ALTER TABLE chess_accounts ADD COLUMN IF NOT EXISTS trophies INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE chess_accounts ADD COLUMN IF NOT EXISTS wins_updated_at BIGINT NOT NULL DEFAULT 0",
         "ALTER TABLE chess_accounts ADD COLUMN IF NOT EXISTS streak_updated_at BIGINT NOT NULL DEFAULT 0",
+        "ALTER TABLE chess_accounts ADD COLUMN IF NOT EXISTS icon TEXT NOT NULL DEFAULT ''",
       ]) {
         try { await pool.query(col); } catch(e) { /* already exists */ }
       }
@@ -169,7 +174,7 @@ function createPgStorage(databaseUrl) {
           }
         }
       } catch(migErr) { console.warn('[migration] skipped:', migErr.message); }
-      console.log("[storage] schema ready (v0.07)");
+      console.log("[storage] schema ready (v0.08)");
     },
     async get(code) {
       const r = await pool.query("SELECT * FROM chess_accounts WHERE code = $1", [code]);
@@ -182,10 +187,10 @@ function createPgStorage(databaseUrl) {
     async save(a) {
       await pool.query(
         `INSERT INTO chess_accounts
-           (code, name, color, wins, streak, best_streak, trophies, last_seen, wins_updated_at, streak_updated_at, friends, requests, replays)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb)
+           (code, name, color, icon, wins, streak, best_streak, trophies, last_seen, wins_updated_at, streak_updated_at, friends, requests, replays)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb)
          ON CONFLICT (code) DO UPDATE SET
-           name=EXCLUDED.name, color=EXCLUDED.color,
+           name=EXCLUDED.name, color=EXCLUDED.color, icon=EXCLUDED.icon,
            wins=EXCLUDED.wins, streak=EXCLUDED.streak,
            best_streak=EXCLUDED.best_streak, trophies=EXCLUDED.trophies,
            last_seen=EXCLUDED.last_seen,
@@ -194,7 +199,7 @@ function createPgStorage(databaseUrl) {
            friends=EXCLUDED.friends, requests=EXCLUDED.requests,
            replays=EXCLUDED.replays`,
         [
-          a.code, a.name, a.color,
+          a.code, a.name, a.color, a.icon||"",
           a.wins, a.streak||0, a.best_streak||0, a.trophies||0,
           a.lastSeen, a.wins_updated_at||0, a.streak_updated_at||0,
           Array.from(a.friends), Array.from(a.requests),
@@ -305,7 +310,7 @@ app.post("/api/account/login", async (req, res, next) => {
       await storage.save(a);
     }
     await touch(a);
-    res.json({ code: a.code, name: a.name, color: a.color, wins: a.wins, streak: a.streak||0, best_streak: a.best_streak||0, trophies: a.trophies||0 });
+    res.json({ code: a.code, name: a.name, color: a.color, icon: a.icon||"", wins: a.wins, streak: a.streak||0, best_streak: a.best_streak||0, trophies: a.trophies||0 });
   } catch (e) { next(e); }
 });
 
@@ -315,7 +320,7 @@ app.get("/api/account/me", async (req, res, next) => {
     const a = await storage.get(code);
     if (!a) return res.status(404).json({ error: "Not found" });
     await touch(a);
-    res.json({ code: a.code, name: a.name, color: a.color, wins: a.wins, streak: a.streak||0, best_streak: a.best_streak||0, trophies: a.trophies||0 });
+    res.json({ code: a.code, name: a.name, color: a.color, icon: a.icon||"", wins: a.wins, streak: a.streak||0, best_streak: a.best_streak||0, trophies: a.trophies||0 });
   } catch (e) { next(e); }
 });
 
@@ -404,12 +409,14 @@ app.post("/api/account/sync-wins", async (req, res, next) => {
     const localTroph = req.body && typeof req.body.trophies === 'number' ? Math.floor(req.body.trophies) : 0;
     const clientName = req.body && typeof req.body.name  === 'string' ? sanitizeName(req.body.name) : '';
     const clientColor= req.body && typeof req.body.color === 'string' ? req.body.color : '';
+    const clientIcon = req.body && typeof req.body.icon  === 'string' ? req.body.icon.slice(0,16) : '';
     if (!code) return res.status(400).json({ error: 'Missing code' });
     if (localWins < 0 || localWins > 1000000) return res.status(400).json({ error: 'Invalid wins' });
     const now = Date.now();
     let a = await storage.get(code);
     if (!a) {
       a = newAccount(code, clientName || 'Player', clientColor || '#3498db');
+      a.icon = clientIcon;
       a.wins = localWins;
       a.best_streak = localBest;
       a.trophies = localTroph;
@@ -421,13 +428,14 @@ app.post("/api/account/sync-wins", async (req, res, next) => {
         a.name = clientName;
       }
       if (clientColor) a.color = clientColor;
+      if (clientIcon) a.icon = clientIcon;
       if (localWins > a.wins) { a.wins = localWins; a.wins_updated_at = now; }
       if (localBest > (a.best_streak||0)) { a.best_streak = localBest; a.streak_updated_at = now; }
       if (localTroph > (a.trophies||0)) a.trophies = localTroph;
     }
     await touch(a);
     if (localWins > 0) console.log(`[sync-wins] ${a.name} (${code}) wins=${a.wins} best_streak=${a.best_streak}`);
-    res.json({ ok: true, wins: a.wins, best_streak: a.best_streak||0, trophies: a.trophies||0 });
+    res.json({ ok: true, wins: a.wins, best_streak: a.best_streak||0, trophies: a.trophies||0, icon: a.icon||'' });
   } catch(e) { next(e); }
 });
 
