@@ -1334,6 +1334,7 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
       </div>
     </div>
     <button onclick="maShowAddBox()" style="background:none;border:1px dashed #5d4037;color:#a08060;padding:8px;border-radius:6px;font-size:10px;font-weight:bold;letter-spacing:2px;cursor:pointer;">+ ADD ACCOUNT</button>
+    <button onclick="window.maCreateNewAccount&&window.maCreateNewAccount()" style="background:#1a3a05;border:2px solid #4caf50;color:#4caf50;padding:9px;border-radius:6px;font-size:10px;font-weight:bold;letter-spacing:2px;cursor:pointer;">✚ CREATE ACC</button>
     <div style="border-top:1px solid #2a1200;padding-top:10px;display:flex;flex-direction:column;gap:8px;">
       <div style="font-size:9px;color:#888;letter-spacing:1px;">NOTIFICATIONS</div>
       <div id="maNotifsStatus" style="font-size:10px;color:#a08060;padding:6px 0;"></div>
@@ -5056,6 +5057,15 @@ function drawThumbQOC(){
             +'<span>'+val+'</span>'
             +'<span style="font-size:8px;color:#a08060;letter-spacing:.5px;">'+t.name+'</span>'
           +'</span>';
+        if(!isMe && window.showAccDetails){
+          const _pdata = p;
+          const seebtn = document.createElement('button');
+          seebtn.textContent = 'SEE-ACC';
+          seebtn.className = 'fBtnSm';
+          seebtn.style.cssText = 'margin-left:5px;flex-shrink:0;font-size:8px;padding:4px 6px;';
+          seebtn.onclick = (ev)=>{ ev.stopPropagation(); window.showAccDetails(_pdata); };
+          row.appendChild(seebtn);
+        }
         list.appendChild(row);
       });
     }catch(e){
@@ -5661,10 +5671,11 @@ function drawThumbQOC(){
     }
   }
   window.suggestWalk = function(){
-    // In team mode with picked pieces, show the teammate selection overlay
+    const msgEl=document.getElementById('walkSelMsg');
+    const ov=document.getElementById('walkSelOverlay');
+
+    // ── TEAM MODE: suggest a move for a teammate piece ──────────────────────
     if(window.ccPickedTypes && typeof ccRunning!=='undefined' && ccRunning && ccTurn===classicPlayerColor){
-      const msgEl=document.getElementById('walkSelMsg');
-      const ov=document.getElementById('walkSelOverlay');
       _walkSelState={selR:-1,selC:-1,selMoves:null};
       if(ov) ov.classList.add('show');
       if(msgEl) msgEl.textContent='Tap a teammate piece (blue glow)';
@@ -5676,7 +5687,6 @@ function drawThumbQOC(){
         const ex=(e.clientX-rect.left)*sc, ey=(e.clientY-rect.top)*sc;
         const c=Math.floor(ex/(352/8)), r=Math.floor(ey/(352/8));
         if(r<0||r>7||c<0||c>7) return;
-        // If a destination is clicked
         if(_walkSelState.selMoves){
           const mv=_walkSelState.selMoves.find(m=>m.r===r&&m.c===c);
           if(mv){
@@ -5689,12 +5699,12 @@ function drawThumbQOC(){
             } else {
               const lvl=window.aiLevel?window.aiLevel('ally'):5;
               const acc=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.65);
-              showToast(acc?'🤝 Teammate accepted the walk!':'✕ Teammate declined the walk');
+              if(acc){ try{ ccDoMove(fr,fc,r,c); }catch(e){} showToast('🤝 Teammate accepted — piece moved!'); }
+              else showToast('✕ Teammate declined the walk');
             }
             return;
           }
         }
-        // Try selecting a teammate piece
         const p=ccBoard[r]&&ccBoard[r][c];
         if(p && p.c===classicPlayerColor && window.ccPickedTypes && !window.ccPlayerOwns(p,c)){
           _walkSelState.selR=r;_walkSelState.selC=c;
@@ -5705,15 +5715,63 @@ function drawThumbQOC(){
       };
       return;
     }
-    // 1v1 / non-team: bot or socket
-    if(typeof sock==='undefined'||!sock||!sock.connected){
-      const lvl=window.aiLevel?window.aiLevel('enemy'):5;
-      const accepted=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.6);
-      showToast(accepted?'🤝 Bot accepted the walk!':'✕ Bot declined the walk');
+
+    // ── 1v1 CLASSIC CHESS: suggest a move for the enemy piece ──────────────
+    if(typeof ccRunning!=='undefined' && ccRunning){
+      _walkSelState={selR:-1,selC:-1,selMoves:null};
+      if(ov) ov.classList.add('show');
+      if(msgEl) msgEl.textContent='Pick any piece and suggest its next move';
+      _drawWalkSel(ccBoard, classicPlayerColor, null);
+      const wc=document.getElementById('walkSelCanvas');
+      if(wc) wc.onclick=function(e){
+        const rect=this.getBoundingClientRect();
+        const sc=352/rect.width;
+        const ex=(e.clientX-rect.left)*sc, ey=(e.clientY-rect.top)*sc;
+        const c=Math.floor(ex/(352/8)), r=Math.floor(ey/(352/8));
+        if(r<0||r>7||c<0||c>7) return;
+        if(_walkSelState.selMoves && _walkSelState.selMoves.length){
+          const mv=_walkSelState.selMoves.find(m=>m.r===r&&m.c===c);
+          if(mv){
+            const fr=_walkSelState.selR,fc=_walkSelState.selC;
+            window.cancelWalkSel();
+            const lvl=window.aiLevel?window.aiLevel('enemy'):5;
+            const acc=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.6);
+            if(acc){ try{ ccDoMove(fr,fc,r,c); }catch(e){} showToast('🤝 Walk accepted — piece moved!'); }
+            else showToast('✕ AI declined the walk suggestion');
+            return;
+          }
+        }
+        const p=ccBoard[r]&&ccBoard[r][c];
+        if(p){
+          _walkSelState.selR=r;_walkSelState.selC=c;
+          try{ _walkSelState.selMoves=ccLegal(r,c)||[]; }catch(e){ _walkSelState.selMoves=[]; }
+          if(msgEl) msgEl.textContent=_walkSelState.selMoves.length?'Tap where it should go':'No legal moves for this piece';
+          _drawWalkSel(ccBoard,classicPlayerColor,null);
+        }
+      };
       return;
     }
-    sock.emit('suggest_walk',{});
-    showToast('Walk suggested');
+
+    // ── GTS: suggest a move for any piece ─────────────────────────────────
+    if(typeof gtsRunning!=='undefined' && gtsRunning){
+      const lvl=window.aiLevel?window.aiLevel('enemy'):5;
+      const acc=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.55);
+      showToast(acc?'🤝 GTS bot accepted the walk!':'✕ GTS bot declined the walk');
+      return;
+    }
+
+    // ── LPS: suggest a pause break ─────────────────────────────────────────
+    if(typeof lpsRunning!=='undefined' && lpsRunning){
+      const lvl=window.aiLevel?window.aiLevel('enemy'):5;
+      const acc=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.5);
+      showToast(acc?'🤝 LPS opponents paused!':'✕ Nobody wants to walk right now');
+      return;
+    }
+
+    // ── Fallback ───────────────────────────────────────────────────────────
+    const lvl=window.aiLevel?window.aiLevel('enemy'):5;
+    const accepted=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.6);
+    showToast(accepted?'🤝 Walk accepted!':'✕ Walk declined');
   };
 
   // ── SOCKET.IO CLIENT (v0.04) ───────────────────────────────────
@@ -5791,7 +5849,7 @@ function drawThumbQOC(){
       sock.on('player_left',(m)=> showToast('Player left ('+m.reason+')'));
       sock.on('suggest_walk',(m)=>{ try{ openWalkModal && openWalkModal(m); }catch(e){} });
       sock.on('suggest_walk_response',(m)=> showToast('Walk '+(m.accepted?'accepted':'declined')+(m.ai?' (bot)':'')));
-      sock.on('friend_invite',(m)=>{ showToast(m.fromName+' invites you to '+m.event+' '+m.mode); try{ window._csNotifFire && window._csNotifFire('⚔️ Team Invite!', (m.fromName||'A friend')+' invites you to '+m.event+' '+m.mode,'invite'); }catch(e){} });
+      sock.on('friend_invite',(m)=>{ if(window.showInvite){ window.showInvite(m.fromName,m.event,m.mode,m.from||m.fromCode); } else { showToast((m.fromName||'Friend')+' invites you to '+m.event+' '+m.mode); } try{ window._csNotifFire && window._csNotifFire('⚔️ Team Invite!', (m.fromName||'A friend')+' invites you to '+m.event+' '+m.mode,'invite'); }catch(e){} });
       sock.on('friend_invite_response',(m)=> showToast('Invite '+(m.accepted?'accepted':'declined')));
     }catch(e){
       console.warn('socket.io connect failed', e);
@@ -6557,8 +6615,12 @@ function drawThumbQOC(){
       window.qocSlotCount = 1;
 
       if(mode === '1v1' || currentEvent === 'lps'){
-        // LPS gets matchmaking too (needs 6 players) — AI fills after 5s
+        // LPS: v08 piece picker shows first; launchLPS() has its own 3-second matchmaking countdown
         if(currentEvent === 'lps'){
+          if(typeof window.openLpsPick === 'function'){
+            window.openLpsPick((type)=>{ window.lpsChosenType=type; launchLPS(type); });
+            return;
+          }
           return window.showMatchmaking ? window.showMatchmaking('LAST PIECE STANDING', _origStart, 6) : _origStart();
         }
         const _evLabels = {classic:'CLASSIC CHESS',gts:'GRIND THE SAFE',qoc:'QUEENS ON COLOR',lps:'LAST PIECE STANDING'};
@@ -7118,6 +7180,17 @@ window.updateMilestones = function(){
     sfb.classList.add('show');
     sfb.classList.toggle('v08StreakZero', (window.winStreak||0)===0);
   }
+  // Fix milestone bar glow — use per-account claimed keys so claimed tiers lose the pulse
+  if(typeof _v08LoadClaimed === 'function'){
+    const WIN_TIERS=[1,2,5,10,15,20,25,30,35,40,50,60,75,100,125,150,200,250,300,400,500,750,1000];
+    const TROPHY_TIERS=[1,2,3,5,7,10,13,15,17,20,25,30,35,40,50,60,75,100];
+    const cW=_v08LoadClaimed('wins'), cT=_v08LoadClaimed('trophies');
+    const hasW=WIN_TIERS.some(t=>(window.totalWins||0)>=t&&!cW.has(t));
+    const hasT=TROPHY_TIERS.some(t=>(window.totalTrophies||0)>=t&&!cT.has(t));
+    const wBtn=$$('winsBar'), tBtn=$$('trophyBar');
+    if(wBtn) wBtn.classList.toggle('claimable', hasW);
+    if(tBtn) tBtn.classList.toggle('claimable', hasT);
+  }
   _v08RefreshBadges();
 };
 
@@ -7546,25 +7619,7 @@ window.v08ConfirmLpsPick=function(){
   if(cb) cb(window.lpsChosenType);
 };
 
-// Override startSelectedEvent for LPS — piece picker BEFORE matchmaking
-const _origSSE = window.startSelectedEvent;
-window.startSelectedEvent = function(){
-  const ev=(typeof currentEvent!=='undefined')?currentEvent:'';
-  const mode=window.currentMode||'1v1';
-  if(ev==='lps'){
-    window.openLpsPick((chosenType)=>{
-      window.lpsChosenType=chosenType;
-      const needed=6;
-      if(window.showMatchmaking){
-        window.showMatchmaking('LAST PIECE STANDING',()=>{ if(_origSSE)_origSSE.apply(this,arguments); },needed);
-      } else {
-        if(_origSSE) _origSSE.apply(this,arguments);
-      }
-    });
-    return;
-  }
-  if(_origSSE) _origSSE.apply(this,arguments);
-};
+// LPS piece picker is now handled in the v06 wrapper — no duplicate override needed here.
 
 // ─────────────────────────────────────────────────────────
 // 10. NOTIFICATION BADGES (red circles)
@@ -7573,7 +7628,8 @@ function _v08EnsureBadge(parentId, badgeId){
   let b=$$( badgeId);
   if(!b){
     const par=$$( parentId); if(!par) return null;
-    par.style.position='relative';
+    // Do NOT override par.style.position — #friendsBtn and #leaderboardBtn are position:absolute
+    // and overriding that breaks their layout. Absolute children still position against them.
     b=document.createElement('div'); b.id=badgeId; b.className='v08Badge'; b.textContent='!';
     par.appendChild(b);
   }
@@ -7660,21 +7716,30 @@ window.applyAccountFromServer=function(j){
 };
 
 // ─────────────────────────────────────────────────────────
-// 13. EMAIL INFO MODAL
+// 13. CREATE NEW ACCOUNT — from Manage Accounts modal
 // ─────────────────────────────────────────────────────────
-window.v08OpenEmailInfo=function(){ $$('v08EmailInfoModal').classList.add('show'); };
-window.v08CloseEmailInfo=function(){ $$('v08EmailInfoModal').classList.remove('show'); };
-
-// Add email info button to profile save area
-setTimeout(()=>{
-  const scb=$$('saveCodeBox');
-  if(scb&&scb.parentElement&&!$$('v08EmailBtn')){
-    const btn=document.createElement('button'); btn.id='v08EmailBtn'; btn.className='miniBtn';
-    btn.textContent='📧 Email save?'; btn.style.marginTop='6px'; btn.style.width='100%';
-    btn.onclick=()=>window.v08OpenEmailInfo();
-    scb.parentElement.appendChild(btn);
-  }
-},1200);
+window.maCreateNewAccount = async function(){
+  try{
+    const r=await fetch('/api/account/new',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Player'})});
+    if(!r.ok){ window.showToast&&window.showToast('Server error — could not create account'); return; }
+    const j=await r.json();
+    if(!j.code){ window.showToast&&window.showToast('Error: no code returned'); return; }
+    // Save to local saved accounts list
+    const SA_KEY='chessstar_saved_accts';
+    let saved=[]; try{ saved=JSON.parse(localStorage.getItem(SA_KEY)||'[]'); }catch(e){}
+    saved.push({code:j.code,name:'Player',color:'#f1c40f',wins:0});
+    localStorage.setItem(SA_KEY,JSON.stringify(saved));
+    // Switch to new account
+    window.myCode=j.code;
+    localStorage.setItem('chessstar_acct_code',j.code);
+    if(window.profile){ window.profile.name='Player'; }
+    if(window.updateSaveCodeUI) window.updateSaveCodeUI();
+    const cc=$$('maCurCode'); if(cc) cc.textContent='#'+j.code;
+    if(window.netConnect) window.netConnect();
+    window.closeManageAccounts&&window.closeManageAccounts();
+    window.showToast&&window.showToast('New account created! Code: #'+j.code.slice(0,6)+'…');
+  }catch(e){ window.showToast&&window.showToast('Could not create account'); }
+};
 
 // ─────────────────────────────────────────────────────────
 // INIT
@@ -7747,16 +7812,7 @@ window.refreshFriends=async function(){
 #v08LpsPickGo { background:#1a3a05;color:#4caf50;border-color:#4caf50; }
 #v08LpsPickGo:disabled { opacity:.4;cursor:not-allowed; }
 #v08LpsPickGo:not(:disabled):hover { background:#4caf50;color:#000; }
-/* Email info modal */
-#v08EmailInfoModal { position:absolute;inset:0;background:rgba(0,0,0,.92);z-index:295;display:none;align-items:center;justify-content:center;padding:16px; }
-#v08EmailInfoModal.show { display:flex; }
-#v08EmailInfoInner { background:linear-gradient(180deg,#1a0a04,#0a0500);border:3px solid #1976d2;border-radius:14px;padding:20px 16px;max-width:300px;width:100%; }
-#v08EmailInfoInner h3 { color:#42a5f5;font-size:13px;letter-spacing:2px;margin-bottom:12px;text-align:center; }
-#v08EmailInfoInner p { color:#ccc;font-size:10px;line-height:1.6;margin-bottom:8px; }
-#v08EmailInfoInner ul { color:#a08060;font-size:10px;line-height:1.7;padding-left:14px;margin-bottom:8px; }
-#v08EmailInfoInner b { color:#f1c40f; }
-#v08EmailInfoClose { width:100%;padding:10px;background:#1976d2;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;letter-spacing:1px;font-size:11px;margin-top:4px; }
-body.lightTheme #v08FrProfileInner,body.lightTheme #v08ConfirmInner,body.lightTheme #v08LpsPickInner,body.lightTheme #v08EmailInfoInner { background:linear-gradient(180deg,#fff8e8,#f5ecd8);border-color:#7a4e20; }
+body.lightTheme #v08FrProfileInner,body.lightTheme #v08ConfirmInner,body.lightTheme #v08LpsPickInner { background:linear-gradient(180deg,#fff8e8,#f5ecd8);border-color:#7a4e20; }
 body.lightTheme #v08FrProfName,body.lightTheme #v08ConfirmMsg { color:#1a0500; }
 body.lightTheme .v08FrStat { background:#fff8e8;border-color:#a08060; }
 body.lightTheme .v08FrStat .v08FrLbl { color:#7a5030; }
@@ -7800,28 +7856,6 @@ body.lightTheme .v08FrStat .v08FrVal { color:#1976d2; }
   </div>
 </div>
 
-<!-- Email Info Modal -->
-<div id="v08EmailInfoModal" onclick="if(event.target.id==='v08EmailInfoModal')v08CloseEmailInfo()">
-  <div id="v08EmailInfoInner">
-    <h3>📧 EMAIL-BASED SAVE</h3>
-    <p>Right now your progress is saved with a <b>13-character code</b>. Here's what adding an email system would mean:</p>
-    <p><b>What you'd gain:</b></p>
-    <ul>
-      <li>Password reset via email</li>
-      <li>Login with email + password (no code to paste)</li>
-      <li>Easier account recovery if code is lost</li>
-    </ul>
-    <p><b>What you'd lose / risks:</b></p>
-    <ul>
-      <li>Email stored on server — <b>privacy risk</b> if hacked</li>
-      <li>Requires email verification &amp; password setup</li>
-      <li>GDPR compliance needed for EU players</li>
-      <li>Current system is <b>100% anonymous</b> — no email = no personal data leak</li>
-    </ul>
-    <p style="color:#f1c40f;font-size:9px;margin-top:4px;">💡 Your 13-char code IS your password. Copy it and store it somewhere safe!</p>
-    <button id="v08EmailInfoClose" onclick="v08CloseEmailInfo()">GOT IT</button>
-  </div>
-</div>
 
 </body>
 </html>
