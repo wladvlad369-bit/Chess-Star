@@ -266,6 +266,33 @@ body.lightTheme #iconSelectBtn,body.lightTheme #nameSelectBtn{background:#1976d2
 #ppGo{background:#1a3a05;color:#4caf50;border-color:#4caf50;}
 #ppGo:disabled{opacity:.4;cursor:not-allowed;}
 #ppGo:not(:disabled):hover{background:#4caf50;color:#000;}
+/* v0.08 — team lobby */
+#teamLobbyModal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:300;}
+#teamLobbyModal.show{display:flex;}
+#teamLobbyInner{background:#140800;border:2px solid #f1c40f;border-radius:14px;width:100%;max-width:360px;padding:18px 16px;display:flex;flex-direction:column;gap:14px;max-height:90vh;overflow-y:auto;}
+#teamLobbyTitle{font-size:15px;font-weight:900;color:#f1c40f;letter-spacing:3px;text-align:center;}
+#teamLobbyPlayers{display:flex;flex-direction:column;gap:8px;}
+.tlPlayer{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #3e1a00;border-radius:8px;background:#1a0800;}
+.tlPlayerIco{width:32px;height:32px;border-radius:50%;background:#2a1200;border:2px solid #5d4037;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tlPlayerName{flex:1;font-size:11px;font-weight:bold;color:#f1c40f;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tlPlayerReady{font-size:10px;color:#4caf50;font-weight:bold;flex-shrink:0;}
+.tlPlayerWaiting{font-size:10px;color:#a08060;flex-shrink:0;}
+.tlPlayerHost{font-size:8px;color:#f1c40f;background:#2a1800;border:1px solid #f1c40f;border-radius:3px;padding:1px 4px;letter-spacing:1px;flex-shrink:0;}
+#teamLobbyEventRow{display:flex;flex-direction:column;gap:6px;}
+.tlEvLabel{font-size:8px;color:#a08060;letter-spacing:2px;}
+#teamLobbyEvPicker{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.tlEvBtn{padding:7px 4px;background:#1a0800;border:1px solid #3e1a00;border-radius:6px;color:#a08060;font-size:8px;font-weight:bold;letter-spacing:1px;cursor:pointer;text-align:center;}
+.tlEvBtn.on{background:#1a3010;border-color:#4caf50;color:#4caf50;}
+#teamLobbyModePicker{display:flex;gap:5px;}
+.tlModeBtn{flex:1;padding:6px;background:#1a0800;border:1px solid #3e1a00;border-radius:6px;color:#a08060;font-size:8px;font-weight:bold;letter-spacing:1px;cursor:pointer;text-align:center;}
+.tlModeBtn.on{background:#1a0030;border-color:#42a5f5;color:#42a5f5;}
+#teamLobbyStatus{text-align:center;font-size:10px;color:#a08060;letter-spacing:1px;}
+#teamLobbyBtns{display:flex;gap:8px;}
+#teamLobbyPlay{flex:1;padding:12px;background:#1a3010;color:#4caf50;border:2px solid #4caf50;border-radius:8px;font-size:12px;font-weight:900;letter-spacing:2px;cursor:pointer;}
+#teamLobbyPlay:hover{background:#4caf50;color:#000;}
+#teamLobbyPlay.ready-on{background:#4caf50;color:#000;}
+#teamLobbyLeave{padding:10px 12px;background:#1a0800;color:#e74c3c;border:2px solid #e74c3c;border-radius:8px;font-size:11px;font-weight:bold;cursor:pointer;}
+#teamLobbyCode{text-align:center;font-size:9px;color:#5d4037;letter-spacing:1px;}
 /* v0.05 — team chat */
 #teamChatModal{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;justify-content:center;align-items:flex-end;z-index:220;}
 #teamChatModal.show{display:flex;}
@@ -655,8 +682,8 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
 .lbTab:not(.on):hover{border-color:#f1c40f;color:#f1c40f;}
 body.lightTheme .lbTab{background:#fff8e8;border-color:#a08060;color:#7a4e20;}
 body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;}
-/* ── Player color avatar circle ── */
-.lbAvatar{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.15);flex-shrink:0;}
+/* ── Player icon avatar circle ── */
+.lbAvatar{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.15);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;}
 
 /* v0.03 — FRIENDS SCREEN */
 #friendsScreen{justify-content:flex-start;}
@@ -5048,9 +5075,10 @@ function drawThumbQOC(){
         const onlineDot = p._online ? ' <span style="font-size:7px;color:#4caf50;">●</span>' : '';
         const t   = _lbTier(p.wins);
         const val = type==='streaks'?(p.best_streak||0)+' streak':type==='trophies'?(p.trophies||0)+' TR':(p.wins||0)+'W';
+        const playerIcon = (p.icon && p.icon.length < 8) ? p.icon : '🎭';
         row.innerHTML =
           '<span class="lbRank">'+(isFirst?'👑':'#'+p.rank)+'</span>'
-          +'<span class="lbAvatar" style="background:'+(p.color||'#3498db')+';"></span>'
+          +'<span class="lbAvatar" style="background:'+(p.color||'#3498db')+';" title="'+escapeHtml(p.name||'Player')+'">'+playerIcon+'</span>'
           +'<span style="font-size:11px;margin:0 2px;" title="'+t.name+'">'+t.icon+'</span>'
           +'<span class="lbName" style="color:'+(p.color||'#f1c40f')+'">'+escapeHtml(p.name||'Player')+onlineDot+'</span>'
           +'<span class="lbWins" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">'
@@ -5173,9 +5201,10 @@ function drawThumbQOC(){
     }catch(e){}
   }
   function frInvite(p){
-    if(!ws || ws.readyState!==1){ showToast('Not connected'); return; }
-    ws.send(JSON.stringify({type:'invite',target:p.code,event:currentEvent,mode:currentMode}));
-    showToast('Invite sent to '+p.name);
+    if(typeof sock === 'undefined' || !sock || !sock.connected){ showToast('Not connected to server'); return; }
+    // Create lobby and invite the friend
+    sock.emit('team_lobby_create', { event: currentEvent||'classic', mode: currentMode||'2v2', inviteCode: p.code });
+    showToast('Invite sent to '+p.name+'!');
   }
 
   // ── REPLAYS ──────────────────────────────────────────────────────
@@ -5617,14 +5646,18 @@ function drawThumbQOC(){
   };
   // ── v0.06 SUGGEST WALK — teammate piece selection overlay ──────────
   let _walkSelState = null;
+  let _walkSuggestTimer = null;
   window.cancelWalkSel = function(){
     const ov = document.getElementById('walkSelOverlay');
     if(ov) ov.classList.remove('show');
     _walkSelState = null;
+    clearTimeout(_walkSuggestTimer);
     const wc = document.getElementById('walkSelCanvas');
     if(wc) wc.onclick = null;
   };
-  function _drawWalkSel(board, playerColor, pickedTypes){
+
+  // ownsFunc(p, c): returns true if piece is a TEAMMATE piece (not player's own)
+  function _drawWalkSel(board, playerColor, ownsFunc){
     const cvs = document.getElementById('walkSelCanvas');
     if(!cvs || !board) return;
     const ctx = cvs.getContext('2d');
@@ -5635,24 +5668,22 @@ function drawThumbQOC(){
       ctx.fillStyle=(r+c)%2===0?'#f0d9b5':'#b58863';
       ctx.fillRect(c*SQ,r*SQ,SQ,SQ);
     }
-    // Highlight selected piece square
     if(_walkSelState && _walkSelState.selR>=0){
       ctx.fillStyle='rgba(0,150,255,.55)';
       ctx.fillRect(_walkSelState.selC*SQ,_walkSelState.selR*SQ,SQ,SQ);
     }
-    // Highlight valid destinations
     if(_walkSelState && _walkSelState.selMoves){
       _walkSelState.selMoves.forEach(m=>{
-        ctx.fillStyle='rgba(0,220,100,.45)';
+        // Light blue dots for move suggestions (not green)
+        ctx.fillStyle='rgba(66,165,245,.35)';
         ctx.fillRect(m.c*SQ,m.r*SQ,SQ,SQ);
-        ctx.fillStyle='rgba(0,220,100,.8)';
+        ctx.fillStyle='rgba(66,165,245,.9)';
         ctx.beginPath();ctx.arc(m.c*SQ+SQ/2,m.r*SQ+SQ/2,SQ*.22,0,Math.PI*2);ctx.fill();
       });
     }
     for(let r=0;r<8;r++) for(let c=0;c<8;c++){
       const p=board[r][c]; if(!p) continue;
-      const isTeammate = pickedTypes && p.c===playerColor && !window.ccPlayerOwns(p,c);
-      // Blue halo on teammate pieces
+      const isTeammate = ownsFunc && ownsFunc(p, c);
       if(isTeammate){
         ctx.fillStyle='rgba(79,195,247,.3)';
         ctx.fillRect(c*SQ,r*SQ,SQ,SQ);
@@ -5663,115 +5694,84 @@ function drawThumbQOC(){
       const px=c*SQ+SQ/2, py=r*SQ+SQ/2;
       ctx.font='bold '+(SQ*.62)+'px serif';
       ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillStyle=p.c==='w'?'rgba(0,0,0,.35)':'rgba(0,0,0,.35)';
+      ctx.fillStyle='rgba(0,0,0,.35)';
       ctx.fillText(PICO[p.t],px+1,py+2);
       ctx.fillStyle=p.c==='w'?'#fff8e0':'#1a0a00';
       ctx.strokeStyle=p.c==='w'?'#8b6508':'#e0c070';ctx.lineWidth=.5;
       ctx.fillText(PICO[p.t],px,py);ctx.strokeText(PICO[p.t],px,py);
     }
   }
-  window.suggestWalk = function(){
+
+  // Generic walk overlay for any game (CC/GTS/QOC)
+  function _openWalkOverlay(board, playerColor, ownsFunc, getMovesFunc, doMoveFunc){
     const msgEl=document.getElementById('walkSelMsg');
     const ov=document.getElementById('walkSelOverlay');
+    _walkSelState={selR:-1,selC:-1,selMoves:null};
+    if(ov) ov.classList.add('show');
+    if(msgEl) msgEl.textContent='Tap a teammate piece (blue glow)';
+    _drawWalkSel(board, playerColor, ownsFunc);
+    const wc=document.getElementById('walkSelCanvas');
+    if(!wc) return;
+    wc.onclick=function(e){
+      const rect=this.getBoundingClientRect();
+      const sc=352/rect.width;
+      const ex=(e.clientX-rect.left)*sc, ey=(e.clientY-rect.top)*sc;
+      const c=Math.floor(ex/(352/8)), r=Math.floor(ey/(352/8));
+      if(r<0||r>7||c<0||c>7) return;
+      if(_walkSelState.selMoves){
+        const mv=_walkSelState.selMoves.find(m=>m.r===r&&m.c===c);
+        if(mv){
+          const fr=_walkSelState.selR,fc=_walkSelState.selC;
+          const p=board[fr][fc];
+          window.cancelWalkSel();
+          // Send to teammate via socket, or use bot decision locally
+          if(typeof sock!=='undefined'&&sock&&sock.connected&&window._currentLobbyId){
+            sock.emit('suggest_walk',{lobbyId:window._currentLobbyId,sr:fr,sc:fc,dr:r,dc:c,piece:p?p.t:''});
+            showToast('Walk suggested! Waiting…');
+            // 5s timeout on suggester side
+            _walkSuggestTimer = setTimeout(()=>{ showToast('⏱ Suggestion expired'); }, 5000);
+          } else {
+            const lvl=window.aiLevel?window.aiLevel('ally'):5;
+            const acc=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.65);
+            if(acc){ try{ doMoveFunc(fr,fc,r,c); }catch(e){} showToast('🤝 Teammate accepted — piece moved!'); }
+            else showToast('✕ Teammate declined the walk');
+          }
+          return;
+        }
+      }
+      const p=board[r]&&board[r][c];
+      if(p && p.c===playerColor && ownsFunc && ownsFunc(p, c)){
+        _walkSelState.selR=r;_walkSelState.selC=c;
+        try{ _walkSelState.selMoves=getMovesFunc(r,c)||[]; }catch(e){ _walkSelState.selMoves=[]; }
+        if(msgEl) msgEl.textContent=_walkSelState.selMoves.length?'Now tap where it should go':'No moves for this piece';
+        _drawWalkSel(board, playerColor, ownsFunc);
+      }
+    };
+  }
 
-    // ── TEAM MODE: suggest a move for a teammate piece ──────────────────────
+  window.suggestWalk = function(){
+    // ── CC TEAM MODE ──────────────────────────────────────────────────────
     if(window.ccPickedTypes && typeof ccRunning!=='undefined' && ccRunning && ccTurn===classicPlayerColor){
-      _walkSelState={selR:-1,selC:-1,selMoves:null};
-      if(ov) ov.classList.add('show');
-      if(msgEl) msgEl.textContent='Tap a teammate piece (blue glow)';
-      _drawWalkSel(ccBoard, classicPlayerColor, window.ccPickedTypes);
-      const wc=document.getElementById('walkSelCanvas');
-      if(wc) wc.onclick=function(e){
-        const rect=this.getBoundingClientRect();
-        const sc=352/rect.width;
-        const ex=(e.clientX-rect.left)*sc, ey=(e.clientY-rect.top)*sc;
-        const c=Math.floor(ex/(352/8)), r=Math.floor(ey/(352/8));
-        if(r<0||r>7||c<0||c>7) return;
-        if(_walkSelState.selMoves){
-          const mv=_walkSelState.selMoves.find(m=>m.r===r&&m.c===c);
-          if(mv){
-            const fr=_walkSelState.selR,fc=_walkSelState.selC;
-            const p=ccBoard[fr][fc];
-            window.cancelWalkSel();
-            if(typeof sock!=='undefined'&&sock&&sock.connected){
-              sock.emit('suggest_walk',{sr:fr,sc:fc,dr:r,dc:c,piece:p?p.t:''});
-              showToast('Walk suggested to teammate!');
-            } else {
-              const lvl=window.aiLevel?window.aiLevel('ally'):5;
-              const acc=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.65);
-              if(acc){ try{ ccDoMove(fr,fc,r,c); }catch(e){} showToast('🤝 Teammate accepted — piece moved!'); }
-              else showToast('✕ Teammate declined the walk');
-            }
-            return;
-          }
-        }
-        const p=ccBoard[r]&&ccBoard[r][c];
-        if(p && p.c===classicPlayerColor && window.ccPickedTypes && !window.ccPlayerOwns(p,c)){
-          _walkSelState.selR=r;_walkSelState.selC=c;
-          _walkSelState.selMoves=ccLegal(r,c);
-          if(msgEl) msgEl.textContent='Now tap where it should go';
-          _drawWalkSel(ccBoard,classicPlayerColor,window.ccPickedTypes);
-        }
-      };
+      const ownsFunc=(p,_c)=> p.c===classicPlayerColor && !window.ccPlayerOwns(p,_c);
+      _openWalkOverlay(ccBoard, classicPlayerColor, ownsFunc, ccLegal, ccDoMove);
       return;
     }
-
-    // ── 1v1 CLASSIC CHESS: suggest a move for the enemy piece ──────────────
-    if(typeof ccRunning!=='undefined' && ccRunning){
-      _walkSelState={selR:-1,selC:-1,selMoves:null};
-      if(ov) ov.classList.add('show');
-      if(msgEl) msgEl.textContent='Pick any piece and suggest its next move';
-      _drawWalkSel(ccBoard, classicPlayerColor, null);
-      const wc=document.getElementById('walkSelCanvas');
-      if(wc) wc.onclick=function(e){
-        const rect=this.getBoundingClientRect();
-        const sc=352/rect.width;
-        const ex=(e.clientX-rect.left)*sc, ey=(e.clientY-rect.top)*sc;
-        const c=Math.floor(ex/(352/8)), r=Math.floor(ey/(352/8));
-        if(r<0||r>7||c<0||c>7) return;
-        if(_walkSelState.selMoves && _walkSelState.selMoves.length){
-          const mv=_walkSelState.selMoves.find(m=>m.r===r&&m.c===c);
-          if(mv){
-            const fr=_walkSelState.selR,fc=_walkSelState.selC;
-            window.cancelWalkSel();
-            const lvl=window.aiLevel?window.aiLevel('enemy'):5;
-            const acc=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.6);
-            if(acc){ try{ ccDoMove(fr,fc,r,c); }catch(e){} showToast('🤝 Walk accepted — piece moved!'); }
-            else showToast('✕ AI declined the walk suggestion');
-            return;
-          }
-        }
-        const p=ccBoard[r]&&ccBoard[r][c];
-        if(p){
-          _walkSelState.selR=r;_walkSelState.selC=c;
-          try{ _walkSelState.selMoves=ccLegal(r,c)||[]; }catch(e){ _walkSelState.selMoves=[]; }
-          if(msgEl) msgEl.textContent=_walkSelState.selMoves.length?'Tap where it should go':'No legal moves for this piece';
-          _drawWalkSel(ccBoard,classicPlayerColor,null);
-        }
-      };
+    // ── GTS TEAM MODE ─────────────────────────────────────────────────────
+    if(window.gtsPickedTypes && typeof gtsRunning!=='undefined' && gtsRunning && gtsTurn===(window.gtsPlayerColor||'w')){
+      const pc=window.gtsPlayerColor||'w';
+      const ownsFunc=(p,_c)=> p.c===pc && !window.gtsPlayerOwns(p,_c);
+      _openWalkOverlay(gtsBoard, pc, ownsFunc, gtsGetMoves, gtsDoMove);
       return;
     }
-
-    // ── GTS: suggest a move for any piece ─────────────────────────────────
-    if(typeof gtsRunning!=='undefined' && gtsRunning){
-      const lvl=window.aiLevel?window.aiLevel('enemy'):5;
-      const acc=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.55);
-      showToast(acc?'🤝 GTS bot accepted the walk!':'✕ GTS bot declined the walk');
+    // ── QOC TEAM MODE ─────────────────────────────────────────────────────
+    if(window.qocSlotsActive && typeof qocRunning!=='undefined' && qocRunning && qocTurn===(window.qocPlayerColor||'w')){
+      const pc=window.qocPlayerColor||'w';
+      const ownsFunc=(p,_c)=> p.c===pc && !window.qocPlayerOwns(p);
+      _openWalkOverlay(qocBoard, pc, ownsFunc, qocGetMoves, qocDoMove);
       return;
     }
-
-    // ── LPS: suggest a pause break ─────────────────────────────────────────
-    if(typeof lpsRunning!=='undefined' && lpsRunning){
-      const lvl=window.aiLevel?window.aiLevel('enemy'):5;
-      const acc=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.5);
-      showToast(acc?'🤝 LPS opponents paused!':'✕ Nobody wants to walk right now');
-      return;
-    }
-
-    // ── Fallback ───────────────────────────────────────────────────────────
-    const lvl=window.aiLevel?window.aiLevel('enemy'):5;
-    const accepted=window.botWalkDecision?window.botWalkDecision(lvl):(Math.random()<0.6);
-    showToast(accepted?'🤝 Walk accepted!':'✕ Walk declined');
+    // ── Not in a valid team game ───────────────────────────────────────────
+    showToast('Suggest Walk is only available in 2v2/4v4 matches');
   };
 
   // ── SOCKET.IO CLIENT (v0.04) ───────────────────────────────────
@@ -5847,10 +5847,81 @@ function drawThumbQOC(){
       sock.on('match_state',(m)=>{ try{ window.onMatchState && window.onMatchState(m); }catch(e){} });
       sock.on('match_event',(m)=>{ try{ window.onMatchEvent && window.onMatchEvent(m); }catch(e){} });
       sock.on('player_left',(m)=> showToast('Player left ('+m.reason+')'));
-      sock.on('suggest_walk',(m)=>{ try{ openWalkModal && openWalkModal(m); }catch(e){} });
-      sock.on('suggest_walk_response',(m)=> showToast('Walk '+(m.accepted?'accepted':'declined')+(m.ai?' (bot)':'')));
       sock.on('friend_invite',(m)=>{ if(window.showInvite){ window.showInvite(m.fromName,m.event,m.mode,m.from||m.fromCode); } else { showToast((m.fromName||'Friend')+' invites you to '+m.event+' '+m.mode); } try{ window._csNotifFire && window._csNotifFire('⚔️ Team Invite!', (m.fromName||'A friend')+' invites you to '+m.event+' '+m.mode,'invite'); }catch(e){} });
-      sock.on('friend_invite_response',(m)=> showToast('Invite '+(m.accepted?'accepted':'declined')));
+      sock.on('friend_invite_response',(m)=>{ if(m.accepted){ showToast((m.fromName||'Friend')+' accepted your invite!'); } else { showToast('Invite declined'); } });
+
+      // ── Team lobby events ─────────────────────────────────────────────
+      sock.on('team_lobby_invite',(m)=>{
+        // Invitee receives a lobby invite with lobbyId
+        if(window.showInvite){ window.showInvite(m.fromName, m.event, m.mode, m.fromCode, m.lobbyId); }
+        else { showToast((m.fromName||'Friend')+' invites you to '+m.event+' '+m.mode); }
+        try{ window._csNotifFire && window._csNotifFire('⚔️ Team Invite!', (m.fromName||'Friend')+' wants to team up!', 'invite'); }catch(e){}
+      });
+      sock.on('team_lobby_created',(m)=>{
+        window._currentLobbyId = m.lobbyId;
+        window.openTeamLobby && window.openTeamLobby(m);
+        showToast('Lobby created — waiting for teammate…');
+      });
+      sock.on('team_lobby_update',(m)=>{
+        window._currentLobbyId = window._currentLobbyId || m.lobbyId;
+        window.updateTeamLobby && window.updateTeamLobby(m);
+      });
+      sock.on('team_lobby_ready_update',(m)=>{
+        window.updateTeamLobbyReady && window.updateTeamLobbyReady(m);
+      });
+      sock.on('team_lobby_start',(m)=>{
+        window._currentLobbyId = m.lobbyId;
+        window.closeTeamLobby && window.closeTeamLobby();
+        currentEvent = m.event || 'classic';
+        window.currentMode = m.mode || '2v2';
+        showToast('Starting '+m.event+' '+m.mode+'!');
+        setTimeout(()=>{ try{ startSelectedEvent(); }catch(e){} }, 400);
+      });
+      sock.on('team_lobby_error',(m)=>{ showToast('Lobby: '+(m.msg||'Error')); });
+      // Move relay for team games
+      sock.on('team_move',(m)=>{
+        try{ window.onTeamMove && window.onTeamMove(m); }catch(e){}
+      });
+      // Walk suggestion with 5s response window
+      sock.on('suggest_walk',(m)=>{
+        try{
+          const resp = window.confirm ? null : null; // use custom modal below
+          window._pendingWalkSuggestion = m;
+          const accept = ()=>{
+            clearTimeout(window._walkExpireTimer);
+            window._pendingWalkSuggestion = null;
+            if(m.fromCode && window._currentLobbyId){
+              sock.emit('suggest_walk_response',{lobbyId:window._currentLobbyId,accepted:true,fromCode:m.fromCode});
+            }
+            // Apply the move on this client
+            try{
+              if(typeof ccRunning!=='undefined'&&ccRunning){ ccDoMove(m.sr,m.sc,m.dr,m.dc); }
+              else if(typeof gtsRunning!=='undefined'&&gtsRunning){ gtsDoMove(m.sr,m.sc,m.dr,m.dc); }
+              else if(typeof qocRunning!=='undefined'&&qocRunning){ qocDoMove(m.sr,m.sc,m.dr,m.dc); }
+            }catch(e){}
+            showToast('🤝 Walk accepted!');
+          };
+          const decline = ()=>{
+            clearTimeout(window._walkExpireTimer);
+            window._pendingWalkSuggestion = null;
+            if(m.fromCode && window._currentLobbyId){
+              sock.emit('suggest_walk_response',{lobbyId:window._currentLobbyId,accepted:false,fromCode:m.fromCode});
+            }
+            showToast('✕ Walk suggestion declined');
+          };
+          // Show walk modal
+          if(window.openWalkModal){ openWalkModal({...m, onAccept:accept, onDecline:decline}); }
+          else { showToast('Teammate suggests a move — tap walk button to respond'); }
+          window._walkExpireTimer = setTimeout(()=>{
+            if(window._pendingWalkSuggestion){ decline(); showToast('⏱ Walk suggestion expired'); }
+          }, 5000);
+        }catch(e){}
+      });
+      sock.on('suggest_walk_response',(m)=>{
+        clearTimeout(_walkSuggestTimer);
+        if(m.accepted) showToast('🤝 Teammate accepted your walk!');
+        else showToast('✕ Teammate declined the walk suggestion');
+      });
     }catch(e){
       console.warn('socket.io connect failed', e);
       setServerStatus(false);
@@ -6040,12 +6111,17 @@ function drawThumbQOC(){
   };
 
   // ── PIECE LOCK STATE ──
-  const PIECE_UNLOCK_WINS = { P:0, R:5, N:10, B:15, Q:25, K:50 };
+  // Queen requires 100W and is chained with King (King must be unlocked first at 50W)
+  const PIECE_UNLOCK_WINS = { P:0, R:5, N:10, B:15, K:50, Q:100 };
   window.getUnlockedPieces = function(){
     const wins = window.totalWins || 0;
     return Object.keys(PIECE_UNLOCK_WINS).filter(k => wins >= PIECE_UNLOCK_WINS[k]);
   };
-  window.isPieceUnlocked = function(t){ return (window.totalWins||0) >= (PIECE_UNLOCK_WINS[t]||0); };
+  window.isPieceUnlocked = function(t){
+    const wins = window.totalWins || 0;
+    if(t==='Q') return wins >= 100; // Queen needs 100W AND King must be unlocked
+    return wins >= (PIECE_UNLOCK_WINS[t] || 0);
+  };
   window.refreshPieceLocks = function(){
     const wins = window.totalWins || 0;
     let count = 0;
@@ -6189,8 +6265,9 @@ function drawThumbQOC(){
       }, 380);
     }, thinkMs);
   }
-  // Hook AI in by wrapping ccEndMove
-  if(typeof window.ccEndMove === 'undefined' && typeof ccEndMove === 'function'){
+  // Hook AI in by wrapping ccEndMove (use flag so we don't double-hook)
+  if(!window._ccAiHooked && typeof ccEndMove === 'function'){
+    window._ccAiHooked = true;
     const _origCcEndMove = ccEndMove;
     window.ccEndMove = function(){
       _origCcEndMove();
@@ -6606,6 +6683,18 @@ function drawThumbQOC(){
   if(_origStart){
     window.startSelectedEvent = function(){
       const mode = window.currentMode || '1v1';
+
+      // ── Piece requirement gate (1v1 only) ──────────────────────────────
+      if(mode === '1v1'){
+        const REQUIRED = { classic:['P','R','N','B','Q','K'], gts:['P','R','N','B','Q'], qoc:['P'], lps:[] };
+        const NAMES    = { P:'Pawn', R:'Rook', N:'Knight', B:'Bishop', Q:'Queen', K:'King' };
+        const missing  = (REQUIRED[currentEvent]||[]).filter(t=>!window.isPieceUnlocked(t));
+        if(missing.length){
+          showToast('🔒 Unlock '+missing.map(t=>NAMES[t]).join(', ')+' to play '+currentEvent.toUpperCase());
+          return;
+        }
+      }
+
       // Reset all ownership state — anything set below applies only to this match
       window.ccPickedTypes = null;
       window.ccPickedFiles = null;
@@ -6668,12 +6757,12 @@ function drawThumbQOC(){
 
   // ── INVITATION POPUP ──
   let pendingInvite = null;
-  window.showInvite = function(fromName, event, mode, fromCode){
-    pendingInvite = { fromName, event, mode, fromCode };
+  window.showInvite = function(fromName, event, mode, fromCode, lobbyId){
+    pendingInvite = { fromName, event, mode, fromCode, lobbyId };
     document.getElementById('inviteFromName').textContent = fromName || 'Friend';
     const labels = { lps:'Last Piece Standing', classic:'Classic Chess', qoc:'Queens On Color', gts:'Grind The Safe' };
-    document.getElementById('inviteEvent').textContent = labels[event] || event || 'Last Piece Standing';
-    document.getElementById('inviteMode').textContent = (mode || '1v1').toUpperCase();
+    document.getElementById('inviteEvent').textContent = labels[event] || event || 'Classic Chess';
+    document.getElementById('inviteMode').textContent = (mode || '2v2').toUpperCase();
     document.getElementById('inviteModal').classList.add('show');
   };
   window.inviteRespond = function(accept){
@@ -6681,12 +6770,16 @@ function drawThumbQOC(){
     if(!pendingInvite){ return; }
     const inv = pendingInvite; pendingInvite = null;
     if(accept){
-      currentEvent = inv.event || 'lps';
-      window.currentMode = inv.mode || '1v1';
-      try{ window.netSend && window.netSend('invite_accept', { from: inv.fromCode }); }catch(e){}
-      showToast('Joining match…');
-      // Trigger the game start the usual way
-      try{ startSelectedEvent(); }catch(e){}
+      currentEvent = inv.event || 'classic';
+      window.currentMode = inv.mode || '2v2';
+      if(inv.lobbyId){
+        // Join the lobby room the inviter already created
+        try{ window.netSend && window.netSend('team_lobby_join', { lobbyId: inv.lobbyId }); }catch(e){}
+      } else {
+        try{ window.netSend && window.netSend('invite_accept', { from: inv.fromCode }); }catch(e){}
+        showToast('Joining match…');
+        try{ startSelectedEvent(); }catch(e){}
+      }
     } else {
       try{ window.netSend && window.netSend('invite_decline', { from: inv.fromCode }); }catch(e){}
       showToast('Invite declined');
@@ -6712,6 +6805,103 @@ function drawThumbQOC(){
       };
     }
   } catch(e){}
+
+  // ── TEAM LOBBY JS ──────────────────────────────────────────────────
+  let _tlState = { event:'classic', mode:'2v2', isHost:false, players:[], readyCount:0 };
+
+  window.openTeamLobby = function(m){
+    _tlState.event = m.event || 'classic';
+    _tlState.mode  = m.mode  || '2v2';
+    _tlState.isHost = true;
+    _tlState.players = m.players || [];
+    _tlState.readyCount = 0;
+    document.getElementById('teamLobbyModal').classList.add('show');
+    _tlRender();
+  };
+  window.updateTeamLobby = function(m){
+    _tlState.event   = m.event || _tlState.event;
+    _tlState.mode    = m.mode  || _tlState.mode;
+    _tlState.isHost  = (m.hostCode === myCode);
+    _tlState.players = m.players || _tlState.players;
+    _tlState.readyCount = 0;
+    document.getElementById('teamLobbyModal').classList.add('show');
+    _tlRender();
+  };
+  window.updateTeamLobbyReady = function(m){
+    _tlState.readyCount = m.readyCount || 0;
+    const stat = document.getElementById('teamLobbyStatus');
+    if(stat) stat.textContent = 'Ready: '+m.readyCount+'/'+m.total+' — waiting…';
+  };
+  window.closeTeamLobby = function(){
+    document.getElementById('teamLobbyModal').classList.remove('show');
+    window._currentLobbyId = null;
+    _tlState = { event:'classic', mode:'2v2', isHost:false, players:[], readyCount:0 };
+  };
+
+  function _tlRender(){
+    // Players
+    const pb = document.getElementById('teamLobbyPlayers');
+    if(pb){
+      pb.innerHTML = _tlState.players.map(p=>{
+        const icon = (p.icon && p.icon.length < 8) ? p.icon : '🎭';
+        const isHost = _tlState.isHost && p.code === myCode;
+        return '<div class="tlPlayer">'
+          +'<div class="tlPlayerIco">'+icon+'</div>'
+          +'<div class="tlPlayerName">'+escapeHtml(p.name||'Player')+(isHost?' <span class="tlPlayerHost">HOST</span>':'')+'</div>'
+          +'<div class="tlPlayerWaiting">●</div>'
+          +'</div>';
+      }).join('');
+      if(_tlState.players.length < 2){
+        pb.innerHTML += '<div class="tlPlayer" style="border-style:dashed;opacity:.5;"><div class="tlPlayerIco">?</div><div class="tlPlayerName" style="color:#5d4037;">Waiting for teammate…</div></div>';
+      }
+    }
+    // Event buttons
+    document.querySelectorAll('.tlEvBtn').forEach(b=>{
+      b.classList.toggle('on', b.dataset.ev === _tlState.event);
+      b.disabled = !_tlState.isHost;
+      b.style.opacity = _tlState.isHost ? '1' : '0.5';
+    });
+    // Mode buttons
+    document.querySelectorAll('.tlModeBtn').forEach(b=>{
+      b.classList.toggle('on', b.dataset.mode === _tlState.mode);
+      b.disabled = !_tlState.isHost;
+      b.style.opacity = _tlState.isHost ? '1' : '0.5';
+    });
+    // Event row visibility
+    const evRow = document.getElementById('teamLobbyEventRow');
+    if(evRow) evRow.style.display = 'flex';
+    // Status
+    const stat = document.getElementById('teamLobbyStatus');
+    if(stat) stat.textContent = _tlState.players.length < 2 ? 'Waiting for players to join…' : 'All players joined! Press PLAY when ready.';
+    // Lobby code
+    const codeEl = document.getElementById('teamLobbyCode');
+    if(codeEl && window._currentLobbyId) codeEl.textContent = 'Lobby: '+window._currentLobbyId;
+  }
+
+  window.tlSetEvent = function(ev){
+    if(!_tlState.isHost) return;
+    _tlState.event = ev;
+    _tlRender();
+    if(window._currentLobbyId) window.netSend('team_lobby_set_event',{lobbyId:window._currentLobbyId, event:ev, mode:_tlState.mode});
+  };
+  window.tlSetMode = function(md){
+    if(!_tlState.isHost) return;
+    _tlState.mode = md;
+    _tlRender();
+    if(window._currentLobbyId) window.netSend('team_lobby_set_event',{lobbyId:window._currentLobbyId, event:_tlState.event, mode:md});
+  };
+  window.tlReady = function(){
+    if(!window._currentLobbyId) return;
+    const btn = document.getElementById('teamLobbyPlay');
+    if(btn){ btn.classList.add('ready-on'); btn.disabled=true; btn.textContent='✔ READY'; }
+    window.netSend('team_lobby_ready', { lobbyId:window._currentLobbyId });
+    const stat = document.getElementById('teamLobbyStatus');
+    if(stat) stat.textContent = 'You are ready! Waiting for others…';
+  };
+  window.tlLeave = function(){
+    if(window._currentLobbyId) window.netSend('team_lobby_leave',{lobbyId:window._currentLobbyId});
+    window.closeTeamLobby();
+  };
 
   // ── TEAM CHAT (text + emoji) ──
   let chatLog = [];
@@ -6904,6 +7094,8 @@ function drawThumbQOC(){
     function _autoMove(){
       try{
         const _teamMode = window.currentMode==='2v2'||window.currentMode==='4v4';
+        // Auto-move only applies in team modes (prevents random moves in 1v1)
+        if(!_teamMode){ _resetTimer(); return; }
         // Classic chess — use correct variable names ccRunning/ccTurn (NOT classicRunning/classicTurn)
         if(typeof ccRunning!=='undefined' && ccRunning && typeof ccTurn!=='undefined'){
           const pc = typeof classicPlayerColor!=='undefined' ? classicPlayerColor : 'w';
@@ -7840,6 +8032,35 @@ body.lightTheme .v08FrStat .v08FrVal { color:#1976d2; }
     <div class="v08FrStat"><span class="v08FrLbl">BEST STREAK</span><span class="v08FrVal" id="v08FrProfStreak">—</span></div>
     <div class="v08FrStat"><span class="v08FrLbl">STATUS</span><span class="v08FrVal" id="v08FrProfStatus">—</span></div>
     <button id="v08FrProfClose" onclick="v08CloseFrProfile()">CLOSE</button>
+  </div>
+</div>
+
+<!-- v0.08 TEAM LOBBY -->
+<div id="teamLobbyModal">
+  <div id="teamLobbyInner">
+    <div id="teamLobbyTitle">⚔ TEAM LOBBY</div>
+    <div id="teamLobbyPlayers"></div>
+    <div id="teamLobbyEventRow">
+      <div class="tlEvLabel">EVENT (HOST PICKS)</div>
+      <div id="teamLobbyEvPicker">
+        <button class="tlEvBtn on" data-ev="classic" onclick="tlSetEvent('classic')">♟ CLASSIC</button>
+        <button class="tlEvBtn" data-ev="gts" onclick="tlSetEvent('gts')">🛡 GRIND SAFE</button>
+        <button class="tlEvBtn" data-ev="qoc" onclick="tlSetEvent('qoc')">♛ QUEENS</button>
+        <button class="tlEvBtn" data-ev="lps" onclick="tlSetEvent('lps')">🏁 LAST PIECE</button>
+      </div>
+      <div class="tlEvLabel" style="margin-top:4px;">MODE</div>
+      <div id="teamLobbyModePicker">
+        <button class="tlModeBtn" data-mode="1v1" onclick="tlSetMode('1v1')">1v1</button>
+        <button class="tlModeBtn on" data-mode="2v2" onclick="tlSetMode('2v2')">2v2</button>
+        <button class="tlModeBtn" data-mode="4v4" onclick="tlSetMode('4v4')">4v4</button>
+      </div>
+    </div>
+    <div id="teamLobbyStatus">Waiting for players…</div>
+    <div id="teamLobbyCode"></div>
+    <div id="teamLobbyBtns">
+      <button id="teamLobbyLeave" onclick="tlLeave()">✕ LEAVE</button>
+      <button id="teamLobbyPlay" onclick="tlReady()">▶ PLAY</button>
+    </div>
   </div>
 </div>
 

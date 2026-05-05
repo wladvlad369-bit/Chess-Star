@@ -1,8 +1,21 @@
 const path = require("path");
 const express = require("express");
+const http  = require("http");
+const { Server: IOServer } = require("socket.io");
 
 const app = express();
+const httpServer = http.createServer(app);
+const io = new IOServer(httpServer, {
+  path: "/api/socket",
+  cors: { origin: "*" },
+  transports: ["websocket", "polling"],
+});
 const PORT = process.env.PORT || 8080;
+
+// ── In-memory real-time state ────────────────────────────────────────────────
+const onlineSockets = new Map();   // code → socketId
+const socketToCode  = new Map();   // socketId → code
+const lobbies       = new Map();   // lobbyId → { players, event, mode, ready, hostCode }
 const APP_VERSION = "v0.08";
 
 app.use(express.json({ limit: "1mb" }));
@@ -495,6 +508,7 @@ app.get("/api/leaderboard", async (req, res, next) => {
         code: a.code,
         name: a.name,
         color: a.color,
+        icon: a.icon || "",
         wins: a.wins,
         streak: a.streak || 0,
         best_streak: a.best_streak || 0,
@@ -502,6 +516,150 @@ app.get("/api/leaderboard", async (req, res, next) => {
       })),
     });
   } catch (e) { next(e); }
+});
+
+// ── Socket.IO ────────────────────────────────────────────────────────────────
+io.on("connection", (sock) => {
+  let myCode = null;
+
+  sock.on("auth", async ({ code }) => {
+    try {
+      const c = normalizeCode(code || "");
+      const a = await storage.get(c);
+      if (!a) { sock.emit("auth_failed"); return; }
+      myCode = c;
+      socketToCode.set(sock.id, c);
+      onlineSockets.set(c, sock.id);
+      await touch(a);
+      sock.emit("auth_ok", { account: { code: a.code, name: a.name, color: a.color, icon: a.icon || "", wins: a.wins, best_streak: a.best_streak || 0, trophies: a.trophies || 0 } });
+      Array.from(a.friends).forEach(fc => {
+        const fid = onlineSockets.get(fc); if (fid) io.to(fid).emit("friend_presence");
+      });
+    } catch(e) {}
+  });
+
+  // ── Friend invite ──────────────────────────────────────────────────────────
+  sock.on("friend_invite", async ({ target, event, mode }) => {
+    if (!myCode) return;
+    const a = await storage.get(myCode).catch(() => null);
+    const tid = onlineSockets.get(normalizeCode(target || ""));
+    if (!tid) { sock.emit("friend_invite_response", { accepted: false }); return; }
+    io.to(tid).emit("friend_invite", { fromCode: myCode, fromName: a ? a.name : "Friend", event: event || "classic", mode: mode || "2v2" });
+  });
+
+  sock.on("invite_accept", async ({ from }) => {
+    if (!myCode) return;
+    const a = await storage.get(myCode).catch(() => null);
+    const fid = onlineSockets.get(normalizeCode(from || ""));
+    if (fid) io.to(fid).emit("friend_invite_response", { accepted: true, fromCode: myCode, fromName: a ? a.name : "Friend" });
+  });
+
+  sock.on("invite_decline", async ({ from }) => {
+    if (!myCode) return;
+    const a = await storage.get(myCode).catch(() => null);
+    const fid = onlineSockets.get(normalizeCode(from || ""));
+    if (fid) io.to(fid).emit("friend_invite_response", { accepted: false, fromCode: myCode, fromName: a ? a.name : "Friend" });
+  });
+
+  // ── Team lobby ─────────────────────────────────────────────────────────────
+  function _pubPlayers(lobby) { return lobby.players.map(p => ({ code: p.code, name: p.name, icon: p.icon })); }
+
+  sock.on("team_lobby_create", async ({ event, mode, inviteCode }) => {
+    if (!myCode) return;
+    const a = await storage.get(myCode).catch(() => null);
+    const lid = Math.random().toString(36).substr(2, 8).toUpperCase();
+    const me = { code: myCode, name: a ? a.name : "Player", icon: a ? (a.icon || "🎭") : "🎭", sockId: sock.id };
+    lobbies.set(lid, { players: [me], event: event || "classic", mode: mode || "2v2", ready: new Set(), hostCode: myCode });
+    sock.join("lobby_" + lid);
+    sock.emit("team_lobby_created", { lobbyId: lid, players: _pubPlayers(lobbies.get(lid)), event: event || "classic", mode: mode || "2v2" });
+    // Also send lobby invite to inviteCode if provided
+    if (inviteCode) {
+      const tid = onlineSockets.get(normalizeCode(inviteCode));
+      if (tid) io.to(tid).emit("team_lobby_invite", { lobbyId: lid, fromCode: myCode, fromName: me.name, event: event || "classic", mode: mode || "2v2" });
+    }
+  });
+
+  sock.on("team_lobby_join", async ({ lobbyId }) => {
+    if (!myCode) return;
+    const lobby = lobbies.get(lobbyId);
+    if (!lobby) { sock.emit("team_lobby_error", { msg: "Lobby not found" }); return; }
+    if (lobby.players.length >= 4) { sock.emit("team_lobby_error", { msg: "Lobby full" }); return; }
+    const a = await storage.get(myCode).catch(() => null);
+    if (!lobby.players.find(p => p.code === myCode)) {
+      lobby.players.push({ code: myCode, name: a ? a.name : "Player", icon: a ? (a.icon || "🎭") : "🎭", sockId: sock.id });
+    }
+    sock.join("lobby_" + lobbyId);
+    io.to("lobby_" + lobbyId).emit("team_lobby_update", { players: _pubPlayers(lobby), event: lobby.event, mode: lobby.mode, hostCode: lobby.hostCode });
+  });
+
+  sock.on("team_lobby_set_event", ({ lobbyId, event, mode }) => {
+    if (!myCode) return;
+    const lobby = lobbies.get(lobbyId);
+    if (!lobby || lobby.hostCode !== myCode) return;
+    lobby.event = event || "classic";
+    lobby.mode  = mode  || "2v2";
+    lobby.ready = new Set();
+    io.to("lobby_" + lobbyId).emit("team_lobby_update", { players: _pubPlayers(lobby), event: lobby.event, mode: lobby.mode, hostCode: lobby.hostCode });
+  });
+
+  sock.on("team_lobby_ready", ({ lobbyId }) => {
+    if (!myCode) return;
+    const lobby = lobbies.get(lobbyId);
+    if (!lobby) return;
+    lobby.ready.add(myCode);
+    if (lobby.ready.size >= lobby.players.length && lobby.players.length >= 2) {
+      io.to("lobby_" + lobbyId).emit("team_lobby_start", { event: lobby.event, mode: lobby.mode, lobbyId, players: _pubPlayers(lobby) });
+      lobbies.delete(lobbyId);
+    } else {
+      io.to("lobby_" + lobbyId).emit("team_lobby_ready_update", { readyCount: lobby.ready.size, total: lobby.players.length });
+    }
+  });
+
+  sock.on("team_lobby_leave", ({ lobbyId }) => {
+    const lobby = lobbies.get(lobbyId);
+    if (lobby) {
+      lobby.players = lobby.players.filter(p => p.code !== myCode);
+      lobby.ready.delete(myCode);
+      sock.leave("lobby_" + lobbyId);
+      if (!lobby.players.length) lobbies.delete(lobbyId);
+      else io.to("lobby_" + lobbyId).emit("team_lobby_update", { players: _pubPlayers(lobby), event: lobby.event, mode: lobby.mode, hostCode: lobby.hostCode });
+    }
+  });
+
+  // ── Team move relay ────────────────────────────────────────────────────────
+  sock.on("team_move", ({ lobbyId, move }) => {
+    if (!myCode) return;
+    sock.to("lobby_" + lobbyId).emit("team_move", { move, fromCode: myCode });
+  });
+
+  // ── Suggest-walk relay ─────────────────────────────────────────────────────
+  sock.on("suggest_walk", (data) => {
+    if (!myCode) return;
+    Array.from(sock.rooms).filter(r => r.startsWith("lobby_")).forEach(room => {
+      sock.to(room).emit("suggest_walk", { ...data, fromCode: myCode });
+    });
+  });
+
+  sock.on("suggest_walk_response", (data) => {
+    if (!myCode) return;
+    Array.from(sock.rooms).filter(r => r.startsWith("lobby_")).forEach(room => {
+      sock.to(room).emit("suggest_walk_response", { ...data, fromCode: myCode });
+    });
+  });
+
+  // ── Disconnect cleanup ─────────────────────────────────────────────────────
+  sock.on("disconnect", () => {
+    if (!myCode) return;
+    onlineSockets.delete(myCode);
+    socketToCode.delete(sock.id);
+    for (const [lid, lobby] of lobbies) {
+      if (!lobby.players.find(p => p.code === myCode)) continue;
+      lobby.players = lobby.players.filter(p => p.code !== myCode);
+      lobby.ready.delete(myCode);
+      if (!lobby.players.length) { lobbies.delete(lid); continue; }
+      io.to("lobby_" + lid).emit("team_lobby_update", { players: _pubPlayers(lobby), event: lobby.event, mode: lobby.mode, hostCode: lobby.hostCode });
+    }
+  });
 });
 
 // SPA fallback
@@ -519,7 +677,7 @@ app.use((err, _req, res, _next) => {
     console.error("[storage] init failed:", e.message);
     console.error("[storage] continuing anyway — some routes may fail");
   }
-  app.listen(PORT, "0.0.0.0", () => {
+  httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`Chess Star ${APP_VERSION} listening on http://0.0.0.0:${PORT} (storage: ${storage.name})`);
   });
 })();
