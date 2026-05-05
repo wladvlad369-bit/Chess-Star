@@ -18,23 +18,33 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .screen.active{display:flex;}
 
 /* MENU */
-#menuScreen{justify-content:center;}
+#menuScreen{justify-content:flex-start;}
 #menuBg{position:absolute;inset:0;width:100%;height:100%;}
-#titleBlock{position:absolute;top:36%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:5;pointer-events:none;}
-#titleBlock h1{font-size:34px;font-weight:900;letter-spacing:4px;color:#f1c40f;text-shadow:0 0 25px rgba(241,196,15,.7),3px 3px 0 #3e1a00;font-family:'Georgia',serif;}
-#titleBlock p{color:#c8a060;font-size:10px;letter-spacing:3px;margin-top:6px;}
-/* v0.05 — Profile button moved to TOP-LEFT corner, side by side with milestone bars */
-#profileBox{position:absolute;top:8px;left:8px;display:flex;flex-direction:column;align-items:center;gap:2px;z-index:20;cursor:pointer;width:50px;}
-#profileBox #iconBox{width:36px;height:36px;font-size:20px;}
-#profileBox #pName{font-size:9px;letter-spacing:0;}
+#titleBlock{display:none!important;}
+/* ── NEW MENU LAYOUT ── */
+/* TOP ROW (milestoneRow repurposed as full top bar) */
+#milestoneRow{position:absolute;top:0;left:0;right:0;height:60px;display:flex;align-items:center;gap:4px;z-index:19;padding:5px 6px 5px 5px;background:rgba(8,3,0,.92);border-bottom:2px solid #3e2723;box-shadow:0 3px 12px rgba(0,0,0,.6);}
+/* Profile in top row */
+#profileBox{position:static;width:auto;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;}
+#profileBox #iconBox{width:34px;height:34px;font-size:18px;}
+#profileBox #pName{font-size:7px;letter-spacing:0;max-width:40px;}
 #profileBox #pSub{display:none;}
 #profileBox #serverBadgeMini{display:none;}
 #iconBox{width:44px;height:44px;border:2px solid #5d4037;border-radius:6px;background:#1a0800;display:flex;align-items:center;justify-content:center;font-size:20px;transition:border-color .2s;}
 #iconBox:hover{border-color:#f1c40f;}
 #pName{font-size:11px;font-weight:bold;text-shadow:1px 1px 3px #000;text-align:center;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #pSub{display:none;}
-/* v0.05 — Settings button TOP-RIGHT corner, smaller */
-#settingsBtn{position:absolute;top:8px;right:8px;width:44px;height:44px;border:2px solid #5d4037;border-radius:7px;background:#1a0800;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;transition:border-color .2s,transform .25s;}
+/* Stats area between profile and settings */
+#menuStatsArea{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;padding:0 4px;}
+#menuStatsArea .msBtn{flex:none;padding:2px 5px 2px 4px;min-height:0;}
+#menuStatsArea .msIco{font-size:14px;}
+#menuStatsArea .msTrack{height:9px;}
+#menuStatsArea .msLbl{font-size:7px;}
+.msReward{font-size:6px;color:#5d4037;letter-spacing:.5px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.msBtn.claimable .msReward{color:#f1c40f;}
+.msDiamond{position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:8px;color:#f1c40f;z-index:3;line-height:1;filter:drop-shadow(0 0 3px rgba(241,196,15,.8));pointer-events:none;}
+/* Settings in top row — smaller */
+#settingsBtn{position:static;width:32px;height:32px;flex-shrink:0;border:2px solid #5d4037;border-radius:7px;background:#1a0800;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,transform .25s;}
 #settingsBtn:hover{border-color:#f1c40f;}
 #settingsBtn.spin svg{animation:gearSpin .6s linear;}
 @keyframes gearSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
@@ -43,19 +53,43 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 #connBars .bar.on{background:#4caf50;}
 #connBars .bar.med{background:#f1c40f;}
 #connBars .bar.bad{background:#e74c3c;}
-#fpsLbl{position:absolute;top:34px;right:62px;font-size:8px;color:#666;letter-spacing:1px;z-index:20;pointer-events:none;}
+#fpsLbl{display:none;}
 .infoBtn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#1976d2;color:#fff;font-size:11px;font-weight:bold;font-family:Georgia,serif;border:1px solid #0d47a1;cursor:pointer;font-style:italic;transition:transform .15s,background .15s;}
 .infoBtn:hover{background:#42a5f5;transform:scale(1.1);}
-#piecesBtn{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:52px;height:52px;border:2px solid #5d4037;border-radius:8px;background:#1a0800;cursor:pointer;z-index:20;display:flex;align-items:center;justify-content:center;transition:border-color .2s;}
-#piecesBtn:hover{border-color:#f1c40f;}
-#menuBottom{position:absolute;bottom:20px;left:12px;right:12px;display:flex;align-items:center;gap:8px;z-index:20;}
-#eventsBtn{cursor:pointer;flex:1;min-width:0;}
-#eventsBtnInner{background:rgba(10,4,0,.92);border:2px solid #000;outline:2px solid #3e1a00;border-radius:10px;padding:10px 12px;transition:border-color .2s;}
-#eventsBtn:hover #eventsBtnInner{border-color:#f1c40f;}
-#evLabel{font-size:9px;color:#4caf50;letter-spacing:2px;font-weight:bold;}
-#evName{font-size:11px;color:#f1c40f;font-weight:bold;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#evArrow{font-size:8px;color:#666;margin-top:2px;}
-#startBtn{width:62px;height:62px;flex-shrink:0;border-radius:12px;border:2px solid #1565c0;outline:2px solid #1976d2;font-size:28px;cursor:pointer;color:#fff;background:linear-gradient(180deg,#42a5f5,#1565c0,#0d47a1);text-shadow:none;display:flex;align-items:center;justify-content:center;animation:glow 2s ease-in-out infinite;padding:0;}
+/* piecesBtn now lives inside .colBtns as a .sideBtn */
+#piecesBtn{position:static!important;transform:none!important;width:100%!important;height:100%!important;border:none!important;border-radius:0!important;background:transparent!important;}
+/* ── MIDDLE COLUMNS ── */
+#menuMiddle{position:absolute;top:62px;bottom:82px;left:0;right:0;display:flex;align-items:flex-start;justify-content:space-between;padding:14px 8px 0;z-index:10;pointer-events:none;}
+.menuSideCol{display:flex;flex-direction:column;align-items:center;gap:0;width:72px;pointer-events:auto;}
+.colHanger{display:flex;flex-direction:column;align-items:center;width:100%;}
+.hangerStick{width:64px;height:7px;background:linear-gradient(180deg,#6a3c10,#c49050,#6a3c10);border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,.8),0 1px 2px rgba(196,144,80,.4);}
+.hangerChains{display:flex;justify-content:space-between;width:44px;margin-top:0;}
+.hangerChain{width:2px;height:14px;background:repeating-linear-gradient(180deg,#c49050 0px,#c49050 3px,#5a3010 3px,#5a3010 6px);border-radius:1px;}
+.colBtns{display:flex;flex-direction:column;width:72px;background:#160a02;border:2px solid #5d4037;border-radius:8px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.6);}
+.sideBtn{width:100%;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border-bottom:1px solid #2a1200;transition:background .15s;position:relative;-webkit-tap-highlight-color:transparent;}
+.sideBtn:last-child{border-bottom:none;}
+.sideBtn:hover,.sideBtn:active{background:#2a1200;}
+.sideBtn:hover .sideBtnLbl{color:#f1c40f;}
+.sideBtnIco{font-size:22px;line-height:1;}
+.sideBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
+.menuRectBtn{width:72px;min-height:40px;background:#160a02;border:2px solid #5d4037;border-radius:7px;margin-top:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:6px 4px;pointer-events:auto;}
+.menuRectBtn:hover,.menuRectBtn:active{border-color:#f1c40f;background:#2a1200;}
+.rectBtnLbl{font-size:7px;color:#a08060;letter-spacing:.5px;font-weight:bold;text-align:center;line-height:1.4;}
+/* ── BOTTOM BAR ── */
+#menuBottom{position:absolute;bottom:0;left:0;right:0;height:82px;display:flex;align-items:stretch;z-index:20;border-top:2px solid #3e2723;background:rgba(8,3,0,.97);}
+#seasonBtn{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:8px 10px;cursor:pointer;border-right:1px solid #3e2723;min-width:0;transition:background .15s;}
+#seasonBtn:hover{background:rgba(241,196,15,.06);}
+#seasonLabel{font-size:8px;font-weight:900;color:#f1c40f;letter-spacing:2px;}
+#seasonName{font-size:11px;color:#fff;font-weight:bold;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#eventsBtn{flex:1;cursor:pointer;min-width:0;border-right:1px solid #3e2723;transition:background .15s;}
+#eventsBtn:hover{background:rgba(76,175,80,.06);}
+#eventsBtnInner{height:100%;display:flex;flex-direction:column;justify-content:center;padding:8px 10px;background:transparent;border:none;border-radius:0;outline:none;}
+#evLabel{font-size:8px;color:#4caf50;letter-spacing:2px;font-weight:bold;}
+#evName{font-size:10px;color:#fff;font-weight:bold;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#evArrow{display:none;}
+/* Start group: streak badge above play button */
+#startBtnGroup{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 8px;gap:4px;flex-shrink:0;}
+#startBtn{width:54px;height:44px;flex-shrink:0;border-radius:10px;border:2px solid #1565c0;font-size:24px;cursor:pointer;color:#fff;background:linear-gradient(180deg,#42a5f5,#1565c0,#0d47a1);text-shadow:none;display:flex;align-items:center;justify-content:center;animation:glow 2s ease-in-out infinite;padding:0;}
 @keyframes glow{0%,100%{box-shadow:0 0 8px #1976d2,0 0 20px rgba(25,118,210,.45);}50%{box-shadow:0 0 18px #42a5f5,0 0 40px rgba(66,165,245,.65);}}
 #startBtn:hover{filter:brightness(1.15);}
 #startBtn:active{filter:brightness(.9);}
@@ -597,18 +631,17 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #acctSkip{margin-top:10px;text-align:center;font-size:9px;color:#666;cursor:pointer;letter-spacing:1px;}
 #acctSkip:hover{color:#f1c40f;}
 
-/* v0.03 — FRIENDS BUTTON (menu right side) */
-#friendsBtn{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:52px;height:52px;border:2px solid #5d4037;border-radius:8px;background:#1a0800;cursor:pointer;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color .2s;gap:2px;}
-#friendsBtn:hover{border-color:#f1c40f;}
+/* friendsBtn + leaderboardBtn now live inside .colBtns as .sideBtns */
+#friendsBtn{position:static!important;transform:none!important;width:100%!important;height:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
+#friendsBtn:hover{background:#2a1200!important;}
 #friendsBtnIco{font-size:22px;line-height:1;}
-#friendsBtnLbl{font-size:7px;color:#f1c40f;letter-spacing:1px;font-weight:bold;}
-#friendsBtnBadge{position:absolute;top:-4px;right:-4px;background:#e74c3c;color:#fff;border:1px solid #000;border-radius:50%;min-width:16px;height:16px;font-size:9px;font-weight:bold;display:none;align-items:center;justify-content:center;padding:0 3px;}
+#friendsBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
+#friendsBtnBadge{position:absolute;top:4px;right:4px;background:#e74c3c;color:#fff;border:1px solid #000;border-radius:50%;min-width:14px;height:14px;font-size:8px;font-weight:bold;display:none;align-items:center;justify-content:center;padding:0 2px;}
 #friendsBtnBadge.show{display:flex;}
-/* v0.06 — LEADERBOARD BUTTON (above friends btn) */
-#leaderboardBtn{position:absolute;right:12px;top:calc(50% - 94px);width:52px;height:52px;border:2px solid #5d4037;border-radius:8px;background:#1a0800;cursor:pointer;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color .2s;gap:2px;}
-#leaderboardBtn:hover{border-color:#f1c40f;}
+#leaderboardBtn{position:static!important;transform:none!important;width:100%!important;height:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
+#leaderboardBtn:hover{background:#2a1200!important;}
 #leaderboardBtnIco{font-size:22px;line-height:1;}
-#leaderboardBtnLbl{font-size:7px;color:#f1c40f;letter-spacing:1px;font-weight:bold;}
+#leaderboardBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
 /* v0.06 — LEADERBOARD SCREEN */
 #leaderboardScreen{justify-content:flex-start;}
 #lbContent{width:100%;flex:1;overflow-y:auto;padding:0 10px 12px;}
@@ -668,11 +701,11 @@ body.lightTheme .lbPodium{background:#fff8e8;border-color:#a08060;}
 body.lightTheme .lbPodium.first{border-color:#f1c40f;background:#ffe9a0;}
 body.lightTheme .lbPodName{color:#3a2306;}
 body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;}
-/* ── v0.08 — Fire badge (streak) near Start Game ── */
-#streakFireBadge{display:none;flex-shrink:0;background:linear-gradient(135deg,#7f1500,#b71c1c,#7f1500);border:2px solid #ff5722;border-radius:10px;width:52px;height:62px;align-items:center;justify-content:center;gap:2px;flex-direction:column;cursor:default;}
+/* ── v0.08 — Fire badge (streak) — now ABOVE the start button ── */
+#streakFireBadge{display:none;background:linear-gradient(135deg,#7f1500,#b71c1c,#7f1500);border:2px solid #ff5722;border-radius:8px;padding:2px 6px;align-items:center;justify-content:center;gap:3px;flex-direction:row;cursor:default;white-space:nowrap;}
 #streakFireBadge.show{display:flex;}
-#streakFireBadge .sfIco{font-size:20px;line-height:1;animation:sfPulse 1.2s ease-in-out infinite;}
-#streakFireBadge .sfNum{font-size:14px;font-weight:900;color:#ff6d00;line-height:1;}
+#streakFireBadge .sfIco{font-size:13px;line-height:1;animation:sfPulse 1.2s ease-in-out infinite;}
+#streakFireBadge .sfNum{font-size:12px;font-weight:900;color:#ff6d00;line-height:1;}
 #streakFireBadge .sfLbl{font-size:6px;color:#ff8a65;letter-spacing:1px;font-weight:bold;}
 @keyframes sfPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
 /* ── v0.08 — Leaderboard tabs ── */
@@ -813,6 +846,31 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
 #walkSelMsg{font-size:10px;color:#a08060;letter-spacing:1px;text-align:center;padding:0 16px;max-width:340px;}
 #walkSelCancel{background:#1a0800;border:2px solid #5d4037;color:#f1c40f;padding:8px 24px;border-radius:6px;font-weight:bold;font-size:11px;letter-spacing:2px;cursor:pointer;margin-top:4px;}
 #walkSelCancel:hover{background:#f1c40f;color:#000;}
+
+/* ── NEW MENU v0.09 — light theme overrides ── */
+body.lightTheme #milestoneRow{background:rgba(245,236,216,.97);border-bottom-color:#a08060;}
+body.lightTheme .menuSideCol .colBtns{background:#fff8e8;border-color:#a08060;}
+body.lightTheme .sideBtn{border-bottom-color:#d9c8a0;}
+body.lightTheme .sideBtn:hover{background:#f5ecd8;}
+body.lightTheme .sideBtn:hover .sideBtnLbl{color:#7a4e20;}
+body.lightTheme .sideBtnLbl{color:#7a4e20;}
+body.lightTheme .menuRectBtn{background:#fff8e8;border-color:#a08060;}
+body.lightTheme .menuRectBtn:hover{border-color:#c89c0a;background:#f5ecd8;}
+body.lightTheme .rectBtnLbl{color:#7a4e20;}
+body.lightTheme .hangerStick{background:linear-gradient(180deg,#6a3c10,#a07830,#6a3c10);}
+body.lightTheme #menuBottom{background:rgba(245,236,216,.97);border-top-color:#a08060;}
+body.lightTheme #seasonBtn{border-right-color:#d9c8a0;}
+body.lightTheme #seasonLabel{color:#c89c0a;}
+body.lightTheme #seasonName{color:#3a2306;}
+body.lightTheme #eventsBtn{border-right-color:#d9c8a0;}
+body.lightTheme #evLabel{color:#2e7d32;}
+body.lightTheme #evName{color:#3a2306;}
+body.lightTheme #leaderboardBtn:hover,body.lightTheme #friendsBtn:hover{background:#f5ecd8!important;}
+body.lightTheme #leaderboardBtnLbl,body.lightTheme #friendsBtnLbl{color:#7a4e20;}
+body.lightTheme .msReward{color:#a08060;}
+/* ── v0.08 notification badge ── */
+.v08Badge{position:absolute;top:4px;right:4px;background:#e74c3c;color:#fff;border:1px solid #000;border-radius:50%;min-width:14px;height:14px;font-size:8px;font-weight:bold;display:none;align-items:center;justify-content:center;padding:0 2px;pointer-events:none;}
+.v08Badge.show{display:flex;}
 </style>
 </head>
 <body>
@@ -828,76 +886,140 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
 <!-- MENU -->
 <div id="menuScreen" class="screen active">
   <canvas id="menuBg" width="360" height="600"></canvas>
-  <div id="titleBlock"><h1>CHESS STAR</h1><p data-i18n="menu.subtitle">v0.08 — ONLINE — SELECT AN EVENT</p></div>
-  <!-- v0.04 — MILESTONE BARS (Wins + Trophies) -->
+  <div id="titleBlock"><h1>CHESS STAR</h1><p>v0.08</p></div>
+
+  <!-- TOP ROW: Profile | Wins+Trophies bars | Settings -->
   <div id="milestoneRow">
-    <div id="winsBar" class="msBtn" onclick="openMilestone('wins')" title="Wins milestones">
-      <div class="msIco">🏅</div>
-      <div class="msMain">
-        <div class="msTrack"><div id="winsFill" class="msFill"></div><span class="msPrev" id="winsPrev">0</span><span class="msNext" id="winsNext">1</span></div>
-        <div class="msLbl"><span id="winsCount">0</span> WINS <span style="color:#5d4037;">·</span> <span id="winsProg" style="color:#f1c40f;">0/1</span></div>
+    <div id="profileBox" onclick="goTo('profileScreen')" title="Profile">
+      <div id="serverBadgeMini" title="Server status"><span class="sd" id="serverDot">●</span><span id="serverTxt">connecting…</span></div>
+      <div id="iconBox">🎭</div>
+      <div id="pName" style="color:#3498db;">Player</div>
+      <div id="pSub">TAP TO EDIT</div>
+    </div>
+    <div id="menuStatsArea">
+      <div id="winsBar" class="msBtn" onclick="openMilestone('wins')" title="Wins milestones">
+        <div class="msIco">🏅</div>
+        <div class="msMain">
+          <div class="msTrack">
+            <div id="winsFill" class="msFill"></div>
+            <span class="msPrev" id="winsPrev">0</span>
+            <span class="msNext" id="winsNext">1</span>
+            <span class="msDiamond">◆</span>
+          </div>
+          <div class="msLbl"><span id="winsCount">0</span> WINS · <span id="winsProg" style="color:#f1c40f;">0/1</span></div>
+          <div class="msReward">🎁 Next reward: <span id="winsRewardTarget">1</span> wins</div>
+        </div>
+      </div>
+      <div id="trophyBar" class="msBtn" onclick="openMilestone('trophies')" title="Trophy milestones">
+        <div class="msIco">🏆</div>
+        <div class="msMain">
+          <div class="msTrack">
+            <div id="trophyFill" class="msFill"></div>
+            <span class="msPrev" id="trophyPrev">0</span>
+            <span class="msNext" id="trophyNext">1</span>
+            <span class="msDiamond">◆</span>
+          </div>
+          <div class="msLbl"><span id="trophyCount">0</span> TR · <span id="trophyProg" style="color:#f1c40f;">0/1</span> <span id="trophyInfo" onclick="event.stopPropagation();showTrophyInfo();" title="What are trophies?">ⓘ</span></div>
+          <div class="msReward">🏆 Next reward: <span id="trophyRewardTarget">1</span> trophies</div>
+        </div>
       </div>
     </div>
-    <div id="trophyBar" class="msBtn" onclick="openMilestone('trophies')" title="Trophy milestones">
-      <div class="msIco">🏆</div>
-      <div class="msMain">
-        <div class="msTrack"><div id="trophyFill" class="msFill"></div><span class="msPrev" id="trophyPrev">0</span><span class="msNext" id="trophyNext">1</span></div>
-        <div class="msLbl"><span id="trophyCount">0</span> TR <span style="color:#5d4037;">·</span> <span id="trophyProg" style="color:#f1c40f;">0/1</span> <span id="trophyInfo" onclick="event.stopPropagation();showTrophyInfo();" title="What are trophies?">ⓘ</span></div>
+    <div id="settingsBtn" onclick="goTo('settingsScreen')" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#f1c40f">
+        <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.31-.07.63-.07.94s.02.63.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- MIDDLE: Two hanging columns -->
+  <div id="menuMiddle">
+    <!-- Left column: Shop, Items, Pieces, Crafts + Star Path -->
+    <div class="menuSideCol">
+      <div class="colHanger">
+        <div class="hangerStick"></div>
+        <div class="hangerChains">
+          <div class="hangerChain"></div>
+          <div class="hangerChain"></div>
+        </div>
+      </div>
+      <div class="colBtns">
+        <div class="sideBtn" onclick="showComingSoon('Shop')">
+          <span class="sideBtnIco">🛒</span>
+          <span class="sideBtnLbl">SHOP</span>
+        </div>
+        <div class="sideBtn" onclick="showComingSoon('Items')">
+          <span class="sideBtnIco">🎒</span>
+          <span class="sideBtnLbl">ITEMS</span>
+        </div>
+        <div id="piecesBtn" class="sideBtn" onclick="goTo('piecesMenuScreen')" title="Pieces">
+          <span class="sideBtnIco">♟</span>
+          <span class="sideBtnLbl">PIECES</span>
+        </div>
+        <div class="sideBtn" onclick="showComingSoon('Crafts')">
+          <span class="sideBtnIco">🔧</span>
+          <span class="sideBtnLbl">CRAFTS</span>
+        </div>
+      </div>
+      <div class="menuRectBtn" onclick="showComingSoon('Star Path')">
+        <span class="rectBtnLbl">⭐ STAR PATH</span>
+      </div>
+    </div>
+
+    <!-- Right column: Ranks, Team, Friends, Duels + Challenges -->
+    <div class="menuSideCol">
+      <div class="colHanger">
+        <div class="hangerStick"></div>
+        <div class="hangerChains">
+          <div class="hangerChain"></div>
+          <div class="hangerChain"></div>
+        </div>
+      </div>
+      <div class="colBtns">
+        <div id="leaderboardBtn" class="sideBtn" onclick="openLeaderboard()" title="Leaderboard">
+          <span id="leaderboardBtnIco" class="sideBtnIco">🎖️</span>
+          <span id="leaderboardBtnLbl" class="sideBtnLbl">RANKS</span>
+        </div>
+        <div class="sideBtn" onclick="showComingSoon('Team')">
+          <span class="sideBtnIco">🤝</span>
+          <span class="sideBtnLbl">TEAM</span>
+        </div>
+        <div id="friendsBtn" class="sideBtn" onclick="openFriends()" title="Friends">
+          <span id="friendsBtnIco" class="sideBtnIco">👥</span>
+          <span id="friendsBtnLbl" class="sideBtnLbl">FRIENDS</span>
+          <div id="friendsBtnBadge">0</div>
+        </div>
+        <div class="sideBtn" onclick="showComingSoon('Duels')">
+          <span class="sideBtnIco">⚔️</span>
+          <span class="sideBtnLbl">DUELS</span>
+        </div>
+      </div>
+      <div class="menuRectBtn" onclick="showComingSoon('Challenges')">
+        <span class="rectBtnLbl">🏆 CHALLENGES</span>
       </div>
     </div>
   </div>
-  <div id="profileBox" onclick="goTo('profileScreen')">
-    <div id="serverBadgeMini" title="Server status"><span class="sd" id="serverDot">●</span><span id="serverTxt">connecting…</span></div>
-    <div id="iconBox">🎭</div>
-    <div id="pName" style="color:#3498db;">Player 1</div>
-    <div id="pSub">TAP TO EDIT</div>
-  </div>
-  <div id="settingsBtn" onclick="goTo('settingsScreen')" title="Settings">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="#f1c40f">
-      <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.31-.07.63-.07.94s.02.63.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-    </svg>
-  </div>
-  <div id="fpsLbl">60 FPS</div>
-  <div id="leaderboardBtn" onclick="openLeaderboard()" title="Leaderboard">
-    <div id="leaderboardBtnIco">🎖️</div>
-    <div id="leaderboardBtnLbl">RANKS</div>
-  </div>
-  <div id="friendsBtn" onclick="openFriends()" title="Friends">
-    <div id="friendsBtnIco">👥</div>
-    <div id="friendsBtnLbl">FRIENDS</div>
-    <div id="friendsBtnBadge">0</div>
-  </div>
-  <div id="piecesBtn" onclick="goTo('piecesMenuScreen')" title="Pieces">
-    <svg width="40" height="32" viewBox="0 0 40 32">
-      <ellipse cx="9" cy="27" rx="6" ry="2.2" fill="#5a3a10" opacity=".6"/>
-      <rect x="6" y="20" width="6" height="7" rx="1.5" fill="#c49050"/>
-      <rect x="6.5" y="18" width="5" height="3" rx="1" fill="#a07030"/>
-      <circle cx="9" cy="13" r="4.5" fill="#c49050"/>
-      <ellipse cx="31" cy="27" rx="6" ry="2.2" fill="#5a3a10" opacity=".6"/>
-      <rect x="28" y="20" width="6" height="7" rx="1.5" fill="#c49050"/>
-      <rect x="28.5" y="18" width="5" height="3" rx="1" fill="#a07030"/>
-      <circle cx="31" cy="13" r="4.5" fill="#c49050"/>
-      <ellipse cx="20" cy="29" rx="7.5" ry="2.5" fill="#3a2008" opacity=".7"/>
-      <rect x="16" y="21" width="8" height="8" rx="2" fill="#d4a040"/>
-      <rect x="16.5" y="19" width="7" height="3.5" rx="1.2" fill="#b8860b"/>
-      <circle cx="20" cy="13" r="5.5" fill="#d4a040"/>
-      <ellipse cx="18" cy="11" rx="2" ry="1.3" fill="rgba(255,255,255,.28)"/>
-    </svg>
-  </div>
+
+  <!-- BOTTOM BAR: Season | Events | Start Game -->
   <div id="menuBottom">
+    <div id="seasonBtn" onclick="showComingSoon('Season')">
+      <div id="seasonLabel">SEASON <span id="seasonNr">1</span></div>
+      <div id="seasonName">The Golden Age</div>
+    </div>
     <div id="eventsBtn" onclick="goTo('eventsScreen')">
       <div id="eventsBtnInner">
-        <div id="evLabel">EVENTS</div>
+        <div id="evLabel">EVENTS:</div>
         <div id="evName">Last Piece Standing</div>
         <div id="evArrow">▼ browse</div>
       </div>
     </div>
-    <div id="streakFireBadge" title="Win Streak">
-      <span class="sfIco">🔥</span>
-      <span class="sfNum" id="sfNum">0</span>
-      <span class="sfLbl">STREAK</span>
+    <div id="startBtnGroup">
+      <div id="streakFireBadge" title="Win Streak">
+        <span class="sfIco">🔥</span>
+        <span class="sfNum" id="sfNum">0</span>
+        <span class="sfLbl">STREAK</span>
+      </div>
+      <button id="startBtn" onclick="startSelectedEvent()">▶</button>
     </div>
-    <button id="startBtn" onclick="startSelectedEvent()">▶</button>
   </div>
 </div>
 
@@ -4476,11 +4598,16 @@ function drawThumbQOC(){
     const tBtn = document.getElementById('trophyBar');
     if(wBtn) wBtn.classList.toggle('claimable', hasClaimable(WIN_TIERS, window.totalWins, claimedWins));
     if(tBtn) tBtn.classList.toggle('claimable', hasClaimable(TROPHY_TIERS, window.totalTrophies, claimedTrophy));
-    // Fire badge near Start Game button
+    // Fire badge ABOVE start button
     const sfb = document.getElementById('streakFireBadge');
     const sfn = document.getElementById('sfNum');
     if(sfb) sfb.classList.toggle('show', (window.winStreak||0) > 0);
     if(sfn) sfn.textContent = window.winStreak||0;
+    // Reward target labels (next milestone to reach)
+    const wRT = document.getElementById('winsRewardTarget');
+    if(wRT) wRT.textContent = wNext;
+    const tRT = document.getElementById('trophyRewardTarget');
+    if(tRT) tRT.textContent = tNext;
     // Profile stats sync
     const pbsn = document.getElementById('profBestStreakNum'); if(pbsn) pbsn.textContent = window.bestStreak||0;
     const pwnn = document.getElementById('profWinsNum');       if(pwnn) pwnn.textContent = window.totalWins||0;
@@ -8077,6 +8204,23 @@ body.lightTheme .v08FrStat .v08FrVal { color:#1976d2; }
   </div>
 </div>
 
+<script>
+// ── COMING SOON toast (v0.09 menu) ──────────────────────────────────
+window.showComingSoon = function(feature) {
+  const name = feature || 'This feature';
+  if (typeof showToast === 'function') {
+    showToast('⭐ ' + name + ' — Coming Soon!');
+  } else {
+    const t = document.getElementById('toast');
+    if (t) {
+      t.textContent = '⭐ ' + name + ' — Coming Soon!';
+      t.classList.add('show');
+      clearTimeout(t._cst);
+      t._cst = setTimeout(() => t.classList.remove('show'), 2400);
+    }
+  }
+};
+</script>
 
 </body>
 </html>
