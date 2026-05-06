@@ -67,7 +67,7 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .infoBtn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#1976d2;color:#fff;font-size:11px;font-weight:bold;font-family:Georgia,serif;border:1px solid #0d47a1;cursor:pointer;font-style:italic;transition:transform .15s,background .15s;}
 .infoBtn:hover{background:#42a5f5;transform:scale(1.1);}
 /* piecesBtn override reset */
-#piecesBtn{position:static!important;transform:none!important;width:100%!important;height:100%!important;border:none!important;border-radius:0!important;background:transparent!important;}
+#piecesBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;}
 
 /* ── MIDDLE COLUMNS ── */
 #menuMiddle{position:absolute;top:64px;bottom:92px;left:0;right:0;display:flex;align-items:flex-start;justify-content:space-between;padding:8px 4px 0;z-index:10;pointer-events:none;}
@@ -78,31 +78,31 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .hangerChain{width:2px;height:12px;background:repeating-linear-gradient(180deg,#c49050 0px,#c49050 3px,#5a3010 3px,#5a3010 6px);border-radius:1px;}
 .colBtns{display:flex;flex-direction:column;width:84px;background:#160a02;border:2px solid #5d4037;border-radius:8px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.65);}
 /* All 4 buttons identical size */
-.sideBtn{width:100%;height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;border-bottom:1px solid #2a1200;transition:background .15s;position:relative;-webkit-tap-highlight-color:transparent;}
+.sideBtn{width:100%;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border-bottom:1px solid #2a1200;transition:background .15s;position:relative;-webkit-tap-highlight-color:transparent;}
 .sideBtn:last-child{border-bottom:none;}
 .sideBtn:hover,.sideBtn:active{background:rgba(241,196,15,.06);}
 .sideBtn:hover .sideBtnLbl{color:#f1c40f;}
 /* Square image frame overlay — same size for every button */
-.sideBtnFrame{width:48px;height:48px;border-radius:9px;background:#1a0800;border:2px solid #5d4037;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;transition:border-color .15s,box-shadow .15s;}
+.sideBtnFrame{width:40px;height:40px;border-radius:8px;background:#1a0800;border:2px solid #5d4037;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;transition:border-color .15s,box-shadow .15s;}
 .sideBtn:hover .sideBtnFrame,.sideBtn:active .sideBtnFrame{border-color:#f1c40f;box-shadow:0 0 10px rgba(241,196,15,.45);}
-.sideBtnImg{width:38px;height:38px;object-fit:contain;display:block;}
+.sideBtnImg{width:30px;height:30px;object-fit:contain;display:block;}
 .sideBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;line-height:1;}
-/* Rect buttons below columns (Star Path / Challenges) */
-.menuRectBtn{width:84px;min-height:36px;background:#160a02;border:2px solid #5d4037;border-radius:7px;margin-top:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:6px 4px;pointer-events:auto;}
+/* Rect buttons below columns (Star Path / Challenges) — wider, attached to colBtns */
+.menuRectBtn{width:98px;min-height:32px;background:#160a02;border:2px solid #5d4037;border-top:none;border-top-left-radius:0;border-top-right-radius:0;border-bottom-left-radius:7px;border-bottom-right-radius:7px;margin-top:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:5px 4px;pointer-events:auto;}
 .menuRectBtn:hover,.menuRectBtn:active{border-color:#f1c40f;background:#2a1200;}
-.rectBtnLbl{font-size:7px;color:#a08060;letter-spacing:.5px;font-weight:bold;text-align:center;line-height:1.4;}
+.rectBtnLbl{font-size:8px;color:#a08060;letter-spacing:.5px;font-weight:bold;text-align:center;line-height:1.4;}
 
 /* ── BOTTOM BAR ── */
 #menuBottom{position:absolute;bottom:0;left:0;right:0;height:92px;display:flex;align-items:stretch;z-index:20;border-top:2px solid #3e2723;background:rgba(8,3,0,.97);}
 #seasonBtn{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:8px 10px;cursor:pointer;border-right:1px solid #3e2723;min-width:0;transition:background .15s;}
 #seasonBtn:hover{background:rgba(241,196,15,.06);}
-#seasonLabel{font-size:8px;font-weight:900;color:#f1c40f;letter-spacing:2px;}
-#seasonName{font-size:11px;color:#fff;font-weight:bold;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#seasonLabel{font-size:10px;font-weight:900;color:#f1c40f;letter-spacing:2px;}
+#seasonName{font-size:15px;color:#fff;font-weight:900;margin-top:2px;white-space:normal;overflow:hidden;line-height:1.2;}
 #eventsBtn{flex:1;cursor:pointer;min-width:0;border-right:1px solid #3e2723;transition:background .15s;}
 #eventsBtn:hover{background:rgba(76,175,80,.06);}
 #eventsBtnInner{height:100%;display:flex;flex-direction:column;justify-content:center;padding:8px 10px;background:transparent;border:none;border-radius:0;outline:none;}
-#evLabel{font-size:8px;color:#4caf50;letter-spacing:2px;font-weight:bold;}
-#evName{font-size:10px;color:#fff;font-weight:bold;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#evLabel{font-size:10px;color:#4caf50;letter-spacing:2px;font-weight:bold;}
+#evName{font-size:14px;color:#fff;font-weight:900;margin-top:2px;white-space:normal;overflow:hidden;line-height:1.2;}
 #evArrow{display:none;}
 /* Start group: streak badge above play button, same height as bottom bar */
 #startBtnGroup{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 8px;gap:4px;flex-shrink:0;width:82px;}
@@ -202,7 +202,7 @@ body.lightTheme #iconSelectBtn,body.lightTheme #nameSelectBtn{background:#1976d2
 #piecesGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px 14px;width:100%;flex:1;align-content:start;}
 .pieceCard{border:2px solid #3e1a00;border-radius:10px;background:#140800;cursor:pointer;transition:border-color .15s,transform .12s,box-shadow .2s;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 6px 10px;gap:6px;min-height:120px;}
 .pieceCard:hover{border-color:#f1c40f;transform:translateY(-2px);}
-.pcCanvas{width:84px;height:92px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));}
+.pcCanvas{width:88px;height:60px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));}
 .pcName{font-size:11px;color:#fff;letter-spacing:2px;font-weight:bold;text-shadow:1px 1px 0 rgba(0,0,0,.65);}
 /* v0.04 — piece colored backgrounds in Pieces menu (each piece = its type color) */
 /* v0.04 — piece card colors (corrected per user spec)
@@ -651,7 +651,7 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #friendsBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
 #friendsBtnBadge{position:absolute;top:4px;right:4px;background:#e74c3c;color:#fff;border:1px solid #000;border-radius:50%;min-width:14px;height:14px;font-size:8px;font-weight:bold;display:none;align-items:center;justify-content:center;padding:0 2px;}
 #friendsBtnBadge.show{display:flex;}
-#leaderboardBtn{position:static!important;transform:none!important;width:100%!important;height:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
+#leaderboardBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
 #leaderboardBtn:hover{background:#2a1200!important;}
 #leaderboardBtnIco{font-size:22px;line-height:1;}
 #leaderboardBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
@@ -725,8 +725,9 @@ body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08
 #streakFireBadge.sf10plus .sfNum{color:#fff176;text-shadow:0 0 10px #ffcc02,0 0 20px #ff9800;}
 #streakFireBadge .sfLbl{font-size:6px;color:#ff8a65;letter-spacing:1px;font-weight:bold;}
 @keyframes sfPulse{0%,100%{transform:scale(1) rotate(-6deg);}50%{transform:scale(1.25) rotate(6deg);}}
-/* Particle sparks — only shown when sf10plus */
-.sfSpark{position:absolute;width:5px;height:5px;border-radius:50%;background:#ff9800;pointer-events:none;opacity:0;animation:sfSparkFly var(--sd,1.2s) ease-out var(--dd,0s) infinite;}
+/* Particle sparks — hidden by default, only shown when sf10plus */
+.sfSpark{position:absolute;width:5px;height:5px;border-radius:50%;background:#ff9800;pointer-events:none;opacity:0;display:none;animation:sfSparkFly var(--sd,1.2s) ease-out var(--dd,0s) infinite;}
+#streakFireBadge.sf10plus .sfSpark{display:block;}
 @keyframes sfSparkFly{0%{transform:translate(0,0) scale(1.2);opacity:1;}100%{transform:translate(var(--sx,0px),var(--sy,-18px)) scale(0);opacity:0;}}
 /* ── v0.08 — Leaderboard tabs ── */
 #lbTabs{display:flex;gap:4px;padding:0 10px 6px;}
@@ -983,7 +984,7 @@ body.lightTheme .msReward{color:#a08060;}
           <span class="sideBtnLbl">ITEMS</span>
         </div>
         <div id="piecesBtn" class="sideBtn" onclick="goTo('piecesMenuScreen')" title="Pieces">
-          <div class="sideBtnFrame"><img class="sideBtnImg" src="/icons/pieces.png" alt="Pieces"></div>
+          <div class="sideBtnFrame"><img class="sideBtnImg" src="/icons/pieces-btn.png" alt="Pieces"></div>
           <span class="sideBtnLbl">PIECES</span>
         </div>
         <div class="sideBtn" onclick="showComingSoon('Crafts')">
@@ -1007,7 +1008,7 @@ body.lightTheme .msReward{color:#a08060;}
       </div>
       <div class="colBtns">
         <div id="leaderboardBtn" class="sideBtn" onclick="openLeaderboard()" title="Leaderboard">
-          <div class="sideBtnFrame"><img id="leaderboardBtnIco" class="sideBtnImg" src="/icons/ranks.png" alt="Ranks"></div>
+          <div class="sideBtnFrame"><img id="leaderboardBtnIco" class="sideBtnImg" src="/icons/leaderboard-btn.png" alt="Leaderboard"></div>
           <span id="leaderboardBtnLbl" class="sideBtnLbl">RANKS</span>
         </div>
         <div class="sideBtn" onclick="showComingSoon('Team')">
@@ -1557,7 +1558,10 @@ body.lightTheme .msReward{color:#a08060;}
 <!-- v0.04 — MILESTONE MODAL -->
 <div id="milestoneModal" onclick="if(event.target.id==='milestoneModal')closeMilestone()">
   <div id="milestoneModalInner">
-    <h2 id="msTitle">WINS</h2>
+    <div style="display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:4px;">
+      <h2 id="msTitle" style="margin:0;">WINS</h2>
+      <button id="msTrophyInfoBtn" class="infoBtn" onclick="showTrophyInfo()" style="position:absolute;right:0;display:none;" title="About Trophies">ⓘ</button>
+    </div>
     <div class="msSubt" id="msSubtitle">Wins are forever — they never decrease.</div>
     <div id="msList"></div>
     <button id="msClose" onclick="closeMilestone()">CLOSE</button>
@@ -1568,9 +1572,9 @@ body.lightTheme .msReward{color:#a08060;}
 <div id="trophyInfoModal" onclick="if(event.target.id==='trophyInfoModal')closeTrophyInfo()">
   <div id="trophyInfoInner">
     <h3>🏆 ABOUT TROPHIES</h3>
-    <p>Trophies are <b>much harder</b> to earn than regular wins. You only get them in <b>special events</b>.</p>
-    <p><b>+1</b> trophy for each special-event win.<br><b>−1</b> trophy for each special-event loss.</p>
-    <p style="color:#a08060;font-size:10px;">Special events aren't available yet — coming in a future update.</p>
+    <p>Trophies are a <b>better version of wins</b>, and because it's better it's also <b>harder to achieve</b> one of them.</p>
+    <p>You can also <b>lose</b> them — you get <b>±1 per win/loss</b> in special events.</p>
+    <p>You can achieve them in <b>special events</b>, like <b>ChampionShip</b>.</p>
     <button id="tInfoClose" onclick="closeTrophyInfo()">GOT IT</button>
   </div>
 </div>
@@ -2301,11 +2305,14 @@ function drawWoodK(ctx,p){
 function renderPiecesMenu(){
   ['P','R','N','B','Q','K'].forEach(t=>{
     const c=document.getElementById('pc_'+t);
-    if(!c)return; c.width=54;c.height=60;
-    const x=c.getContext('2d'); x.clearRect(0,0,54,60);
-    x.save();x.translate(27,47);
-    const pal=getPal(true, pieceSkins[t]);
-    drawPieceShape(x,t,pal,false); x.restore();
+    if(!c)return; c.width=88;c.height=60;
+    const x=c.getContext('2d'); x.clearRect(0,0,88,60);
+    // White piece left half
+    x.save();x.translate(22,47);
+    drawPieceShape(x,t,getPal(true, pieceSkins[t]),false); x.restore();
+    // Black piece right half
+    x.save();x.translate(66,47);
+    drawPieceShape(x,t,getPal(false, pieceSkins[t]),false); x.restore();
   });
 }
 
@@ -4663,6 +4670,8 @@ function drawThumbQOC(){
     const value   = isWins ? window.totalWins : window.totalTrophies;
     const claimed = isWins ? claimedWins : claimedTrophy;
     title.textContent = isWins ? '🏅 WINS MILESTONES' : '🏆 TROPHY MILESTONES';
+    const tInfoBtn = document.getElementById('msTrophyInfoBtn');
+    if(tInfoBtn) tInfoBtn.style.display = isWins ? 'none' : 'inline-flex';
     subt.textContent  = isWins ? ('You have '+value+' wins. Wins are forever.') : ('You have '+value+' trophies. ±1 per special event.');
     list.innerHTML = '';
     for(const t of tiers){
@@ -5208,7 +5217,9 @@ function drawThumbQOC(){
         const d = document.createElement('div');
         d.className = 'lbPodium '+cls;
         const val = type==='streaks'?(p.best_streak||0)+' streak':type==='trophies'?(p.trophies||0)+' TR':(p.wins||0)+'W';
+        const pIcon = (p.icon && p.icon.trim()) ? p.icon : '🎭';
         d.innerHTML = '<div class="lbPodRank">'+ico+'</div>'
+          +'<div class="lbAvatar" style="background:'+(p.color||'#3498db')+';margin:3px auto;width:26px;height:26px;font-size:15px;">'+pIcon+'</div>'
           +'<div class="lbPodName">'+escapeHtml(p.name||'Player')+'</div>'
           +'<div class="lbPodWins">'+val+'</div>';
         topRow.appendChild(d);
@@ -5225,7 +5236,9 @@ function drawThumbQOC(){
           const valStr = type==='streaks'?mv+' streak':type==='trophies'?mv+' TR':mv+'W';
           banner.className = isFirst ? 'me1' : '';
           banner.style.display='flex'; banner.style.alignItems='center'; banner.style.gap='10px';
-          banner.innerHTML = '<span class="yrRank">#'+me.rank+'</span>'
+          const myIcon = (me.icon && me.icon.trim()) ? me.icon : (window.profileIcon||'🎭');
+          banner.innerHTML = '<span class="lbAvatar" style="background:'+(me.color||'#3498db')+';flex-shrink:0;width:26px;height:26px;font-size:15px;">'+myIcon+'</span>'
+            +'<span class="yrRank">#'+me.rank+'</span>'
             +'<span class="yrTier">'+mt.icon+'</span>'
             +'<span class="yrName">'+escapeHtml(me.name||'Player')+'</span>'
             +'<span class="yrRight"><span class="yrWins">'+valStr+'</span><span class="yrTierName">'+mt.name+'</span></span>';
@@ -5241,25 +5254,28 @@ function drawThumbQOC(){
         const onlineDot = p._online ? ' <span style="font-size:7px;color:#4caf50;">●</span>' : '';
         const t   = _lbTier(p.wins);
         const val = type==='streaks'?(p.best_streak||0)+' streak':type==='trophies'?(p.trophies||0)+' TR':(p.wins||0)+'W';
-        const playerIcon = (p.icon && p.icon.length < 8) ? p.icon : '🎭';
+        const playerIcon = (p.icon && p.icon.trim()) ? p.icon : '🎭';
         row.innerHTML =
           '<span class="lbRank">'+(isFirst?'👑':'#'+p.rank)+'</span>'
           +'<span class="lbAvatar" style="background:'+(p.color||'#3498db')+';" title="'+escapeHtml(p.name||'Player')+'">'+playerIcon+'</span>'
           +'<span style="font-size:11px;margin:0 2px;" title="'+t.name+'">'+t.icon+'</span>'
-          +'<span class="lbName" style="color:'+(p.color||'#f1c40f')+'">'+escapeHtml(p.name||'Player')+onlineDot+'</span>'
-          +'<span class="lbWins" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">'
-            +'<span>'+val+'</span>'
-            +'<span style="font-size:8px;color:#a08060;letter-spacing:.5px;">'+t.name+'</span>'
-          +'</span>';
+          +'<span class="lbName" style="color:'+(p.color||'#f1c40f')+'">'+escapeHtml(p.name||'Player')+onlineDot+'</span>';
+        // SEE-ACC button goes BEFORE the score (left of score/rank)
         if(!isMe && window.showAccDetails){
           const _pdata = p;
           const seebtn = document.createElement('button');
           seebtn.textContent = 'SEE-ACC';
           seebtn.className = 'fBtnSm';
-          seebtn.style.cssText = 'margin-left:5px;flex-shrink:0;font-size:8px;padding:4px 6px;';
+          seebtn.style.cssText = 'flex-shrink:0;font-size:8px;padding:4px 6px;margin:0 4px;';
           seebtn.onclick = (ev)=>{ ev.stopPropagation(); window.showAccDetails(_pdata); };
           row.appendChild(seebtn);
         }
+        // Score column — rightmost
+        const scoreEl = document.createElement('span');
+        scoreEl.className = 'lbWins';
+        scoreEl.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex-shrink:0;';
+        scoreEl.innerHTML = '<span>'+val+'</span><span style="font-size:8px;color:#a08060;letter-spacing:.5px;">'+t.name+'</span>';
+        row.appendChild(scoreEl);
         list.appendChild(row);
       });
     }catch(e){
@@ -6227,8 +6243,8 @@ function drawThumbQOC(){
   setTimeout(applyI18n, 50);
 
   // ── PROFILE ICON PICKER ──
-  const ICON_LIST = ['🎭','♟','♚','🦁','🐺','🦊','🐼','🦅','🐉','🔥','⚔','🛡','👑','🌟','💎','⚡','🎯','🏆','🎲','🃏'];
-  const ICON_UNLOCK_WINS = [0, 0, 0, 1, 3, 5, 8, 10, 15, 20, 25, 35, 50, 65, 80, 100, 125, 150, 200, 300];
+  const ICON_LIST = ['🎭','♟','♛','♜','♝','♞','♚','🦁','🦅','🐉','🔥','⚔','🛡','👑','🌟','💎','⚡','🎯','🎲','🃏'];
+  const ICON_UNLOCK_WINS = [0, 0, 0, 0, 0, 0, 0, 1, 5, 10, 15, 20, 25, 35, 50, 75, 100, 125, 200, 300];
   function loadProfileIcon(){
     try{ const saved = localStorage.getItem('chessstar_icon'); if(saved && ICON_LIST.includes(saved)) return saved; }catch(e){}
     return '🎭';
@@ -6257,6 +6273,14 @@ function drawThumbQOC(){
           saveProfileIcon();
           grid.querySelectorAll('.iPick').forEach(x=>x.classList.remove('on'));
           div.classList.add('on');
+          applyProfileIcon();
+          // Sync icon to server immediately
+          if(window.myCode){
+            try{
+              const p=window.profile||{};
+              fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:window.myCode,wins:window.totalWins||0,best_streak:window.bestStreak||0,trophies:window.totalTrophies||0,name:p.name||'Player',color:p.color||'#3498db',icon:emoji})}).catch(()=>{});
+            }catch(e){}
+          }
         };
       }
       grid.appendChild(div);
