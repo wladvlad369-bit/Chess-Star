@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 8080;
 const onlineSockets = new Map();   // code → socketId
 const socketToCode  = new Map();   // socketId → code
 const lobbies       = new Map();   // lobbyId → { players, event, mode, ready, hostCode }
-const APP_VERSION = "v0.08";
+const APP_VERSION = "v0.09";
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"] }));

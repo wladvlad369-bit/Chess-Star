@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Chess Star v0.08</title>
+<title>Chess Star v0.09</title>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -36,13 +36,26 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 #pSub{display:none;}
 /* Stats area — WINS and TROPHIES side by side in one row */
 #menuStatsArea{flex:1;display:flex;flex-direction:row;gap:3px;min-width:0;padding:0 3px;}
-#menuStatsArea .msBtn{flex:1;min-width:0;padding:3px 5px 3px 4px;min-height:0;}
-#menuStatsArea .msIco{font-size:13px;}
-#menuStatsArea .msTrack{height:8px;}
-#menuStatsArea .msLbl{font-size:6px;}
-.msReward{font-size:5.5px;color:#5d4037;letter-spacing:.3px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.msBtn.claimable .msReward{color:#f1c40f;}
-.msDiamond{position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:8px;color:#f1c40f;z-index:3;line-height:1;filter:drop-shadow(0 0 3px rgba(241,196,15,.8));pointer-events:none;}
+#menuStatsArea .msBtn{flex:1;min-width:0;padding:3px 4px;min-height:0;}
+#menuStatsArea .msTrack{height:9px;}
+/* Icon+count stack on left */
+.msIconStack{display:flex;flex-direction:column;align-items:center;gap:1px;flex-shrink:0;}
+.msIco{font-size:16px;line-height:1;}
+.msCount{font-size:9px;font-weight:900;color:#f1c40f;line-height:1;}
+/* Diamond claim indicator on right */
+.msDiamondBox{display:flex;flex-direction:column;align-items:center;gap:1px;flex-shrink:0;width:22px;}
+.msDiamondNormal{width:18px;height:18px;object-fit:contain;display:block;}
+.msDiamondGlow{width:18px;height:18px;object-fit:contain;display:none;}
+.msDiamondNext{font-size:6px;color:#5d4037;font-weight:bold;line-height:1;text-align:center;}
+/* Claimable state — swap to glow diamond */
+.msBtn.claimable .msDiamondNormal{display:none;}
+.msBtn.claimable .msDiamondGlow{display:block;animation:diamondPulse .9s ease-in-out infinite;}
+.msBtn.claimable .msDiamondNext{color:#f1c40f;}
+@keyframes diamondPulse{0%,100%{filter:drop-shadow(0 0 4px rgba(255,210,0,.5));}50%{filter:drop-shadow(0 0 10px rgba(255,220,0,1)) drop-shadow(0 0 18px rgba(241,196,15,.8));}}
+/* Keep old msDiamond hidden (compat) */
+.msDiamond{display:none;}
+.msReward{display:none;}
+.msLbl{display:none;}
 /* Settings — pinned to right corner */
 #settingsBtn{position:static;width:36px;height:36px;flex-shrink:0;border:2px solid #5d4037;border-radius:7px;background:#1a0800;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,transform .25s;}
 #settingsBtn:hover{border-color:#f1c40f;}
@@ -214,15 +227,15 @@ body.lightTheme #iconSelectBtn,body.lightTheme #nameSelectBtn{background:#1976d2
 .msBtn.claimable{border-color:#f1c40f;background:#3a2a05;box-shadow:0 0 12px rgba(241,196,15,.6);animation:msPulse 1.4s ease-in-out infinite;}
 .msBtn.claimable .msIco{filter:drop-shadow(0 0 6px #f1c40f);}
 @keyframes msPulse{0%,100%{box-shadow:0 0 8px rgba(241,196,15,.4);}50%{box-shadow:0 0 18px rgba(241,196,15,.85);}}
-.msIco{font-size:20px;line-height:1;}
-.msMain{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;}
-.msTrack{position:relative;height:11px;background:#0a0500;border:1px solid #5d4037;border-radius:5px;overflow:hidden;display:flex;align-items:center;justify-content:space-between;padding:0 4px;}
+.msIco{font-size:16px;line-height:1;}
+.msMain{flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;}
+.msTrack{position:relative;height:9px;background:#0a0500;border:1px solid #5d4037;border-radius:5px;overflow:hidden;}
 .msFill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#7a5a10,#f1c40f);transition:width .4s ease;width:0;box-shadow:0 0 6px rgba(241,196,15,.5) inset;}
-.msPrev,.msNext{position:relative;font-size:7px;font-weight:bold;color:#fff;letter-spacing:.5px;text-shadow:0 0 3px rgba(0,0,0,.9);z-index:2;line-height:1;}
-.msLbl{font-size:8px;color:#a08060;letter-spacing:1px;font-weight:bold;display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.msBtn.claimable .msLbl{color:#f1c40f;}
-.msSlash{color:#f1c40f;}
-#trophyInfo{display:inline-flex;align-items:center;justify-content:center;width:12px;height:12px;border:1px solid currentColor;border-radius:50%;font-size:8px;line-height:1;cursor:pointer;}
+.msPrev,.msNext{display:none;}
+.msLbl{display:none;}
+.msBtn.claimable .msLbl{display:none;}
+.msSlash{display:none;}
+#trophyInfo{display:none;}
 /* server-status pill, sits ABOVE the profile icon */
 #serverBadgeMini{display:flex;align-items:center;gap:4px;background:rgba(20,8,0,.85);border:1px solid #5d4037;color:#a08060;font-size:7px;font-weight:bold;letter-spacing:1px;padding:2px 5px;border-radius:8px;}
 #serverBadgeMini .sd{font-size:8px;color:#888;}
@@ -559,13 +572,11 @@ body.lightTheme #leaderboardBtn,body.lightTheme #piecesBtn,body.lightTheme #frie
 body.lightTheme #leaderboardBtnLbl,body.lightTheme #friendsBtnLbl{color:#7a4e20;}
 body.lightTheme #leaderboardBtnIco,body.lightTheme #friendsBtnIco,body.lightTheme #fpsLbl{color:#7a4e20;}
 body.lightTheme .msBtn{background:rgba(255,248,232,.92);border-color:#a08060;}
-body.lightTheme .msLbl{color:#7a4e20;}
 body.lightTheme .msTrack{background:#d9c8a0;border-color:#a08060;}
-body.lightTheme .msFill{background:linear-gradient(90deg,#5a8a20,#1976d2);}
-body.lightTheme .msPrev,body.lightTheme .msNext{color:#7a4e20;}
-body.lightTheme #trophyInfo{color:#1976d2;}
-body.lightTheme #winsCount,body.lightTheme #trophyCount{color:#3a2306;}
-body.lightTheme #winsProg,body.lightTheme #trophyProg{color:#1976d2!important;}
+body.lightTheme .msFill{background:linear-gradient(90deg,#a06010,#c89c0a);}
+body.lightTheme .msCount{color:#3a2306;}
+body.lightTheme .msDiamondNext{color:#a08060;}
+body.lightTheme .msBtn.claimable .msDiamondNext{color:#c89c0a;}
 body.lightTheme #iconBox{background:#fff8e8;border-color:#a08060;}
 body.lightTheme #eventsBtn #eventsBtnInner{background:rgba(255,248,232,.92);border-color:#a08060;outline-color:#a08060;}
 body.lightTheme #toast{background:rgba(255,248,232,.97);color:#7a4e20;border-color:#c89c0a;}
@@ -891,13 +902,13 @@ body.lightTheme .msReward{color:#a08060;}
 <div id="startupSplash" style="position:fixed;inset:0;background:#0a0500;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;">
   <div id="ssStar" style="font-size:64px;color:#f1c40f;opacity:0;transform:scale(0.1) rotate(-180deg);transition:none;text-shadow:0 0 30px rgba(241,196,15,.9);">♛</div>
   <div id="ssTitle" style="font-family:Georgia,serif;font-size:36px;font-weight:900;color:#f1c40f;letter-spacing:5px;text-shadow:0 0 40px rgba(241,196,15,.9),4px 4px 0 #3e1a00;opacity:0;transform:scale(0.05);transition:none;margin-top:12px;">CHESS STAR</div>
-  <div id="ssSub" style="font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;margin-top:16px;opacity:0;transition:none;">v0.08 — ONLINE</div>
+  <div id="ssSub" style="font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;margin-top:16px;opacity:0;transition:none;">v0.09 — ONLINE</div>
 </div>
 
 <!-- MENU -->
 <div id="menuScreen" class="screen active">
   <canvas id="menuBg" width="360" height="600"></canvas>
-  <div id="titleBlock"><h1>CHESS STAR</h1><p>v0.08</p></div>
+  <div id="titleBlock"><h1>CHESS STAR</h1><p>v0.09</p></div>
 
   <!-- TOP ROW: Profile | Wins+Trophies bars | Settings -->
   <div id="milestoneRow">
@@ -909,30 +920,39 @@ body.lightTheme .msReward{color:#a08060;}
     </div>
     <div id="menuStatsArea">
       <div id="winsBar" class="msBtn" onclick="openMilestone('wins')" title="Wins milestones">
-        <div class="msIco">🏅</div>
-        <div class="msMain">
-          <div class="msTrack">
-            <div id="winsFill" class="msFill"></div>
-            <span class="msPrev" id="winsPrev">0</span>
-            <span class="msNext" id="winsNext">1</span>
-            <span class="msDiamond">◆</span>
-          </div>
-          <div class="msLbl"><span id="winsCount">0</span> WINS · <span id="winsProg" style="color:#f1c40f;">0/1</span></div>
-          <div class="msReward">🎁 Next reward: <span id="winsRewardTarget">1</span> wins</div>
+        <div class="msIconStack">
+          <div class="msIco">🏅</div>
+          <span class="msCount" id="winsCount">0</span>
         </div>
+        <div class="msMain">
+          <div class="msTrack"><div id="winsFill" class="msFill"></div></div>
+        </div>
+        <div class="msDiamondBox">
+          <img class="msDiamondNormal" src="/icons/diamond.png" alt="">
+          <img class="msDiamondGlow" src="/icons/diamond-glow.png" alt="">
+          <span class="msDiamondNext" id="winsRewardTarget">1</span>
+        </div>
+        <span style="display:none" id="winsPrev">0</span>
+        <span style="display:none" id="winsNext">1</span>
+        <span style="display:none" id="winsProg">0/1</span>
       </div>
       <div id="trophyBar" class="msBtn" onclick="openMilestone('trophies')" title="Trophy milestones">
-        <div class="msIco">🏆</div>
-        <div class="msMain">
-          <div class="msTrack">
-            <div id="trophyFill" class="msFill"></div>
-            <span class="msPrev" id="trophyPrev">0</span>
-            <span class="msNext" id="trophyNext">1</span>
-            <span class="msDiamond">◆</span>
-          </div>
-          <div class="msLbl"><span id="trophyCount">0</span> TR · <span id="trophyProg" style="color:#f1c40f;">0/1</span> <span id="trophyInfo" onclick="event.stopPropagation();showTrophyInfo();" title="What are trophies?">ⓘ</span></div>
-          <div class="msReward">🏆 Next reward: <span id="trophyRewardTarget">1</span> trophies</div>
+        <div class="msIconStack">
+          <div class="msIco">🏆</div>
+          <span class="msCount" id="trophyCount">0</span>
         </div>
+        <div class="msMain">
+          <div class="msTrack"><div id="trophyFill" class="msFill"></div></div>
+        </div>
+        <div class="msDiamondBox">
+          <img class="msDiamondNormal" src="/icons/diamond.png" alt="">
+          <img class="msDiamondGlow" src="/icons/diamond-glow.png" alt="">
+          <span class="msDiamondNext" id="trophyRewardTarget">1</span>
+        </div>
+        <span style="display:none" id="trophyPrev">0</span>
+        <span style="display:none" id="trophyNext">1</span>
+        <span style="display:none" id="trophyProg">0/1</span>
+        <span style="display:none" id="trophyInfo"></span>
       </div>
     </div>
     <div id="settingsBtn" onclick="goTo('settingsScreen')" title="Settings">
@@ -963,11 +983,11 @@ body.lightTheme .msReward{color:#a08060;}
           <span class="sideBtnLbl">ITEMS</span>
         </div>
         <div id="piecesBtn" class="sideBtn" onclick="goTo('piecesMenuScreen')" title="Pieces">
-          <div class="sideBtnFrame"><img class="sideBtnImg" src="/icons/pieces.jpg" alt="Pieces"></div>
+          <div class="sideBtnFrame"><img class="sideBtnImg" src="/icons/pieces.png" alt="Pieces"></div>
           <span class="sideBtnLbl">PIECES</span>
         </div>
         <div class="sideBtn" onclick="showComingSoon('Crafts')">
-          <div class="sideBtnFrame"><img class="sideBtnImg" src="/icons/crafts.webp" alt="Crafts"></div>
+          <div class="sideBtnFrame"><img class="sideBtnImg" src="/icons/crafts.png" alt="Crafts"></div>
           <span class="sideBtnLbl">CRAFTS</span>
         </div>
       </div>
@@ -1000,7 +1020,7 @@ body.lightTheme .msReward{color:#a08060;}
           <div id="friendsBtnBadge">0</div>
         </div>
         <div class="sideBtn" onclick="showComingSoon('Duels')">
-          <div class="sideBtnFrame"><img class="sideBtnImg" src="/icons/duels.jpg" alt="Duels"></div>
+          <div class="sideBtnFrame"><img class="sideBtnImg" src="/icons/duels.png" alt="Duels"></div>
           <span class="sideBtnLbl">DUELS</span>
         </div>
       </div>
@@ -1395,7 +1415,7 @@ body.lightTheme .msReward{color:#a08060;}
       <h3>VERSION</h3>
       <div id="versionRow">
         <div class="setRow"><span>Game</span><span style="color:#f1c40f;font-weight:bold;letter-spacing:2px;">CHESS STAR</span></div>
-        <div class="setRow"><span>Build</span><span id="versionLabel" style="color:#4caf50;font-weight:bold;letter-spacing:2px;">v0.08</span></div>
+        <div class="setRow"><span>Build</span><span id="versionLabel" style="color:#4caf50;font-weight:bold;letter-spacing:2px;">v0.09</span></div>
         <div class="setRow"><span>Realtime</span><span style="color:#42a5f5;letter-spacing:1px;">Socket.io</span></div>
       </div>
     </div>
@@ -1455,7 +1475,7 @@ body.lightTheme .msReward{color:#a08060;}
 <div id="acctModal">
   <div id="acctModalInner">
     <div id="acctTitle">CHESS STAR</div>
-    <div id="acctSub">v0.08 — Sign in or create your account</div>
+    <div id="acctSub">v0.09 — Sign in or create your account</div>
     <div class="acctTabRow">
       <div class="acctTab on" data-acct="create" onclick="acctSwitch('create')">CREATE</div>
       <div class="acctTab" data-acct="login" onclick="acctSwitch('login')">LOGIN</div>
@@ -1588,7 +1608,7 @@ body.lightTheme .msReward{color:#a08060;}
     <p data-i18n="version.body">A newer version of Chess Star is available. Please refresh the page to continue playing.</p>
     <div id="vgVersions">
       <div><span data-i18n="version.you">You have</span>: <b id="vgYourVer">v0.04</b></div>
-      <div><span data-i18n="version.latest">Latest</span>: <b id="vgLatestVer" style="color:#4caf50;">v0.08</b></div>
+      <div><span data-i18n="version.latest">Latest</span>: <b id="vgLatestVer" style="color:#4caf50;">v0.09</b></div>
     </div>
     <button id="vgRefresh" onclick="(function(){var lv=document.getElementById('vgLatestVer');if(lv)localStorage.setItem('chessstar_vg_ack',lv.textContent);location.reload(true);})()">↻ <span data-i18n="version.refresh">REFRESH NOW</span></button>
   </div>
@@ -6137,12 +6157,12 @@ function drawThumbQOC(){
   //  - Version-required gate
   //  - Profile stats refresh on Profile screen open
   // ════════════════════════════════════════════════════════════════
-  const APP_VERSION = 'v0.08';
+  const APP_VERSION = 'v0.09';
 
   // ── i18n ──
   const I18N = {
     en: {
-      'menu.subtitle':'v0.08 — ONLINE — SELECT AN EVENT',
+      'menu.subtitle':'v0.09 — ONLINE — SELECT AN EVENT',
       'profile.title':'PROFILE','profile.wins':'WINS','profile.trophies':'TROPHIES','profile.pieces':'PIECES',
       'profile.name':'PLAYER NAME (MAX 10 CHARS)','profile.color':'NAME COLOR','profile.icon':'PROFILE ICON','profile.save':'SAVE',
       'settings.theme':'THEME','settings.dark':'DARK','settings.light':'LIGHT','settings.language':'LANGUAGE',

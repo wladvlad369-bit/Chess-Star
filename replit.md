@@ -1,10 +1,11 @@
-# Chess Star v0.08
+# Chess Star v0.09
 
 Self-contained chess-themed mobile-style web game. The entire client lives in a single HTML file (`chess-star/public/index.html`) served by a small Express server (`chess-star/server.js`).
 
 ## Structure
 
-- `chess-star/public/index.html` — the whole client app (UI, engine, AI, persistence, sockets, i18n) ~7828 lines
+- `chess-star/public/index.html` — the whole client app (UI, engine, AI, persistence, sockets, i18n) ~8270 lines
+- `chess-star/public/icons/` — button icons (shop, items, pieces, crafts, ranks, team, friends, duels, diamond, diamond-glow)
 - `chess-star/server.js` — Express server (accounts, version, search, friends, replays, icon sync)
 - `chess-star/package.json` — Node deps (express, pg)
 - `artifacts/mockup-sandbox/` — canvas mockup sandbox (design prototyping only)
