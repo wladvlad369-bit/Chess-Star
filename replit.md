@@ -14,23 +14,31 @@ Self-contained chess-themed mobile-style web game. The entire client lives in a 
 
 Workflow: **Start application** — `cd chess-star && PORT=5000 node server.js` on port 5000.
 
-## v0.08 Features (latest)
+## v0.09 Features (latest)
+
+- **Trophy ⓘ button** — info button shown in Progressive Trophies modal only; updated text explains trophies as a better, harder win variant earned in ChampionShip events
+- **Dual-color piece thumbnails** — Pieces menu card shows both white (left) + black (right) pieces side-by-side in an 88px canvas
+- **Chess-piece profile icons** — All 6 chess pieces (♟♛♜♝♞♚) added to icon picker as first icons (0 wins required); emoji icons after index 6 gated by win count
+- **Icon sync on picker** — Selecting an icon immediately syncs to server via sync-wins call
+- **New Pieces button image** — 3 golden pawns icon (background removed) replaces old pieces.png
+- **New Leaderboard button image** — Podium+star icon (background removed) replaces old ranks.png
+- **Equal-length thinner side bars** — sideBtn 74→62px, sideBtnFrame 48→40px, sideBtnImg 38→30px; height:100% overrides removed from pieces/leaderboard buttons
+- **Fire sparks at 10+ streak only** — sfSpark hidden by default; shown only with `.sf10plus` class (≥10 streak)
+- **Star Path/Events wider + attached** — menuRectBtn width 98px, no top border/radius; visually connected to colBtns column
+- **Bigger Season/Events text + wrapping** — seasonLabel 9→11px, seasonName 13→16px bold, evLabel 8→10px, evName 12→14px bold; white-space:normal for long names
+- **SEE-ACC left of score in leaderboard** — button inserted before score column so score stays rightmost
+- **Player icons in leaderboard podium** — each top-3 podium card shows the player's colored avatar with icon
+- **Player icon in rank banner** — your-rank sticky banner now shows your own profile icon
+
+## v0.08 Features
 
 - **Streak fire always visible** — gray/desaturated when streak = 0, full color when active
 - **Friend profile modal (SEE-ACC)** — full profile card with wins, trophies, best streak, online status
-- **Code security** — 13-char codes hidden from friend list and search results (wins + status shown instead)
-- **Confirm dialog for remove friend** — generic confirm dialog used for destructive actions
-- **Better invite toasts** — shows if friend is in match; "Your invite was rejected" / "Friend joined" notifications
-- **Per-account claimed rewards** — milestone claims keyed per account code (no cross-account bleed)
-- **Account switching** — reloads icon, wins, rewards, and syncs to server on switch
-- **Delete account from device** — with confirm, blocked if only 1 account on device
-- **LPS piece picker** — appears BEFORE matchmaking for all LPS modes; piece is sent to server
-- **LPS poison level 0 fix** — warning ring shown at stage 0 before any squares become lethal; stage advances from round 4+
-- **LPS auto-move bug fix** — inactivity timer now calls `lpsGetMoves(x,y)` correctly (was passing piece object)
-- **LPS poison speed** — pawn mode: advances every 3 rounds; standard: every 2 rounds (both start at round 4)
+- **Code security** — 13-char codes hidden from friend list and search results
+- **Per-account claimed rewards** — milestone claims keyed per account code
+- **Account switching** — reloads icon, wins, rewards, syncs to server on switch
+- **LPS piece picker** — appears BEFORE matchmaking for all LPS modes
 - **Notification badges** — red circles on Wins bar, Trophies bar, Friends button, Leaderboard button
-- **Progressive Wins/Trophies** — milestone modals renamed from "Wins/Trophies" to "Progressive Wins/Trophies"
-- **Email info modal** — explains the trade-offs of adding email-based saving vs current anonymous code system
 - **Server icon sync** — player icon saved to PostgreSQL, returned on login/me/friends calls
 
 ## Persistence (localStorage keys)
