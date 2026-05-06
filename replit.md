@@ -17,18 +17,18 @@ Workflow: **Start application** — `cd chess-star && PORT=5000 node server.js` 
 ## v0.09 Features (latest)
 
 - **Trophy ⓘ button** — info button shown in Progressive Trophies modal only; updated text explains trophies as a better, harder win variant earned in ChampionShip events
-- **Dual-color piece thumbnails** — Pieces menu card shows both white (left) + black (right) pieces side-by-side in an 88px canvas
-- **Chess-piece profile icons** — All 6 chess pieces (♟♛♜♝♞♚) added to icon picker as first icons (0 wins required); emoji icons after index 6 gated by win count
-- **Icon sync on picker** — Selecting an icon immediately syncs to server via sync-wins call
-- **New Pieces button image** — 3 golden pawns icon (background removed) replaces old pieces.png
-- **New Leaderboard button image** — Podium+star icon (background removed) replaces old ranks.png
-- **Equal-length thinner side bars** — sideBtn 74→62px, sideBtnFrame 48→40px, sideBtnImg 38→30px; height:100% overrides removed from pieces/leaderboard buttons
-- **Fire sparks at 10+ streak only** — sfSpark hidden by default; shown only with `.sf10plus` class (≥10 streak)
-- **Star Path/Events wider + attached** — menuRectBtn width 98px, no top border/radius; visually connected to colBtns column
-- **Bigger Season/Events text + wrapping** — seasonLabel 9→11px, seasonName 13→16px bold, evLabel 8→10px, evName 12→14px bold; white-space:normal for long names
-- **SEE-ACC left of score in leaderboard** — button inserted before score column so score stays rightmost
-- **Player icons in leaderboard podium** — each top-3 podium card shows the player's colored avatar with icon
-- **Player icon in rank banner** — your-rank sticky banner now shows your own profile icon
+- **Classic skin — real piece images** — 6 user-provided JPGs (Pawn/Rook/Knight/Bishop/Queen/King) used for classic skin; each JPG has black piece (top half) + white piece (bottom half); BFS flood-fill removes white backgrounds for clean transparent rendering on any board/bg color; glyph fallback if images not yet loaded
+- **Piece images used everywhere** — all boards (Classic, LPS, GTS, QoC), Pieces menu thumbnails, piece detail, skin cards
+- **Season/Events/Streak aligned** — all three bottom bar sections use `justify-content:flex-start; padding-top:10px` so their content starts at the same height
+- **Bars 25% thinner** — sideBtn 62→47px, sideBtnFrame 40→30px, sideBtnImg 30→22px
+- **Star Path / Challenges chained** — gold chain links (3 `rChainLink` elements) between colBtns and menuRectBtn; rectBtn is now 118px wide (+40% of 84px bars), fully bordered and rounded (no longer "glued")
+- **Dual-color piece thumbnails** — Pieces menu card shows white (left) + black (right) pieces side-by-side in 88px canvas
+- **Chess-piece profile icons** — All 6 chess pieces (♟♛♜♝♞♚) free from start; other emoji icons gated by wins
+- **Icon sync on picker** — Selecting an icon immediately syncs to server via sync-wins
+- **New Pieces/Leaderboard button images** — background-removed PNGs (3 golden pawns, podium+star)
+- **Fire sparks at 10+ streak only** — sfSpark hidden by default; visible only with `.sf10plus`
+- **Bigger Season/Events text + wrapping** — seasonName 16px bold, evName 14px bold; white-space:normal
+- **SEE-ACC left of score in leaderboard** — button before score column; player icons in podium + rank banner
 
 ## v0.08 Features
 

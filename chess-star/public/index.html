@@ -78,34 +78,37 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .hangerChain{width:2px;height:12px;background:repeating-linear-gradient(180deg,#c49050 0px,#c49050 3px,#5a3010 3px,#5a3010 6px);border-radius:1px;}
 .colBtns{display:flex;flex-direction:column;width:84px;background:#160a02;border:2px solid #5d4037;border-radius:8px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.65);}
 /* All 4 buttons identical size */
-.sideBtn{width:100%;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border-bottom:1px solid #2a1200;transition:background .15s;position:relative;-webkit-tap-highlight-color:transparent;}
+.sideBtn{width:100%;height:47px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border-bottom:1px solid #2a1200;transition:background .15s;position:relative;-webkit-tap-highlight-color:transparent;}
 .sideBtn:last-child{border-bottom:none;}
 .sideBtn:hover,.sideBtn:active{background:rgba(241,196,15,.06);}
 .sideBtn:hover .sideBtnLbl{color:#f1c40f;}
 /* Square image frame overlay — same size for every button */
-.sideBtnFrame{width:40px;height:40px;border-radius:8px;background:#1a0800;border:2px solid #5d4037;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;transition:border-color .15s,box-shadow .15s;}
+.sideBtnFrame{width:30px;height:30px;border-radius:6px;background:#1a0800;border:2px solid #5d4037;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;transition:border-color .15s,box-shadow .15s;}
 .sideBtn:hover .sideBtnFrame,.sideBtn:active .sideBtnFrame{border-color:#f1c40f;box-shadow:0 0 10px rgba(241,196,15,.45);}
-.sideBtnImg{width:30px;height:30px;object-fit:contain;display:block;}
+.sideBtnImg{width:22px;height:22px;object-fit:contain;display:block;}
 .sideBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;line-height:1;}
-/* Rect buttons below columns (Star Path / Challenges) — wider, attached to colBtns */
-.menuRectBtn{width:98px;min-height:32px;background:#160a02;border:2px solid #5d4037;border-top:none;border-top-left-radius:0;border-top-right-radius:0;border-bottom-left-radius:7px;border-bottom-right-radius:7px;margin-top:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:5px 4px;pointer-events:auto;}
+/* Rect buttons below columns (Star Path / Challenges) — +40% wider than bars, chained */
+.menuRectBtn{width:118px;min-height:32px;background:#160a02;border:2px solid #5d4037;border-radius:7px;margin-top:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:5px 4px;pointer-events:auto;}
 .menuRectBtn:hover,.menuRectBtn:active{border-color:#f1c40f;background:#2a1200;}
+/* Chain connectors between colBtns and rectBtn */
+.rectBtnChain{display:flex;justify-content:space-around;align-items:center;width:48px;padding:0;pointer-events:none;}
+.rChainLink{width:7px;height:11px;border:2px solid #c49050;border-radius:3px;background:linear-gradient(180deg,#9a6020 0%,#e0a840 40%,#9a6020 100%);box-shadow:0 1px 3px rgba(0,0,0,.6);}
 .rectBtnLbl{font-size:8px;color:#a08060;letter-spacing:.5px;font-weight:bold;text-align:center;line-height:1.4;}
 
 /* ── BOTTOM BAR ── */
 #menuBottom{position:absolute;bottom:0;left:0;right:0;height:92px;display:flex;align-items:stretch;z-index:20;border-top:2px solid #3e2723;background:rgba(8,3,0,.97);}
-#seasonBtn{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:8px 10px;cursor:pointer;border-right:1px solid #3e2723;min-width:0;transition:background .15s;}
+#seasonBtn{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:10px 10px 6px;cursor:pointer;border-right:1px solid #3e2723;min-width:0;transition:background .15s;}
 #seasonBtn:hover{background:rgba(241,196,15,.06);}
 #seasonLabel{font-size:10px;font-weight:900;color:#f1c40f;letter-spacing:2px;}
 #seasonName{font-size:15px;color:#fff;font-weight:900;margin-top:2px;white-space:normal;overflow:hidden;line-height:1.2;}
 #eventsBtn{flex:1;cursor:pointer;min-width:0;border-right:1px solid #3e2723;transition:background .15s;}
 #eventsBtn:hover{background:rgba(76,175,80,.06);}
-#eventsBtnInner{height:100%;display:flex;flex-direction:column;justify-content:center;padding:8px 10px;background:transparent;border:none;border-radius:0;outline:none;}
+#eventsBtnInner{height:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:10px 10px 6px;background:transparent;border:none;border-radius:0;outline:none;}
 #evLabel{font-size:10px;color:#4caf50;letter-spacing:2px;font-weight:bold;}
 #evName{font-size:14px;color:#fff;font-weight:900;margin-top:2px;white-space:normal;overflow:hidden;line-height:1.2;}
 #evArrow{display:none;}
-/* Start group: streak badge above play button, same height as bottom bar */
-#startBtnGroup{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 8px;gap:4px;flex-shrink:0;width:82px;}
+/* Start group: streak badge above play button — align from top to match Season/Events */
+#startBtnGroup{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:10px 8px 6px;gap:4px;flex-shrink:0;width:82px;}
 #startBtn{width:66px;height:60px;flex-shrink:0;border-radius:12px;border:2px solid #1565c0;font-size:30px;cursor:pointer;color:#fff;background:linear-gradient(180deg,#42a5f5,#1565c0,#0d47a1);text-shadow:none;display:flex;align-items:center;justify-content:center;animation:glow 2s ease-in-out infinite;padding:0;}
 @keyframes glow{0%,100%{box-shadow:0 0 8px #1976d2,0 0 20px rgba(25,118,210,.45);}50%{box-shadow:0 0 18px #42a5f5,0 0 40px rgba(66,165,245,.65);}}
 #startBtn:hover{filter:brightness(1.15);}
@@ -992,6 +995,11 @@ body.lightTheme .msReward{color:#a08060;}
           <span class="sideBtnLbl">CRAFTS</span>
         </div>
       </div>
+      <div class="rectBtnChain">
+        <div class="rChainLink"></div>
+        <div class="rChainLink"></div>
+        <div class="rChainLink"></div>
+      </div>
       <div class="menuRectBtn" onclick="showComingSoon('Star Path')">
         <span class="rectBtnLbl">⭐ STAR PATH</span>
       </div>
@@ -1024,6 +1032,11 @@ body.lightTheme .msReward{color:#a08060;}
           <div class="sideBtnFrame"><img class="sideBtnImg" src="/icons/duels.png" alt="Duels"></div>
           <span class="sideBtnLbl">DUELS</span>
         </div>
+      </div>
+      <div class="rectBtnChain">
+        <div class="rChainLink"></div>
+        <div class="rChainLink"></div>
+        <div class="rChainLink"></div>
       </div>
       <div class="menuRectBtn" onclick="showComingSoon('Challenges')">
         <span class="rectBtnLbl">🏆 CHALLENGES</span>
@@ -1701,10 +1714,11 @@ function loadPersisted(){
 function savePersistedProfile(){ try{ localStorage.setItem('chessstar_profile', JSON.stringify(profile)); }catch(e){} }
 function savePersistedSkins(){ try{ localStorage.setItem('chessstar_skins', JSON.stringify(pieceSkins)); }catch(e){} }
 loadPersisted();
-// Apply loaded profile to menu DOM right away
+// Apply loaded profile to menu DOM right away + kick off piece image preload
 window.addEventListener('DOMContentLoaded', ()=>{
   const pn = document.getElementById('pName');
   if(pn){ pn.textContent = profile.name; pn.style.color = profile.color; }
+  preloadPieceImgs();
 });
 
 // ═══════════════════════════════════════════
@@ -2056,22 +2070,108 @@ function getPal(isLight, skin){
   return isLight ? PAL_LIGHT : PAL_DARK;
 }
 
-// FIX (new batch): flat 2D Classic skin uses unicode chess silhouettes for a
-// clean web-style look. Black pieces get a thin white outline so they stay
-// readable on dark squares. White pieces get a thin black outline.
+// ── CLASSIC IMAGE PIECES ──
+// Each piece image: top half = BLACK piece, bottom half = WHITE piece (outline style)
+// We flood-fill from edges to isolate background (pure white) → set transparent.
+// Result: clean transparent-background pieces for any background color.
+const CLASSIC_IMGS = {};
+const CLASSIC_PROC = {}; // keys: 'P_b','P_w','R_b','R_w', etc.
+
+function _floodFillBg(d, W, H){
+  // BFS from all 4 edges; marks near-white pixels reachable from outside as background
+  const bg = new Uint8Array(W * H);
+  const q = [];
+  const isNearWhite = i => d[i]>200 && d[i+1]>200 && d[i+2]>200;
+  function seed(x, y){ const p=y*W+x; if(!bg[p]&&isNearWhite(p*4)){bg[p]=1;q.push(p);} }
+  for(let x=0;x<W;x++){seed(x,0);seed(x,H-1);}
+  for(let y=0;y<H;y++){seed(0,y);seed(W-1,y);}
+  let qi=0;
+  while(qi<q.length){
+    const p=q[qi++];
+    const x=p%W, y=Math.floor(p/W);
+    if(x>0){const n=p-1; if(!bg[n]&&isNearWhite(n*4)){bg[n]=1;q.push(n);}}
+    if(x<W-1){const n=p+1; if(!bg[n]&&isNearWhite(n*4)){bg[n]=1;q.push(n);}}
+    if(y>0){const n=p-W; if(!bg[n]&&isNearWhite(n*4)){bg[n]=1;q.push(n);}}
+    if(y<H-1){const n=p+W; if(!bg[n]&&isNearWhite(n*4)){bg[n]=1;q.push(n);}}
+  }
+  return bg;
+}
+
+function _processClassicHalf(img, isWhite){
+  const naturalH = img.naturalHeight, naturalW = img.naturalWidth;
+  const halfH = Math.floor(naturalH / 2);
+  const sy = isWhite ? halfH : 0;
+  const oc = document.createElement('canvas');
+  oc.width = naturalW; oc.height = halfH;
+  const ox = oc.getContext('2d');
+  ox.drawImage(img, 0, sy, naturalW, halfH, 0, 0, naturalW, halfH);
+  const id = ox.getImageData(0, 0, naturalW, halfH);
+  const d = id.data;
+  const bg = _floodFillBg(d, naturalW, halfH);
+  for(let i=0;i<naturalW*halfH;i++){
+    if(bg[i]){ d[i*4+3]=0; continue; }
+    // Interior white pixels of white piece → keep as solid white fill
+    if(isWhite){
+      const r=d[i*4],g=d[i*4+1],b=d[i*4+2];
+      if(r>180&&g>180&&b>180){ d[i*4]=248;d[i*4+1]=248;d[i*4+2]=240;d[i*4+3]=255; }
+    }
+  }
+  ox.putImageData(id, 0, 0);
+  return oc;
+}
+
+function _cacheClassicPieces(){
+  ['P','R','N','B','Q','K'].forEach(t=>{
+    const img = CLASSIC_IMGS[t];
+    if(!img||!img.complete||img.naturalHeight<10) return;
+    CLASSIC_PROC[t+'_b'] = _processClassicHalf(img, false);
+    CLASSIC_PROC[t+'_w'] = _processClassicHalf(img, true);
+  });
+}
+
+function preloadPieceImgs(){
+  const srcs = {P:'/icons/piece-pawn.jpg',R:'/icons/piece-rook.jpg',N:'/icons/piece-knight.jpg',B:'/icons/piece-bishop.jpg',Q:'/icons/piece-queen.jpg',K:'/icons/piece-king.jpg'};
+  let loaded = 0;
+  const types = ['P','R','N','B','Q','K'];
+  types.forEach(t=>{
+    const img = new Image();
+    img.onload = ()=>{
+      CLASSIC_IMGS[t] = img; loaded++;
+      if(loaded===types.length){
+        _cacheClassicPieces();
+        // Re-render pieces menu if currently open
+        const pm = document.getElementById('piecesMenuScreen');
+        if(pm && pm.classList.contains('active')) renderPiecesMenu();
+      }
+    };
+    img.onerror = ()=>{ loaded++; };
+    img.src = srcs[t];
+  });
+}
+
+// Fallback glyph (used if images not yet ready)
 const C2D_GLYPH = { P:'\u265F', R:'\u265C', N:'\u265E', B:'\u265D', Q:'\u265B', K:'\u265A' };
+
 function drawClassic2D(ctx, type, pal){
+  // Determine if this is a white piece
+  const isWhite = (pal.fill === '#fff');
+  const key = type + (isWhite ? '_w' : '_b');
+  const oc = CLASSIC_PROC[key];
+  if(oc){
+    // Draw image piece: oc is transparent-bg processed canvas
+    // Fit into approx 34×40 box, vertically aligned so baseline sits at y=8
+    const dw = 34, dh = Math.round(34 * oc.height / oc.width);
+    ctx.drawImage(oc, -dw/2, -dh + 8, dw, dh);
+    return;
+  }
+  // Fallback: unicode glyph (shown while images load or if load fails)
   const g = C2D_GLYPH[type]; if(!g) return;
-  ctx.font = 'bold 38px "DejaVu Sans", "Segoe UI Symbol", "Apple Symbols", "Arial Unicode MS", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'alphabetic';
-  // Outline pass first (thicker), then fill on top — gives a crisp web-style silhouette
+  ctx.font = 'bold 38px "DejaVu Sans","Segoe UI Symbol","Apple Symbols","Arial Unicode MS",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
   ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-  ctx.strokeStyle = pal.outline;
-  ctx.lineWidth = pal.outlineW || 1.6;
+  ctx.strokeStyle = pal.outline; ctx.lineWidth = pal.outlineW||1.6;
   ctx.strokeText(g, 0, 8);
-  ctx.fillStyle = pal.fill;
-  ctx.fillText(g, 0, 8);
+  ctx.fillStyle = pal.fill; ctx.fillText(g, 0, 8);
 }
 
 function drawPieceShape(ctx,type,pal,shadow){
