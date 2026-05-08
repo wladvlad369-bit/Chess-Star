@@ -16,8 +16,17 @@ Workflow: **Start application** — `cd chess-star && PORT=5000 node server.js` 
 
 ## v0.09 Features (latest)
 
-- **Trophy ⓘ button** — info button shown in Progressive Trophies modal only; updated text explains trophies as a better, harder win variant earned in ChampionShip events
-- **Classic skin — real piece images** — 6 user-provided JPGs (Pawn/Rook/Knight/Bishop/Queen/King) used for classic skin; each JPG has black piece (top half) + white piece (bottom half); BFS flood-fill removes white backgrounds for clean transparent rendering on any board/bg color; glyph fallback if images not yet loaded
+- **Trophy ⓘ button** — info button shown in Progressive Trophies modal only
+- **12 separate piece images** — piece-{P/R/N/B/Q/K}_{w/b}.jpg; BFS flood-fill background removal; glyph fallback
+- **True 9:16 frame** — root height 600px→640px; bars centered vertically in middle section
+- **Chain UI fixed** — rectBtnChain now uses rectChainStick + rectChainLinks (2×hangerChain) to match top colHanger structure exactly
+- **Star Path / Challenges width** — menuRectBtn width 118px→100% (no more overflow)
+- **LPS mode selector hidden** — LPS correctly hides the 1v1/2v2/4v4 selector (toggle not add)
+- **Win/streak dedup guard** — 2-second debounce on notifyMatchFinished prevents double-recording; each game init resets the guard
+- **AI think time 3–6s** — ccAiPlay and gtsAiPlay now use `3000 + rand(3000)` ms
+- **Smarter AI scoring** — Classic: center bonus, pawn advance, knight/bishop development, king-safety penalty; GTS: safe-hit priority scales with enemy HP, advance-toward-safe bonus
+- **GTS draw rule** — gtsEndMove checks if either side runs out of non-SAFE pieces; shows DRAW / YOU WIN / YOU LOSE overlay accordingly
+- **Button separators** — piecesBtn, friendsBtn, leaderboardBtn each get border-bottom divider line
 - **Piece images used everywhere** — all boards (Classic, LPS, GTS, QoC), Pieces menu thumbnails, piece detail, skin cards
 - **Season/Events/Streak aligned** — all three bottom bar sections use `justify-content:flex-start; padding-top:10px` so their content starts at the same height
 - **Bars 25% thinner** — sideBtn 62→47px, sideBtnFrame 40→30px, sideBtnImg 30→22px

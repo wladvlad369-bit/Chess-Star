@@ -11,7 +11,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;background:#0a0500;font-fami
 *{-webkit-tap-highlight-color:transparent;outline:none;}
 button,div,canvas{-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;}
-#root{position:fixed;width:360px;height:600px;overflow:hidden;background:#0a0500;border:2px solid #3e2723;box-shadow:0 0 40px rgba(0,0,0,.9);transform-origin:top left;}
+#root{position:fixed;width:360px;height:640px;overflow:hidden;background:#0a0500;border:2px solid #3e2723;box-shadow:0 0 40px rgba(0,0,0,.9);transform-origin:top left;}
 body.lightTheme{background:#e8e0d0;color:#1a0500;}
 body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;}
@@ -67,10 +67,10 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .infoBtn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#1976d2;color:#fff;font-size:11px;font-weight:bold;font-family:Georgia,serif;border:1px solid #0d47a1;cursor:pointer;font-style:italic;transition:transform .15s,background .15s;}
 .infoBtn:hover{background:#42a5f5;transform:scale(1.1);}
 /* piecesBtn override reset */
-#piecesBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;}
+#piecesBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-bottom:1px solid #2a1200!important;border-radius:0!important;background:transparent!important;}
 
 /* ── MIDDLE COLUMNS ── */
-#menuMiddle{position:absolute;top:64px;bottom:86px;left:0;right:0;display:flex;align-items:flex-start;justify-content:space-between;padding:8px 4px 0;z-index:10;pointer-events:none;}
+#menuMiddle{position:absolute;top:64px;bottom:86px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 4px;z-index:10;pointer-events:none;}
 .menuSideCol{display:flex;flex-direction:column;align-items:center;gap:0;width:63px;pointer-events:auto;}
 .colHanger{display:flex;flex-direction:column;align-items:center;width:100%;}
 .hangerStick{width:54px;height:7px;background:linear-gradient(180deg,#6a3c10,#c49050,#6a3c10);border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,.8),0 1px 2px rgba(196,144,80,.4);}
@@ -87,12 +87,13 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .sideBtn:hover .sideBtnFrame,.sideBtn:active .sideBtnFrame{border-color:#f1c40f;box-shadow:0 0 10px rgba(241,196,15,.45);}
 .sideBtnImg{width:30px;height:30px;object-fit:contain;display:block;}
 .sideBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;line-height:1;}
-/* Rect buttons below columns (Star Path / Challenges) — +40% wider than bars, chained */
-.menuRectBtn{width:118px;min-height:32px;background:#160a02;border:2px solid #5d4037;border-radius:7px;margin-top:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:5px 4px;pointer-events:auto;}
+/* Rect buttons below columns (Star Path / Challenges) — same width as bar column */
+.menuRectBtn{width:100%;min-height:32px;background:#160a02;border:2px solid #5d4037;border-radius:7px;margin-top:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:5px 4px;pointer-events:auto;}
 .menuRectBtn:hover,.menuRectBtn:active{border-color:#f1c40f;background:#2a1200;}
-/* Chain connectors between colBtns and rectBtn */
-.rectBtnChain{display:flex;justify-content:space-around;align-items:center;width:36px;padding:0;pointer-events:none;}
-.rChainLink{width:7px;height:11px;border:2px solid #c49050;border-radius:3px;background:linear-gradient(180deg,#9a6020 0%,#e0a840 40%,#9a6020 100%);box-shadow:0 1px 3px rgba(0,0,0,.6);}
+/* Chain connectors between colBtns and rectBtn — identical to top hangers */
+.rectBtnChain{display:flex;flex-direction:column;align-items:center;pointer-events:none;}
+.rectChainStick{width:54px;height:7px;background:linear-gradient(180deg,#6a3c10,#c49050,#6a3c10);border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,.8),0 1px 2px rgba(196,144,80,.4);}
+.rectChainLinks{display:flex;justify-content:space-between;width:38px;}
 .rectBtnLbl{font-size:8px;color:#a08060;letter-spacing:.5px;font-weight:bold;text-align:center;line-height:1.4;}
 
 /* ── BOTTOM BAR ── */
@@ -648,13 +649,13 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #acctSkip:hover{color:#f1c40f;}
 
 /* friendsBtn + leaderboardBtn now live inside .colBtns as .sideBtns */
-#friendsBtn{position:static!important;transform:none!important;width:100%!important;height:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
+#friendsBtn{position:static!important;transform:none!important;width:100%!important;height:100%!important;border:none!important;border-bottom:1px solid #2a1200!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
 #friendsBtn:hover{background:#2a1200!important;}
 #friendsBtnIco{font-size:22px;line-height:1;}
 #friendsBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
 #friendsBtnBadge{position:absolute;top:4px;right:4px;background:#e74c3c;color:#fff;border:1px solid #000;border-radius:50%;min-width:14px;height:14px;font-size:8px;font-weight:bold;display:none;align-items:center;justify-content:center;padding:0 2px;}
 #friendsBtnBadge.show{display:flex;}
-#leaderboardBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
+#leaderboardBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-bottom:1px solid #2a1200!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
 #leaderboardBtn:hover{background:#2a1200!important;}
 #leaderboardBtnIco{font-size:22px;line-height:1;}
 #leaderboardBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
@@ -996,9 +997,11 @@ body.lightTheme .msReward{color:#a08060;}
         </div>
       </div>
       <div class="rectBtnChain">
-        <div class="rChainLink"></div>
-        <div class="rChainLink"></div>
-        <div class="rChainLink"></div>
+        <div class="rectChainStick"></div>
+        <div class="rectChainLinks">
+          <div class="hangerChain"></div>
+          <div class="hangerChain"></div>
+        </div>
       </div>
       <div class="menuRectBtn" onclick="showComingSoon('Star Path')">
         <span class="rectBtnLbl">⭐ STAR PATH</span>
@@ -1034,9 +1037,11 @@ body.lightTheme .msReward{color:#a08060;}
         </div>
       </div>
       <div class="rectBtnChain">
-        <div class="rChainLink"></div>
-        <div class="rChainLink"></div>
-        <div class="rChainLink"></div>
+        <div class="rectChainStick"></div>
+        <div class="rectChainLinks">
+          <div class="hangerChain"></div>
+          <div class="hangerChain"></div>
+        </div>
       </div>
       <div class="menuRectBtn" onclick="showComingSoon('Challenges')">
         <span class="rectBtnLbl">🏆 CHALLENGES</span>
@@ -2956,6 +2961,7 @@ function lpsPoison(x,y){
 }
 
 function initLPS(type){
+  window._nmfLastCall = 0; // allow this fresh game to record results
   lpsBoard=Array(8).fill(0).map(()=>Array(8).fill(null));
   window._repFrames = [];
   lpsTurn=0;lpsMoves=0;lpsRounds=0;lpsPoisonStg=0;lpsPoisonOn=false;
@@ -3603,6 +3609,7 @@ function ccEndMove(){
 }
 
 function initClassic(){
+  window._nmfLastCall = 0; // allow this fresh game to record results
   window._repFrames = [];
   ccBoard=Array(8).fill(0).map(()=>Array(8).fill(null));
   const back=['R','N','B','Q','K','B','N','R'];
@@ -3776,6 +3783,7 @@ function gtsUpdateHpBar(){
 }
 
 function initGTS(){
+  window._nmfLastCall = 0; // allow this fresh game to record results
   window._repFrames = [];
   gtsBoard=Array(8).fill(0).map(()=>Array(8).fill(null));
   const back=['R','N','B','Q','K','B','N','R'];
@@ -3977,6 +3985,23 @@ function gtsEndMove(){
   // Decrement shield counters AFTER turn switch (each shield lasts 2 half-turns = 1 full cycle)
   if(gtsShieldW>0){ gtsShieldW--; if(gtsShieldW===0) document.getElementById('gtsMsg').textContent='✅ White safe is vulnerable again.'; }
   if(gtsShieldB>0){ gtsShieldB--; if(gtsShieldB===0) document.getElementById('gtsMsg').textContent='✅ Black safe is vulnerable again.'; }
+  // Draw rule: if either side runs out of all non-SAFE pieces, end the game
+  const _wHasP=gtsBoard.flat().some(p=>p&&p.c==='w'&&p.t!=='SAFE');
+  const _bHasP=gtsBoard.flat().some(p=>p&&p.c==='b'&&p.t!=='SAFE');
+  if(!_wHasP||!_bHasP){
+    gtsGameOver=true; gtsRunning=false;
+    const _myColD=window.gtsPlayerColor||'w';
+    const _pureD=!_wHasP&&!_bHasP;
+    const _wonD=(!_bHasP&&_myColD==='w')||(!_wHasP&&_myColD==='b');
+    document.getElementById('gtsWinMsg').textContent=_pureD?'DRAW — ALL PIECES GONE':(_wonD?'YOU WIN! 🏆':'YOU LOSE ☠');
+    const _dsub=document.getElementById('gtsEndSub');
+    if(_dsub) _dsub.textContent=_pureD?'No pieces remain — draw.':((_wonD)?'Enemy lost all pieces.':'You lost all pieces.');
+    document.getElementById('gtsStatKills').textContent=window.gtsPlayerKills||0;
+    document.getElementById('gtsStatHits').textContent=window.gtsPlayerHits||0;
+    document.getElementById('gtsEndOverlay').classList.add('show');
+    if(!_pureD) try{ window.notifyMatchFinished&&window.notifyMatchFinished(_wonD?'win':'loss',{noStreakReset:!_wonD}); }catch(e){}
+    return;
+  }
   const tn = gtsTurn==='w' ? 'WHITE' : 'BLACK';
   document.getElementById('gtsInfo').textContent='GRIND THE SAFE — '+tn+' TURN';
   gtsSel=null;gtsValMoves=[];
@@ -4284,6 +4309,7 @@ let qocBoard=[], qocTurn='w', qocSel=null, qocValMoves=[], qocRunning=false, qoc
 let qocPlies=0, qocBuffMsg='', qocMustChain=null;
 
 function initQOC(){
+  window._nmfLastCall = 0; // allow this fresh game to record results
   window._repFrames = [];
   qocBoard = Array(8).fill(0).map(()=>Array(8).fill(null));
   // Standard 8x8 international-checkers placement on dark squares only
@@ -5182,12 +5208,12 @@ function drawThumbQOC(){
     window.currentMode = m;
     document.querySelectorAll('.modeOpt').forEach(b=>b.classList.toggle('on', b.dataset.mode===m));
   };
-  // v0.05 — Mode selector now shows for ALL events (1v1 / 2v2 / 4v4 universally)
+  // v0.05 — Mode selector now shows for ALL events except LPS (LPS has no 1v1/2v2/4v4)
   const _origSelectEv = window.selectEv;
   window.selectEv = function(ev, el){
     _origSelectEv && _origSelectEv(ev, el);
     const wrap = $('modeSelectorWrap');
-    if(wrap) wrap.classList.add('show');
+    if(wrap) wrap.classList.toggle('show', ev !== 'lps');
   };
 
   // ── FRIENDS ──────────────────────────────────────────────────────
@@ -5583,6 +5609,10 @@ function drawThumbQOC(){
   window.saveReplay  = saveReplay;
   window.loadReplays = loadReplays;
   window.notifyMatchFinished = function(result, opts){
+    // Guard: prevent duplicate calls within 2 seconds (e.g. from double-fire or play-again bugs)
+    const _nmfNow = Date.now();
+    if(window._nmfLastCall && _nmfNow - window._nmfLastCall < 2000) return;
+    window._nmfLastCall = _nmfNow;
     opts = opts || {};
     const special       = !!opts.special;
     const noStreakReset = !!opts.noStreakReset; // local AI games pass this to keep streak alive
@@ -6526,11 +6556,21 @@ function drawThumbQOC(){
     const target = ccBoard[mv.dr][mv.dc];
     if(target){
       s += (PIECE_VAL[target.t]||0) * 10;
-      // captures with lower-value piece are extra good
+      // captures with lower-value piece are extra good (good trades)
       s += Math.max(0, PIECE_VAL[target.t] - PIECE_VAL[mv.piece]) * 2;
     }
-    // center push
-    if(mv.dr>=3 && mv.dr<=4 && mv.dc>=3 && mv.dc<=4) s += 0.8;
+    // center control — extended bonus for broader center
+    if(mv.dr>=3 && mv.dr<=4 && mv.dc>=3 && mv.dc<=4) s += 1.2;
+    else if(mv.dr>=2 && mv.dr<=5 && mv.dc>=2 && mv.dc<=5) s += 0.4;
+    // pawn advancement bonus
+    if(mv.piece==='P'){
+      const adv = aiColor==='w' ? (6-mv.dr) : (mv.dr-1);
+      s += adv * 0.05;
+    }
+    // knight and bishop development (move off back rank early)
+    if((mv.piece==='N'||mv.piece==='B') && (mv.sr===0||mv.sr===7)) s += 0.5;
+    // king safety: penalize moving king away from corner early
+    if(mv.piece==='K') s -= level * 0.3;
     // promotion
     if(mv.piece==='P' && (mv.dr===0||mv.dr===7)) s += 8;
     // simulate consequence — does the opponent immediately recapture for more value?
@@ -6565,8 +6605,8 @@ function drawThumbQOC(){
     if(ccTurn !== aiColor) return;
     const level = window.aiLevel ? window.aiLevel('enemy') : 5;
     document.getElementById('classicMsg').textContent = window.translateMsg('🤖 AI thinking...');
-    // ~3s think time so the user can read and follow what's happening
-    const thinkMs = 1800 + Math.floor(Math.random()*1400);
+    // 3–6s think time so the user can read and follow what's happening
+    const thinkMs = 3000 + Math.floor(Math.random()*3000);
     setTimeout(()=>{
       if(!ccRunning || ccGameOver) return;
       const moves = ccGenAllLegal(aiColor);
@@ -6685,9 +6725,18 @@ function drawThumbQOC(){
   function gtsScoreMove(mv, aiColor, level){
     let s = 0;
     const target = gtsBoard[mv.dr] && gtsBoard[mv.dr][mv.dc];
-    // GTS goal: hit the enemy safe to drain its HP
-    if(target && target.t==='SAFE' && target.c!==aiColor) s += 50; // smashing the safe is best
-    else if(target && target.c!==aiColor) s += (PIECE_VAL[target.t]||0) * 6;
+    // GTS primary goal: hit the enemy safe to drain its HP — this is ALWAYS top priority
+    if(target && target.t==='SAFE' && target.c!==aiColor){
+      s += 80; // highest priority move in GTS
+      // bonus if the safe is at low HP (nearly destroyed)
+      const safeHp = aiColor==='b' ? gtsHpW : gtsHpB;
+      s += (4-safeHp) * 15; // more urgent the closer to winning
+    } else if(target && target.c!==aiColor) {
+      s += (PIECE_VAL[target.t]||0) * 6;
+    }
+    // advance toward enemy safe
+    const enemySafeRow = aiColor==='b' ? 7 : 0;
+    s += (1 - Math.abs(mv.dr - enemySafeRow) / 7) * 0.8;
     // center control still useful
     if(mv.dr>=3 && mv.dr<=4 && mv.dc>=3 && mv.dc<=4) s += 0.6;
     // promotion bonus
@@ -6732,7 +6781,7 @@ function drawThumbQOC(){
     const level = window.aiLevel ? window.aiLevel('enemy') : 5;
     const msg = document.getElementById('gtsMsg');
     if(msg) msg.textContent = window.translateMsg('🤖 AI thinking...');
-    const thinkMs = 1800 + Math.floor(Math.random()*1400);
+    const thinkMs = 3000 + Math.floor(Math.random()*3000);
     setTimeout(()=>{
       if(!gtsRunning || gtsGameOver) return;
       const moves = gtsGenAllForColor(aiColor);
