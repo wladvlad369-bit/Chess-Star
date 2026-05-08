@@ -70,33 +70,33 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 #piecesBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;}
 
 /* ── MIDDLE COLUMNS ── */
-#menuMiddle{position:absolute;top:64px;bottom:92px;left:0;right:0;display:flex;align-items:flex-start;justify-content:space-between;padding:8px 4px 0;z-index:10;pointer-events:none;}
-.menuSideCol{display:flex;flex-direction:column;align-items:center;gap:0;width:84px;pointer-events:auto;}
+#menuMiddle{position:absolute;top:64px;bottom:86px;left:0;right:0;display:flex;align-items:flex-start;justify-content:space-between;padding:8px 4px 0;z-index:10;pointer-events:none;}
+.menuSideCol{display:flex;flex-direction:column;align-items:center;gap:0;width:63px;pointer-events:auto;}
 .colHanger{display:flex;flex-direction:column;align-items:center;width:100%;}
-.hangerStick{width:72px;height:7px;background:linear-gradient(180deg,#6a3c10,#c49050,#6a3c10);border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,.8),0 1px 2px rgba(196,144,80,.4);}
-.hangerChains{display:flex;justify-content:space-between;width:50px;margin-top:0;}
+.hangerStick{width:54px;height:7px;background:linear-gradient(180deg,#6a3c10,#c49050,#6a3c10);border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,.8),0 1px 2px rgba(196,144,80,.4);}
+.hangerChains{display:flex;justify-content:space-between;width:38px;margin-top:0;}
 .hangerChain{width:2px;height:12px;background:repeating-linear-gradient(180deg,#c49050 0px,#c49050 3px,#5a3010 3px,#5a3010 6px);border-radius:1px;}
-.colBtns{display:flex;flex-direction:column;width:84px;background:#160a02;border:2px solid #5d4037;border-radius:8px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.65);}
-/* All 4 buttons identical size */
-.sideBtn{width:100%;height:47px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border-bottom:1px solid #2a1200;transition:background .15s;position:relative;-webkit-tap-highlight-color:transparent;}
+.colBtns{display:flex;flex-direction:column;width:63px;background:#160a02;border:2px solid #5d4037;border-radius:8px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.65);}
+/* All 4 buttons identical size — restored to 62px, colBtns is 25% narrower (63px) */
+.sideBtn{width:100%;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border-bottom:1px solid #2a1200;transition:background .15s;position:relative;-webkit-tap-highlight-color:transparent;}
 .sideBtn:last-child{border-bottom:none;}
 .sideBtn:hover,.sideBtn:active{background:rgba(241,196,15,.06);}
 .sideBtn:hover .sideBtnLbl{color:#f1c40f;}
 /* Square image frame overlay — same size for every button */
-.sideBtnFrame{width:30px;height:30px;border-radius:6px;background:#1a0800;border:2px solid #5d4037;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;transition:border-color .15s,box-shadow .15s;}
+.sideBtnFrame{width:40px;height:40px;border-radius:8px;background:#1a0800;border:2px solid #5d4037;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;transition:border-color .15s,box-shadow .15s;}
 .sideBtn:hover .sideBtnFrame,.sideBtn:active .sideBtnFrame{border-color:#f1c40f;box-shadow:0 0 10px rgba(241,196,15,.45);}
-.sideBtnImg{width:22px;height:22px;object-fit:contain;display:block;}
+.sideBtnImg{width:30px;height:30px;object-fit:contain;display:block;}
 .sideBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;line-height:1;}
 /* Rect buttons below columns (Star Path / Challenges) — +40% wider than bars, chained */
 .menuRectBtn{width:118px;min-height:32px;background:#160a02;border:2px solid #5d4037;border-radius:7px;margin-top:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:5px 4px;pointer-events:auto;}
 .menuRectBtn:hover,.menuRectBtn:active{border-color:#f1c40f;background:#2a1200;}
 /* Chain connectors between colBtns and rectBtn */
-.rectBtnChain{display:flex;justify-content:space-around;align-items:center;width:48px;padding:0;pointer-events:none;}
+.rectBtnChain{display:flex;justify-content:space-around;align-items:center;width:36px;padding:0;pointer-events:none;}
 .rChainLink{width:7px;height:11px;border:2px solid #c49050;border-radius:3px;background:linear-gradient(180deg,#9a6020 0%,#e0a840 40%,#9a6020 100%);box-shadow:0 1px 3px rgba(0,0,0,.6);}
 .rectBtnLbl{font-size:8px;color:#a08060;letter-spacing:.5px;font-weight:bold;text-align:center;line-height:1.4;}
 
 /* ── BOTTOM BAR ── */
-#menuBottom{position:absolute;bottom:0;left:0;right:0;height:92px;display:flex;align-items:stretch;z-index:20;border-top:2px solid #3e2723;background:rgba(8,3,0,.97);}
+#menuBottom{position:absolute;bottom:0;left:0;right:0;height:86px;display:flex;align-items:stretch;z-index:20;border-top:2px solid #3e2723;background:rgba(8,3,0,.97);overflow:visible;}
 #seasonBtn{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:10px 10px 6px;cursor:pointer;border-right:1px solid #3e2723;min-width:0;transition:background .15s;}
 #seasonBtn:hover{background:rgba(241,196,15,.06);}
 #seasonLabel{font-size:10px;font-weight:900;color:#f1c40f;letter-spacing:2px;}
@@ -107,9 +107,9 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 #evLabel{font-size:10px;color:#4caf50;letter-spacing:2px;font-weight:bold;}
 #evName{font-size:14px;color:#fff;font-weight:900;margin-top:2px;white-space:normal;overflow:hidden;line-height:1.2;}
 #evArrow{display:none;}
-/* Start group: streak badge above play button — align from top to match Season/Events */
-#startBtnGroup{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:10px 8px 6px;gap:4px;flex-shrink:0;width:82px;}
-#startBtn{width:66px;height:60px;flex-shrink:0;border-radius:12px;border:2px solid #1565c0;font-size:30px;cursor:pointer;color:#fff;background:linear-gradient(180deg,#42a5f5,#1565c0,#0d47a1);text-shadow:none;display:flex;align-items:center;justify-content:center;animation:glow 2s ease-in-out infinite;padding:0;}
+/* Start group — badge positioned above the separator line, button fills the space */
+#startBtnGroup{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;gap:0;flex-shrink:0;width:86px;position:relative;}
+#startBtn{width:70px;height:70px;flex-shrink:0;border-radius:12px;border:2px solid #1565c0;font-size:30px;cursor:pointer;color:#fff;background:linear-gradient(180deg,#42a5f5,#1565c0,#0d47a1);text-shadow:none;display:flex;align-items:center;justify-content:center;animation:glow 2s ease-in-out infinite;padding:0;}
 @keyframes glow{0%,100%{box-shadow:0 0 8px #1976d2,0 0 20px rgba(25,118,210,.45);}50%{box-shadow:0 0 18px #42a5f5,0 0 40px rgba(66,165,245,.65);}}
 #startBtn:hover{filter:brightness(1.15);}
 #startBtn:active{filter:brightness(.9);}
@@ -205,7 +205,7 @@ body.lightTheme #iconSelectBtn,body.lightTheme #nameSelectBtn{background:#1976d2
 #piecesGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px 14px;width:100%;flex:1;align-content:start;}
 .pieceCard{border:2px solid #3e1a00;border-radius:10px;background:#140800;cursor:pointer;transition:border-color .15s,transform .12s,box-shadow .2s;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 6px 10px;gap:6px;min-height:120px;}
 .pieceCard:hover{border-color:#f1c40f;transform:translateY(-2px);}
-.pcCanvas{width:88px;height:60px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));}
+.pcCanvas{width:54px;height:76px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));}
 .pcName{font-size:11px;color:#fff;letter-spacing:2px;font-weight:bold;text-shadow:1px 1px 0 rgba(0,0,0,.65);}
 /* v0.04 — piece colored backgrounds in Pieces menu (each piece = its type color) */
 /* v0.04 — piece card colors (corrected per user spec)
@@ -718,7 +718,7 @@ body.lightTheme .lbPodium.first{border-color:#f1c40f;background:#ffe9a0;}
 body.lightTheme .lbPodName{color:#3a2306;}
 body.lightTheme #lbRefreshBtn{background:#fff8e8;color:#7a4e20;border-color:#a08060;}
 /* ── FIRE STREAK BADGE — above start button ── */
-#streakFireBadge{display:none;position:relative;overflow:visible;background:linear-gradient(160deg,#7f1500,#c62828,#e64a19);border:2px solid #ff7043;border-radius:8px;padding:2px 7px 2px 5px;align-items:center;justify-content:center;gap:3px;flex-direction:row;cursor:default;white-space:nowrap;box-shadow:0 0 8px rgba(255,112,67,.5),inset 0 1px 0 rgba(255,200,150,.2);}
+#streakFireBadge{display:none;position:absolute;bottom:100%;right:4px;margin-bottom:5px;overflow:visible;background:linear-gradient(160deg,#7f1500,#c62828,#e64a19);border:2px solid #ff7043;border-radius:8px;padding:2px 7px 2px 5px;align-items:center;justify-content:center;gap:3px;flex-direction:row;cursor:default;white-space:nowrap;box-shadow:0 0 8px rgba(255,112,67,.5),inset 0 1px 0 rgba(255,200,150,.2);z-index:30;}
 #streakFireBadge.show{display:flex;}
 /* streak ≥ 10 → golden fire glow + particle sparks */
 #streakFireBadge.sf10plus{border-color:#ffa726;background:linear-gradient(160deg,#7f1500,#e65100,#f57f17);animation:fireGlow10 1s ease-in-out infinite;box-shadow:0 0 14px rgba(255,152,0,.75),0 0 28px rgba(255,87,34,.4),inset 0 1px 0 rgba(255,230,150,.3);}
@@ -2097,55 +2097,75 @@ function _floodFillBg(d, W, H){
   return bg;
 }
 
-function _processClassicHalf(img, isWhite){
-  const naturalH = img.naturalHeight, naturalW = img.naturalWidth;
-  const halfH = Math.floor(naturalH / 2);
-  const sy = isWhite ? halfH : 0;
+// Process a FULL piece image (one image = one piece, one color)
+// For white pieces: remove background, preserve dark outline + white interior fill
+// For black pieces: remove background, add subtle white glow outline so visible on light squares
+function _processFullImg(img, isWhite){
+  const W = img.naturalWidth, H = img.naturalHeight;
   const oc = document.createElement('canvas');
-  oc.width = naturalW; oc.height = halfH;
+  oc.width = W; oc.height = H;
   const ox = oc.getContext('2d');
-  ox.drawImage(img, 0, sy, naturalW, halfH, 0, 0, naturalW, halfH);
-  const id = ox.getImageData(0, 0, naturalW, halfH);
+  ox.drawImage(img, 0, 0, W, H);
+  const id = ox.getImageData(0, 0, W, H);
   const d = id.data;
-  const bg = _floodFillBg(d, naturalW, halfH);
-  for(let i=0;i<naturalW*halfH;i++){
+  const bg = _floodFillBg(d, W, H);
+  for(let i=0;i<W*H;i++){
     if(bg[i]){ d[i*4+3]=0; continue; }
-    // Interior white pixels of white piece → keep as solid white fill
     if(isWhite){
+      // Interior white pixels → solid cream-white fill
       const r=d[i*4],g=d[i*4+1],b=d[i*4+2];
       if(r>180&&g>180&&b>180){ d[i*4]=248;d[i*4+1]=248;d[i*4+2]=240;d[i*4+3]=255; }
     }
+    // Black piece: dark pixels stay as-is
   }
   ox.putImageData(id, 0, 0);
+  if(!isWhite){
+    // Add thin white halo outline around black piece for readability on any bg
+    const oc2 = document.createElement('canvas');
+    oc2.width = W; oc2.height = H;
+    const ox2 = oc2.getContext('2d');
+    ox2.shadowColor = 'rgba(255,255,255,0.9)';
+    ox2.shadowBlur = 4;
+    ox2.drawImage(oc, 0, 0);
+    ox2.shadowBlur = 0;
+    ox2.drawImage(oc, 0, 0); // redraw piece cleanly on top of glow
+    return oc2;
+  }
   return oc;
 }
 
 function _cacheClassicPieces(){
   ['P','R','N','B','Q','K'].forEach(t=>{
-    const img = CLASSIC_IMGS[t];
-    if(!img||!img.complete||img.naturalHeight<10) return;
-    CLASSIC_PROC[t+'_b'] = _processClassicHalf(img, false);
-    CLASSIC_PROC[t+'_w'] = _processClassicHalf(img, true);
+    const imgW = CLASSIC_IMGS[t+'_w'];
+    const imgB = CLASSIC_IMGS[t+'_b'];
+    if(imgW&&imgW.complete&&imgW.naturalHeight>10) CLASSIC_PROC[t+'_w'] = _processFullImg(imgW, true);
+    if(imgB&&imgB.complete&&imgB.naturalHeight>10) CLASSIC_PROC[t+'_b'] = _processFullImg(imgB, false);
   });
 }
 
 function preloadPieceImgs(){
-  const srcs = {P:'/icons/piece-pawn.jpg',R:'/icons/piece-rook.jpg',N:'/icons/piece-knight.jpg',B:'/icons/piece-bishop.jpg',Q:'/icons/piece-queen.jpg',K:'/icons/piece-king.jpg'};
+  const srcs = {
+    'P_w':'/icons/piece-pawn-w.jpg',   'P_b':'/icons/piece-pawn-b.jpg',
+    'R_w':'/icons/piece-rook-w.jpg',   'R_b':'/icons/piece-rook-b.jpg',
+    'N_w':'/icons/piece-knight-w.jpg', 'N_b':'/icons/piece-knight-b.jpg',
+    'B_w':'/icons/piece-bishop-w.jpg', 'B_b':'/icons/piece-bishop-b.jpg',
+    'Q_w':'/icons/piece-queen-w.jpg',  'Q_b':'/icons/piece-queen-b.jpg',
+    'K_w':'/icons/piece-king-w.jpg',   'K_b':'/icons/piece-king-b.jpg',
+  };
   let loaded = 0;
-  const types = ['P','R','N','B','Q','K'];
-  types.forEach(t=>{
+  const keys = Object.keys(srcs);
+  keys.forEach(k=>{
     const img = new Image();
     img.onload = ()=>{
-      CLASSIC_IMGS[t] = img; loaded++;
-      if(loaded===types.length){
+      CLASSIC_IMGS[k] = img; loaded++;
+      if(loaded===keys.length){
         _cacheClassicPieces();
-        // Re-render pieces menu if currently open
         const pm = document.getElementById('piecesMenuScreen');
         if(pm && pm.classList.contains('active')) renderPiecesMenu();
       }
     };
     img.onerror = ()=>{ loaded++; };
-    img.src = srcs[t];
+    img.src = srcs[k];
   });
 }
 
@@ -2153,18 +2173,18 @@ function preloadPieceImgs(){
 const C2D_GLYPH = { P:'\u265F', R:'\u265C', N:'\u265E', B:'\u265D', Q:'\u265B', K:'\u265A' };
 
 function drawClassic2D(ctx, type, pal){
-  // Determine if this is a white piece
   const isWhite = (pal.fill === '#fff');
   const key = type + (isWhite ? '_w' : '_b');
   const oc = CLASSIC_PROC[key];
   if(oc){
-    // Draw image piece: oc is transparent-bg processed canvas
-    // Fit into approx 34×40 box, vertically aligned so baseline sits at y=8
-    const dw = 34, dh = Math.round(34 * oc.height / oc.width);
-    ctx.drawImage(oc, -dw/2, -dh + 8, dw, dh);
+    // Scale to fit within 34×43 box, bottom-aligned to y=8 (same as glyph baseline)
+    const maxW = 34, maxH = 43;
+    const scale = Math.min(maxW / oc.width, maxH / oc.height);
+    const dw = oc.width * scale, dh = oc.height * scale;
+    ctx.drawImage(oc, -dw / 2, -dh + 8, dw, dh);
     return;
   }
-  // Fallback: unicode glyph (shown while images load or if load fails)
+  // Fallback glyph while images load
   const g = C2D_GLYPH[type]; if(!g) return;
   ctx.font = 'bold 38px "DejaVu Sans","Segoe UI Symbol","Apple Symbols","Arial Unicode MS",sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
@@ -2404,15 +2424,26 @@ function drawWoodK(ctx,p){
 // ═══════════════════════════════════════════
 function renderPiecesMenu(){
   ['P','R','N','B','Q','K'].forEach(t=>{
-    const c=document.getElementById('pc_'+t);
-    if(!c)return; c.width=88;c.height=60;
-    const x=c.getContext('2d'); x.clearRect(0,0,88,60);
-    // White piece left half
-    x.save();x.translate(22,47);
-    drawPieceShape(x,t,getPal(true, pieceSkins[t]),false); x.restore();
-    // Black piece right half
-    x.save();x.translate(66,47);
-    drawPieceShape(x,t,getPal(false, pieceSkins[t]),false); x.restore();
+    const c = document.getElementById('pc_'+t);
+    if(!c) return;
+    const CW = 54, CH = 76;
+    c.width = CW; c.height = CH;
+    const x = c.getContext('2d');
+    x.clearRect(0, 0, CW, CH);
+    const oc = CLASSIC_PROC[t+'_w']; // white piece only in menu cards
+    if(oc){
+      // Scale to fill canvas with 4px padding, centered
+      const maxW = CW - 8, maxH = CH - 8;
+      const scale = Math.min(maxW / oc.width, maxH / oc.height);
+      const dw = oc.width * scale, dh = oc.height * scale;
+      const dx = (CW - dw) / 2, dy = (CH - dh) / 2;
+      x.drawImage(oc, dx, dy, dw, dh);
+    } else {
+      // Fallback glyph while images load
+      x.save(); x.translate(CW/2, CH - 10);
+      drawPieceShape(x, t, getPal(true, pieceSkins[t]), false);
+      x.restore();
+    }
   });
 }
 
