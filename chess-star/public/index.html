@@ -2068,6 +2068,9 @@ PAL_LIGHT.style='classic2d';    PAL_LIGHT.outline='#1a1a1a';    PAL_LIGHT.outlin
 PAL_DARK.style='classic2d';     PAL_DARK.outline='#ffffff';     PAL_DARK.outlineW=1.6;
 PAL_WOOD_LIGHT.style='wood';    PAL_WOOD_LIGHT.outline='#3a1a04';PAL_WOOD_LIGHT.outlineW=0.7;
 PAL_WOOD_DARK.style='wood';     PAL_WOOD_DARK.outline='#f0d8a0'; PAL_WOOD_DARK.outlineW=0.7;
+// isLight flag lets drawClassic2D pick the right piece image (white vs black)
+PAL_LIGHT.isLight = true;
+PAL_WOOD_LIGHT.isLight = true;
 
 // FIX (new batch): skin-aware palette — 'wood' → realistic 3D, anything else → flat 2D classic
 function getPal(isLight, skin){
@@ -2178,7 +2181,7 @@ function preloadPieceImgs(){
 const C2D_GLYPH = { P:'\u265F', R:'\u265C', N:'\u265E', B:'\u265D', Q:'\u265B', K:'\u265A' };
 
 function drawClassic2D(ctx, type, pal){
-  const isWhite = (pal.fill === '#fff');
+  const isWhite = !!(pal.isLight); // use isLight flag set on PAL_LIGHT / PAL_WOOD_LIGHT
   const key = type + (isWhite ? '_w' : '_b');
   const oc = CLASSIC_PROC[key];
   if(oc){
@@ -2186,6 +2189,9 @@ function drawClassic2D(ctx, type, pal){
     const maxW = 34, maxH = 43;
     const scale = Math.min(maxW / oc.width, maxH / oc.height);
     const dw = oc.width * scale, dh = oc.height * scale;
+    // HD smoothing — prevents pixelation when piece is scaled up or down
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(oc, -dw / 2, -dh + 8, dw, dh);
     return;
   }
@@ -2590,7 +2596,7 @@ function renderSkins(){
     div.onclick=()=>{ pieceSkins[currentDetailPiece]=sk.id; savePersistedSkins(); renderPieceDetail(); renderSkins(); };
     grid.appendChild(div);
     const x=c.getContext('2d'); x.save();x.translate(32,52);
-    const pal=getPal(true, sk.id);
+    const pal=getPal(pdPreviewColor==='w', sk.id); // respect current color selection
     drawPieceShape(x,currentDetailPiece,pal,false); x.restore();
   });
 }
@@ -2822,7 +2828,7 @@ function showSplash(titleTxt,subTxt,onDone){
   }));
   // Show subtitle for ~1.4s, then run countdown in same subtitle slot
   setTimeout(()=>{
-    let cnt = 3;
+    let cnt = 2; // start at 2 (was 3) — 50% shorter splash
     S.style.transition='none';
     S.style.color='#f1c40f';
     S.style.fontSize='20px';
@@ -2830,17 +2836,17 @@ function showSplash(titleTxt,subTxt,onDone){
     const ci = setInterval(()=>{
       cnt--;
       if(cnt > 0){ S.textContent = '— ' + cnt + ' —'; }
-      else if(cnt === 0){ S.textContent = '— START! —'; }
+      else if(cnt === 0){ S.textContent = '— GO! —'; }
       else {
         clearInterval(ci);
         // Fade out title and subtitle
         T.style.transition='transform .35s cubic-bezier(.6,0,.8,.6),opacity .3s';
         T.style.transform='scale(2.4)'; T.style.opacity='0';
         S.style.transition='opacity .25s'; S.style.opacity='0';
-        setTimeout(onDone, 360);
+        setTimeout(onDone, 300);
       }
-    }, 700);
-  }, 1400);
+    }, 500);
+  }, 700);
 }
 
 // ═══════════════════════════════════════════
@@ -3646,9 +3652,10 @@ function initClassic(){
   const oppTeam = _playerChoseBlack ? 'WHITE' : 'BLACK';
   const topEl = document.getElementById('ccTopTeam');
   const botEl = document.getElementById('ccBotTeam');
-  topEl.textContent = oppTeam + ' TEAM — Player 2';
+  const _ccIcon = window.profileIcon || '🎭';
+  topEl.textContent = oppTeam + ' TEAM — 🤖 AI';
   topEl.style.color = _playerChoseBlack ? '#fff' : '#bbb';
-  botEl.textContent = myTeam + ' TEAM — ' + profile.name;
+  botEl.textContent = myTeam + ' TEAM — ' + _ccIcon + ' ' + profile.name;
   botEl.style.color = profile.color;
   goTo('classicScreen');
   ccRunning=true;
@@ -3811,9 +3818,10 @@ function initGTS(){
   // FIX 11: Team labels for GTS (white at bottom = player, black at top = opponent)
   const topEl = document.getElementById('gtsTopTeam');
   const botEl = document.getElementById('gtsBotTeam');
-  topEl.textContent = 'BLACK TEAM — Player 2';
+  const _gtsIcon = window.profileIcon || '🎭';
+  topEl.textContent = 'BLACK TEAM — 🤖 AI';
   topEl.style.color = '#bbb';
-  botEl.textContent = 'WHITE TEAM — ' + profile.name;
+  botEl.textContent = 'WHITE TEAM — ' + _gtsIcon + ' ' + profile.name;
   botEl.style.color = profile.color;
   goTo('gtsScreen');
   gtsRunning=true;
@@ -4325,9 +4333,10 @@ function initQOC(){
   window.qocPlayerKills=0; window.qocPlayerQueens=0;
   document.getElementById('qocEndOverlay').classList.remove('show');
   document.getElementById('qocMsg').textContent = 'Your turn — spin the wheel for a perk!';
-  document.getElementById('qocBotTeam').textContent = 'YOU — '+(profile.name||'Player 1');
+  const _qocIcon = window.profileIcon || '🎭';
+  document.getElementById('qocBotTeam').textContent = 'YOU — ' + _qocIcon + ' ' + (profile.name||'Player 1');
   document.getElementById('qocBotTeam').style.color = profile.color || '#fff';
-  document.getElementById('qocTopTeam').textContent = 'OPPONENT';
+  document.getElementById('qocTopTeam').textContent = '🤖 OPPONENT';
   goTo('qocScreen');
   qocStartRandomizer();
   requestAnimationFrame(qocLoop);
@@ -5486,7 +5495,9 @@ function drawThumbQOC(){
   }
   function makeFriendItem(p, btns){
     const div = document.createElement('div'); div.className='fItem';
-    const ico = document.createElement('div'); ico.className='fIco'; ico.textContent='🎭';
+    const ico = document.createElement('div'); ico.className='fIco';
+    ico.textContent = (p.icon && p.icon.trim()) ? p.icon : '🎭';
+    if(p.color) ico.style.background = p.color;
     const info = document.createElement('div'); info.className='fInfo';
     const dotCls = p.online ? 'fDot on' : 'fDot';
     info.innerHTML = '<div class="fName"><span class="'+dotCls+'"></span>'+escapeHtml(p.name||'Player')+'</div><div class="fSub">#'+escapeHtml(p.code||'')+(p.wins!=null?' • '+p.wins+'W':'')+'</div>';
@@ -6404,8 +6415,9 @@ function drawThumbQOC(){
   setTimeout(applyI18n, 50);
 
   // ── PROFILE ICON PICKER ──
-  const ICON_LIST = ['🎭','♟','♛','♜','♝','♞','♚','🦁','🦅','🐉','🔥','⚔','🛡','👑','🌟','💎','⚡','🎯','🎲','🃏'];
-  const ICON_UNLOCK_WINS = [0, 0, 0, 0, 0, 0, 0, 1, 5, 10, 15, 20, 25, 35, 50, 75, 100, 125, 200, 300];
+  // Piece icons in standard order: Pawn,Rook,Knight,Bishop,Queen,King — gated by piece unlock wins
+  const ICON_LIST = ['🎭','♟','♜','♞','♝','♛','♚','🦁','🦅','🐉','🔥','⚔','🛡','👑','🌟','💎','⚡','🎯','🎲','🃏'];
+  const ICON_UNLOCK_WINS = [0, 0, 5, 10, 15, 100, 50, 1, 5, 10, 15, 20, 25, 35, 50, 75, 100, 125, 200, 300];
   function loadProfileIcon(){
     try{ const saved = localStorage.getItem('chessstar_icon'); if(saved && ICON_LIST.includes(saved)) return saved; }catch(e){}
     return '🎭';
@@ -6413,6 +6425,7 @@ function drawThumbQOC(){
   let profileIcon = loadProfileIcon();
   function saveProfileIcon(){ try{ localStorage.setItem('chessstar_icon', profileIcon); }catch(e){} }
   function applyProfileIcon(){
+    window.profileIcon = profileIcon; // expose globally for game screens
     const ib = document.getElementById('iconBox'); if(ib) ib.textContent = profileIcon;
     const big = document.getElementById('bigIcon'); if(big) big.textContent = profileIcon;
   }
