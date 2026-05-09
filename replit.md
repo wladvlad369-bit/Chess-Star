@@ -1,10 +1,10 @@
-# Chess Star v0.09
+# Chess Star v0.10
 
 Self-contained chess-themed mobile-style web game. The entire client lives in a single HTML file (`chess-star/public/index.html`) served by a small Express server (`chess-star/server.js`).
 
 ## Structure
 
-- `chess-star/public/index.html` — the whole client app (UI, engine, AI, persistence, sockets, i18n) ~8270 lines
+- `chess-star/public/index.html` — the whole client app (UI, engine, AI, persistence, sockets, i18n) ~8654 lines
 - `chess-star/public/icons/` — button icons (shop, items, pieces, crafts, ranks, team, friends, duels, diamond, diamond-glow)
 - `chess-star/server.js` — Express server (accounts, version, search, friends, replays, icon sync)
 - `chess-star/package.json` — Node deps (express, pg)
@@ -14,7 +14,20 @@ Self-contained chess-themed mobile-style web game. The entire client lives in a 
 
 Workflow: **Start application** — `cd chess-star && PORT=5000 node server.js` on port 5000.
 
-## v0.09 Features (latest)
+## v0.10 Features (latest)
+
+- **Startup splash redesign** — full-bleed castle image (`loading-castle.jpg`) with animated CHESS STAR title, star icon pop-in, and SVG circular progress arc (0→100% over 1.8s); fades out at 2.6s
+- **Icon picker cancel** — selecting an icon stores a temp choice; only committed on ✓ SELECT (back arrow discards without saving)
+- **Profile layout** — player name block moved above stats row; PIECES stat added (e.g. 2/6 unlocked); rank labels under each stat (Bronze/Silver/Gold/Platinum/Diamond/Master by tier)
+- **SEE-ACC pieces count** — friend profile modal now shows pieces unlocked, derived from their win count
+- **Piece artifact fix** — BFS flood-fill threshold 200→185, shadowBlur 4→8 for crisper piece renders
+- **Star Path narrower** — menuRectBtn 95px wide (was 100%); prevents overflow on small screens
+- **Volume persistence** — music/SFX sliders restore from localStorage on page load; oninput handlers save immediately
+- **1st-place glow sync** — `lbMyRankBanner.me1` uses same `lbPod1Glow` animation as the gold podium slot
+- **Player name labels on boards** — player name (colored) drawn on bottom edge, "AI" in red on top edge in Classic, GTS, and QoC game canvases
+- **Replay auto-hide controls** — replay controls fade to 12% opacity after 3s; tap anywhere on the canvas to show them again; MutationObserver detects replay open
+
+## v0.09 Features
 
 - **Trophy ⓘ button** — info button shown in Progressive Trophies modal only
 - **12 separate piece images** — piece-{P/R/N/B/Q/K}_{w/b}.jpg; BFS flood-fill background removal; glyph fallback

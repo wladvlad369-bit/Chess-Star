@@ -88,7 +88,7 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .sideBtnImg{width:30px;height:30px;object-fit:contain;display:block;}
 .sideBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;line-height:1;}
 /* Rect buttons below columns (Star Path / Challenges) — same width as bar column */
-.menuRectBtn{width:100%;min-height:32px;background:#160a02;border:2px solid #5d4037;border-radius:7px;margin-top:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:5px 4px;pointer-events:auto;}
+.menuRectBtn{width:95px;min-height:32px;background:#160a02;border:2px solid #5d4037;border-radius:7px;margin-top:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:5px 4px;pointer-events:auto;}
 .menuRectBtn:hover,.menuRectBtn:active{border-color:#f1c40f;background:#2a1200;}
 /* Chain connectors between colBtns and rectBtn — identical to top hangers */
 .rectBtnChain{display:flex;flex-direction:column;align-items:center;pointer-events:none;}
@@ -701,7 +701,7 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #lbMyRankBanner .yrRight{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;}
 #lbMyRankBanner .yrWins{font-size:14px;font-weight:bold;color:#4caf50;}
 #lbMyRankBanner .yrTierName{font-size:9px;color:#42a5f5;letter-spacing:1px;}
-#lbMyRankBanner.me1{border-color:#f1c40f;background:linear-gradient(135deg,#2a1800,#1a0f00,#2a1800);animation:lbRow1Glow 2s ease-in-out infinite;}
+#lbMyRankBanner.me1{border-color:#f1c40f;background:linear-gradient(135deg,#2a1800,#1a0f00,#2a1800);animation:lbPod1Glow 2s ease-in-out infinite;}
 #lbMyRankBanner.me1 .yrRank{color:#f1c40f;}
 #lbMyRankBanner.me1 .yrTierName{color:#f1c40f;}
 body.lightTheme #lbMyRankBanner{background:linear-gradient(135deg,#e8f4fd,#dff0fb,#e8f4fd);border-color:#1976d2;}
@@ -793,7 +793,8 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
 #repEventTag{font-size:9px;color:#a08060;letter-spacing:2px;text-align:center;margin-bottom:8px;text-transform:uppercase;}
 #repPlayerCanvas{display:block;background:#2d1b0d;border:3px solid #3e2723;width:100%;height:auto;}
 #repProgress{font-size:9px;color:#a08060;text-align:center;margin-top:6px;letter-spacing:1px;}
-#repPlayerCtrl{display:flex;gap:6px;justify-content:center;margin-top:10px;}
+#repPlayerCtrl{display:flex;gap:6px;justify-content:center;margin-top:10px;opacity:1;transition:opacity 0.4s ease;pointer-events:auto;}
+#repPlayerCtrl.ctrl-hidden{opacity:0.12;pointer-events:none;}
 #repPlayerCtrl button{padding:8px 14px;background:#1a0800;color:#f1c40f;border:2px solid #5d4037;border-radius:6px;font-weight:bold;cursor:pointer;font-size:10px;letter-spacing:1px;}
 #repPlayerCtrl button:hover{background:#f1c40f;color:#000;}
 #repWinnerBanner{margin-top:10px;text-align:center;font-size:12px;font-weight:bold;letter-spacing:2px;padding:6px;border-radius:6px;display:none;}
@@ -904,10 +905,21 @@ body.lightTheme .msReward{color:#a08060;}
 <div id="root">
 
 <!-- STARTUP SPLASH (appears over everything on first load) -->
-<div id="startupSplash" style="position:fixed;inset:0;background:#0a0500;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;">
-  <div id="ssStar" style="font-size:64px;color:#f1c40f;opacity:0;transform:scale(0.1) rotate(-180deg);transition:none;text-shadow:0 0 30px rgba(241,196,15,.9);">♛</div>
-  <div id="ssTitle" style="font-family:Georgia,serif;font-size:36px;font-weight:900;color:#f1c40f;letter-spacing:5px;text-shadow:0 0 40px rgba(241,196,15,.9),4px 4px 0 #3e1a00;opacity:0;transform:scale(0.05);transition:none;margin-top:12px;">CHESS STAR</div>
-  <div id="ssSub" style="font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;margin-top:16px;opacity:0;transition:none;">v0.09 — ONLINE</div>
+<div id="startupSplash" style="position:fixed;inset:0;background:#0a0500;z-index:9999;overflow:hidden;">
+  <img id="ssCastle" src="/loading-castle.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.7s ease;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.25) 0%,rgba(5,2,0,0.6) 55%,rgba(5,2,0,0.92) 100%);"></div>
+  <div id="ssStar" style="position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) scale(0.1) rotate(-180deg);transition:none;font-size:64px;color:#f1c40f;text-shadow:0 0 30px rgba(241,196,15,.9);opacity:0;">♛</div>
+  <div id="ssTitle" style="position:absolute;top:42%;left:50%;transform:translate(-50%,14px) scale(0.05);font-family:Georgia,serif;font-size:36px;font-weight:900;color:#f1c40f;letter-spacing:5px;text-shadow:0 0 40px rgba(241,196,15,.9),4px 4px 0 #3e1a00;opacity:0;white-space:nowrap;transition:none;">CHESS STAR</div>
+  <div id="ssSub" style="position:absolute;top:calc(42% + 60px);left:50%;transform:translateX(-50%);font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;opacity:0;white-space:nowrap;">v0.09 — ONLINE</div>
+  <div id="ssProgress" style="position:absolute;bottom:55px;left:50%;transform:translateX(-50%);">
+    <svg width="72" height="72" viewBox="0 0 72 72">
+      <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="5"/>
+      <circle id="ssArc" cx="36" cy="36" r="28" fill="none" stroke="#f1c40f" stroke-width="5"
+        stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="175.9"
+        transform="rotate(-90,36,36)" style="transition:stroke-dashoffset 0.35s ease;"/>
+      <text id="ssArcPct" x="36" y="40" text-anchor="middle" font-size="11" font-weight="bold" fill="#f1c40f" font-family="Verdana">0%</text>
+    </svg>
+  </div>
 </div>
 
 <!-- MENU -->
@@ -1133,19 +1145,18 @@ body.lightTheme .msReward{color:#a08060;}
       <div id="bigIcon">🎭</div>
       <div id="bigIconEditBadge">✎</div>
     </div>
+    <div onclick="window.openNameModal&&window.openNameModal()" style="width:100%;padding:0 14px;box-sizing:border-box;">
+      <div class="fLbl">PLAYER NAME — TAP TO EDIT</div>
+      <div id="profNameDisplay">Player 1</div>
+      <div id="profNameEditHint">✎ tap to change name &amp; color</div>
+    </div>
     <div id="profStatsRow">
       <div class="profStat"><div class="psIco">🏅</div><div class="psNum" id="profWinsNum">0</div><div class="psLbl">WINS</div><div class="psRank" id="profWinsRank" style="font-size:8px;color:#42a5f5;letter-spacing:.5px;margin-top:1px;"></div></div>
       <div class="profStat"><div class="psIco">🔥</div><div class="psNum" id="profBestStreakNum">0</div><div class="psLbl">BEST STREAK</div><div class="psRank" id="profStreakRank" style="font-size:8px;color:#ff8a65;letter-spacing:.5px;margin-top:1px;"></div></div>
       <div class="profStat"><div class="psIco">🏆</div><div class="psNum" id="profTrophiesNum">0</div><div class="psLbl">TROPHIES</div><div class="psRank" id="profTrophyRank" style="font-size:8px;color:#a0c040;letter-spacing:.5px;margin-top:1px;"></div></div>
       <div class="profStat"><div class="psIco">♟</div><div class="psNum" id="profPiecesNum">1/6</div><div class="psLbl">PIECES</div></div>
     </div>
-    <div onclick="window.openNameModal&&window.openNameModal()">
-      <div class="fLbl">PLAYER NAME — TAP TO EDIT</div>
-      <div id="profNameDisplay">Player 1</div>
-      <div id="profNameEditHint">✎ tap to change name &amp; color</div>
-    </div>
-    <button id="saveProfBtn" onclick="saveProf()">✓ <span data-i18n="profile.save">SAVE</span></button>
-  </div>
+      </div>
   <!-- ICON PICKER MODAL -->
   <div id="iconPickerModal">
     <div id="iconPickerHeader" class="topBar" style="border-bottom:1px solid #2a1200;">
@@ -1400,8 +1411,8 @@ body.lightTheme .msReward{color:#a08060;}
     </div>
     <div class="setSection">
       <h3>VOLUME</h3>
-      <div class="setRow"><span>Music</span><input type="range" id="volMusic" min="0" max="100" value="70"></div>
-      <div class="setRow"><span>Effects</span><input type="range" id="volSfx" min="0" max="100" value="80"></div>
+      <div class="setRow"><span>Music</span><input type="range" id="volMusic" min="0" max="100" value="70" oninput="try{localStorage.setItem('chessstar_vol_music',this.value);}catch(e){}"></div>
+      <div class="setRow"><span>Effects</span><input type="range" id="volSfx" min="0" max="100" value="80" oninput="try{localStorage.setItem('chessstar_vol_sfx',this.value);}catch(e){}"></div>
     </div>
     <div class="setSection">
       <h3>ACCOUNT</h3>
@@ -2089,7 +2100,7 @@ function _floodFillBg(d, W, H){
   // BFS from all 4 edges; marks near-white pixels reachable from outside as background
   const bg = new Uint8Array(W * H);
   const q = [];
-  const isNearWhite = i => d[i]>200 && d[i+1]>200 && d[i+2]>200;
+  const isNearWhite = i => d[i]>185 && d[i+1]>185 && d[i+2]>185;
   function seed(x, y){ const p=y*W+x; if(!bg[p]&&isNearWhite(p*4)){bg[p]=1;q.push(p);} }
   for(let x=0;x<W;x++){seed(x,0);seed(x,H-1);}
   for(let y=0;y<H;y++){seed(0,y);seed(W-1,y);}
@@ -2133,7 +2144,7 @@ function _processFullImg(img, isWhite){
     oc2.width = W; oc2.height = H;
     const ox2 = oc2.getContext('2d');
     ox2.shadowColor = 'rgba(255,255,255,0.9)';
-    ox2.shadowBlur = 4;
+    ox2.shadowBlur = 8;
     ox2.drawImage(oc, 0, 0);
     ox2.shadowBlur = 0;
     ox2.drawImage(oc, 0, 0); // redraw piece cleanly on top of glow
@@ -3730,6 +3741,26 @@ function ccDraw(){
     });
   }
   paintParticles(ccX,ccParticles);
+  // Player name labels on board edges
+  {
+    const pname = (window.profile&&window.profile.name)||'Player';
+    const pcol  = (window.profile&&window.profile.color)||'#fff';
+    const playerAtBottom = (classicPlayerColor === 'w');
+    function _ccLabel(ctx, text, cx, cy, col){
+      ctx.save();
+      ctx.font = 'bold 8px Verdana';
+      const tw = ctx.measureText(text.substring(0,14)).width;
+      const bw = Math.min(tw+14, CSZ-8);
+      ctx.globalAlpha = 0.78;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.beginPath(); ctx.roundRect(cx-bw/2, cy-7, bw, 13, 3); ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text.substring(0,14), cx, cy); ctx.restore();
+    }
+    _ccLabel(ccX, pname, CSZ/2, playerAtBottom ? CSZ-7 : 7, pcol);
+    _ccLabel(ccX, 'AI', CSZ/2, playerAtBottom ? 7 : CSZ-7, '#ef5350');
+  }
 }
 
 function ccLoop(){if(!ccRunning)return;ccUpdate();ccDraw();requestAnimationFrame(ccLoop);}
@@ -4111,6 +4142,26 @@ function gtsDraw(){
     });
   }
   paintParticles(gtsX,gtsParticles);
+  // Player name labels on board edges
+  {
+    const pname = (window.profile&&window.profile.name)||'Player';
+    const pcol  = (window.profile&&window.profile.color)||'#fff';
+    const playerAtBottom = ((window.gtsPlayerColor||'w') === 'w');
+    function _gtsLabel(ctx, text, cx, cy, col){
+      ctx.save();
+      ctx.font = 'bold 8px Verdana';
+      const tw = ctx.measureText(text.substring(0,14)).width;
+      const bw = Math.min(tw+14, GSZ-8);
+      ctx.globalAlpha = 0.78;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.beginPath(); ctx.roundRect(cx-bw/2, cy-7, bw, 13, 3); ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text.substring(0,14), cx, cy); ctx.restore();
+    }
+    _gtsLabel(gtsX, pname, GSZ/2, playerAtBottom ? GSZ-7 : 7, pcol);
+    _gtsLabel(gtsX, 'AI', GSZ/2, playerAtBottom ? 7 : GSZ-7, '#ef5350');
+  }
 }
 
 function gtsLoop(){if(!gtsRunning)return;gtsUpdate();gtsDraw();requestAnimationFrame(gtsLoop);}
@@ -4216,6 +4267,17 @@ function loadSaveCode(){
   setTimeout(()=>{inp.style.borderColor='';},900);
 }
 window.addEventListener('DOMContentLoaded', refreshSaveCode);
+// Restore persisted volume slider values
+window.addEventListener('DOMContentLoaded', function(){
+  try{
+    const vm = localStorage.getItem('chessstar_vol_music');
+    const vs = localStorage.getItem('chessstar_vol_sfx');
+    const sm = document.getElementById('volMusic');
+    const ss = document.getElementById('volSfx');
+    if(sm && vm != null) sm.value = vm;
+    if(ss && vs != null) ss.value = vs;
+  }catch(e){}
+});
 
 // Info modal content
 // v0.06 — INFO_CONTENT now multi-language; pick by current language (en/ro/ru)
@@ -4612,6 +4674,26 @@ function qocDraw(){
     drawPieceShape(qocX, p.t==='C' ? 'P' : 'Q', pal, true);
     qocX.restore();
     qocX.restore();
+  }
+  // Player name labels on board edges
+  {
+    const pname = (window.profile&&window.profile.name)||'Player';
+    const pcol  = (window.profile&&window.profile.color)||'#fff';
+    const playerAtBottom = ((qocPlayerColor||'w') === 'w');
+    function _qocLabel(ctx, text, cx, cy, col){
+      ctx.save();
+      ctx.font = 'bold 8px Verdana';
+      const tw = ctx.measureText(text.substring(0,14)).width;
+      const bw = Math.min(tw+14, QSZ-8);
+      ctx.globalAlpha = 0.78;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.beginPath(); ctx.roundRect(cx-bw/2, cy-7, bw, 13, 3); ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text.substring(0,14), cx, cy); ctx.restore();
+    }
+    _qocLabel(qocX, pname, QSZ/2, playerAtBottom ? QSZ-7 : 7, pcol);
+    _qocLabel(qocX, 'AI', QSZ/2, playerAtBottom ? 7 : QSZ-7, '#ef5350');
   }
 }
 function qocLoop(){ if(!qocRunning) return; qocUpdate(); qocDraw(); requestAnimationFrame(qocLoop); }
@@ -6430,7 +6512,9 @@ function drawThumbQOC(){
     const big = document.getElementById('bigIcon'); if(big) big.textContent = profileIcon;
   }
   window.applyProfileIcon = applyProfileIcon;
+  let _tempIcon = profileIcon;
   window.renderIconPicker = function(){
+    _tempIcon = profileIcon; // reset temp to current saved icon
     const grid = document.getElementById('iconPicker'); if(!grid) return;
     grid.innerHTML = '';
     const wins = window.totalWins || 0;
@@ -6443,34 +6527,63 @@ function drawThumbQOC(){
       div.title = unlocked ? emoji : ('Unlocks at '+need+' wins');
       if(unlocked){
         div.onclick = ()=>{
-          profileIcon = emoji;
-          saveProfileIcon();
+          _tempIcon = emoji; // only update temp, do NOT save yet
           grid.querySelectorAll('.iPick').forEach(x=>x.classList.remove('on'));
           div.classList.add('on');
-          applyProfileIcon();
-          // Sync icon to server immediately
-          if(window.myCode){
-            try{
-              const p=window.profile||{};
-              fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:window.myCode,wins:window.totalWins||0,best_streak:window.bestStreak||0,trophies:window.totalTrophies||0,name:p.name||'Player',color:p.color||'#3498db',icon:emoji})}).catch(()=>{});
-            }catch(e){}
-          }
+          // Preview in bigIcon only (not committed until SELECT)
+          const big = document.getElementById('bigIcon'); if(big) big.textContent = emoji;
         };
       }
       grid.appendChild(div);
     });
   };
+  window.openIconModal = function(){
+    _tempIcon = profileIcon; // reset temp to saved value on every open
+    window.renderIconPicker();
+    const modal = document.getElementById('iconPickerModal');
+    if(modal) modal.classList.add('show');
+  };
+  window.closeIconModal = function(){
+    // Restore bigIcon to the saved icon (discard temp preview)
+    const big = document.getElementById('bigIcon'); if(big) big.textContent = profileIcon;
+    const modal = document.getElementById('iconPickerModal');
+    if(modal) modal.classList.remove('show');
+  };
+  window.confirmIconModal = function(){
+    profileIcon = _tempIcon; // commit temp to real
+    saveProfileIcon();
+    applyProfileIcon();
+    // Sync icon to server
+    if(window.myCode){
+      try{
+        const p=window.profile||{};
+        fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:window.myCode,wins:window.totalWins||0,best_streak:window.bestStreak||0,trophies:window.totalTrophies||0,name:p.name||'Player',color:p.color||'#3498db',icon:profileIcon})}).catch(()=>{});
+      }catch(e){}
+    }
+    const modal = document.getElementById('iconPickerModal');
+    if(modal) modal.classList.remove('show');
+  };
   applyProfileIcon();
 
   // ── PROFILE STATS REFRESH ──
+  function _winsRank(w){ return w>=250?'Master':w>=100?'Diamond':w>=50?'Platinum':w>=25?'Gold':w>=10?'Silver':w>=1?'Bronze':'Rookie'; }
+  function _streakRank(s){ return s>=25?'Diamond':s>=15?'Platinum':s>=10?'Gold':s>=5?'Silver':s>=1?'Bronze':''; }
+  function _trophyRank(t){ return t>=25?'Diamond':t>=15?'Platinum':t>=10?'Gold':t>=5?'Silver':t>=1?'Bronze':''; }
   window.refreshProfileStats = function(){
-    const w = document.getElementById('profWinsNum'); if(w) w.textContent = window.totalWins || 0;
-    const t = document.getElementById('profTrophiesNum'); if(t) t.textContent = window.totalTrophies || 0;
+    const wins = window.totalWins || 0;
+    const streak = window.bestStreak || 0;
+    const trophies = window.totalTrophies || 0;
+    const w = document.getElementById('profWinsNum'); if(w) w.textContent = wins;
+    const t = document.getElementById('profTrophiesNum'); if(t) t.textContent = trophies;
+    const bs = document.getElementById('profBestStreakNum'); if(bs) bs.textContent = streak;
     const p = document.getElementById('profPiecesNum');
     if(p){
       const unlocked = window.getUnlockedPieces ? window.getUnlockedPieces().length : 1;
       p.textContent = unlocked + '/6';
     }
+    const wr = document.getElementById('profWinsRank'); if(wr) wr.textContent = _winsRank(wins);
+    const sr = document.getElementById('profStreakRank'); if(sr) sr.textContent = _streakRank(streak);
+    const tr = document.getElementById('profTrophyRank'); if(tr) tr.textContent = _trophyRank(trophies);
     applyProfileIcon();
   };
 
@@ -7545,27 +7658,50 @@ function drawThumbQOC(){
     const star = document.getElementById('ssStar');
     const title = document.getElementById('ssTitle');
     const sub = document.getElementById('ssSub');
+    const castle = document.getElementById('ssCastle');
+    const arc = document.getElementById('ssArc');
+    const arcPct = document.getElementById('ssArcPct');
     if(!sp) return;
-    // Step 1: animate star icon in
+    const CIRC = 175.9;
+    function setArc(pct){
+      if(!arc) return;
+      const offset = CIRC * (1 - pct/100);
+      arc.style.strokeDashoffset = offset;
+      if(arcPct) arcPct.textContent = Math.round(pct) + '%';
+    }
+    // Fade in castle image immediately
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      star.style.transition='transform .7s cubic-bezier(.17,.67,.4,1.5),opacity .5s';
-      star.style.transform='scale(1) rotate(0deg)';
-      star.style.opacity='1';
+      if(castle) castle.style.opacity = '1';
     }));
+    // Step 1: animate star icon in (after castle fades in)
+    setTimeout(()=>{
+      star.style.transition='transform .7s cubic-bezier(.17,.67,.4,1.5),opacity .5s';
+      star.style.transform='translate(-50%,-50%) scale(1) rotate(0deg)';
+      star.style.opacity='1';
+    }, 300);
     // Step 2: title + subtitle pop in
     setTimeout(()=>{
       title.style.transition='transform .6s cubic-bezier(.17,.67,.4,1.3),opacity .45s';
-      title.style.transform='scale(1)';
+      title.style.transform='translate(-50%,14px) scale(1)';
       title.style.opacity='1';
       sub.style.transition='opacity .6s .2s';
       sub.style.opacity='1';
-    }, 500);
+    }, 700);
+    // Animate progress arc: fill from 0% → 100% over ~1.8s
+    const arcStart = Date.now();
+    const arcDur = 1800;
+    (function tickArc(){
+      const elapsed = Date.now() - arcStart;
+      const pct = Math.min(100, (elapsed / arcDur) * 100);
+      setArc(pct);
+      if(pct < 100) requestAnimationFrame(tickArc);
+    })();
     // Step 3: fade out and remove
     setTimeout(()=>{
-      sp.style.transition='opacity .55s';
+      sp.style.transition='opacity .6s';
       sp.style.opacity='0';
-      setTimeout(()=>{ sp.style.display='none'; }, 580);
-    }, 2400);
+      setTimeout(()=>{ sp.style.display='none'; }, 650);
+    }, 2600);
   })();
 
   // ── v0.06 FULL-SCREEN SCALE (9:16 for Median / phone) ─────────────
@@ -7800,6 +7936,9 @@ window.showAccDetails = function(p){
   $$('v08FrProfTrophies').textContent = p.trophies!=null ? p.trophies : '—';
   $$('v08FrProfStreak').textContent = p.best_streak!=null ? p.best_streak : (p.streak!=null ? p.streak : '—');
   $$('v08FrProfStatus').textContent = p.online ? '🟢 Online' : '⚫ Offline';
+  const pieceUnlockW = {P:0,R:5,N:10,B:15,K:50,Q:100};
+  const piecesUnlocked = Object.values(pieceUnlockW).filter(v=>(p.wins||0)>=v).length;
+  const ppEl = $$('v08FrProfPieces'); if(ppEl) ppEl.textContent = piecesUnlocked + '/6';
   $$('v08FrProfileModal').classList.add('show');
 };
 window.v08CloseFrProfile = function(){ $$('v08FrProfileModal').classList.remove('show'); };
@@ -8415,6 +8554,7 @@ body.lightTheme .v08FrStat .v08FrVal { color:#1976d2; }
     <div class="v08FrStat"><span class="v08FrLbl">TROPHIES</span><span class="v08FrVal" id="v08FrProfTrophies">—</span></div>
     <div class="v08FrStat"><span class="v08FrLbl">BEST STREAK</span><span class="v08FrVal" id="v08FrProfStreak">—</span></div>
     <div class="v08FrStat"><span class="v08FrLbl">STATUS</span><span class="v08FrVal" id="v08FrProfStatus">—</span></div>
+    <div class="v08FrStat"><span class="v08FrLbl">PIECES</span><span class="v08FrVal" id="v08FrProfPieces">—</span></div>
     <button id="v08FrProfClose" onclick="v08CloseFrProfile()">CLOSE</button>
   </div>
 </div>
@@ -8462,6 +8602,36 @@ body.lightTheme .v08FrStat .v08FrVal { color:#1976d2; }
 </div>
 
 <script>
+// ── v0.10 — REPLAY AUTO-HIDE CONTROLS ───────────────────────────────
+(function(){
+  let _repHideTimer = null;
+  function _repShowCtrl(){
+    const ctrl = document.getElementById('repPlayerCtrl');
+    if(!ctrl) return;
+    ctrl.classList.remove('ctrl-hidden');
+    clearTimeout(_repHideTimer);
+    _repHideTimer = setTimeout(()=>{ ctrl.classList.add('ctrl-hidden'); }, 3000);
+  }
+  window._repShowCtrl = _repShowCtrl;
+  // Use MutationObserver to detect when replay player opens (gets 'show' class)
+  window.addEventListener('DOMContentLoaded', function(){
+    const repPlayer = document.getElementById('repPlayer');
+    if(repPlayer){
+      const obs = new MutationObserver(function(){
+        if(repPlayer.classList.contains('show')) _repShowCtrl();
+      });
+      obs.observe(repPlayer, {attributes:true, attributeFilter:['class']});
+    }
+    // Also show controls on tap of canvas area
+    const canvas = document.getElementById('repPlayerCanvas');
+    if(canvas) canvas.addEventListener('click', _repShowCtrl);
+    const inner = document.getElementById('repPlayerInner');
+    if(inner) inner.addEventListener('click', function(e){
+      if(e.target.tagName !== 'BUTTON') _repShowCtrl();
+    });
+  });
+})();
+
 // ── COMING SOON toast (v0.09 menu) ──────────────────────────────────
 window.showComingSoon = function(feature) {
   const name = feature || 'This feature';
