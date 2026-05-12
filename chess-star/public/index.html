@@ -67,7 +67,7 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .infoBtn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#1976d2;color:#fff;font-size:11px;font-weight:bold;font-family:Georgia,serif;border:1px solid #0d47a1;cursor:pointer;font-style:italic;transition:transform .15s,background .15s;}
 .infoBtn:hover{background:#42a5f5;transform:scale(1.1);}
 /* piecesBtn override reset */
-#piecesBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-bottom:1px solid #2a1200!important;border-radius:0!important;background:transparent!important;}
+#piecesBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;}
 
 /* ── MIDDLE COLUMNS ── */
 #menuMiddle{position:absolute;top:64px;bottom:86px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 4px;z-index:10;pointer-events:none;}
@@ -88,7 +88,7 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 .sideBtnImg{width:30px;height:30px;object-fit:contain;display:block;}
 .sideBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;line-height:1;}
 /* Rect buttons below columns (Star Path / Challenges) — same width as bar column */
-.menuRectBtn{width:95px;min-height:32px;background:#160a02;border:2px solid #5d4037;border-radius:7px;margin-top:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:5px 4px;pointer-events:auto;}
+.menuRectBtn{width:63px;min-height:32px;background:#160a02;border:2px solid #5d4037;border-radius:7px;margin-top:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s;padding:5px 4px;pointer-events:auto;}
 .menuRectBtn:hover,.menuRectBtn:active{border-color:#f1c40f;background:#2a1200;}
 /* Chain connectors between colBtns and rectBtn — identical to top hangers */
 .rectBtnChain{display:flex;flex-direction:column;align-items:center;pointer-events:none;}
@@ -649,13 +649,13 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #acctSkip:hover{color:#f1c40f;}
 
 /* friendsBtn + leaderboardBtn now live inside .colBtns as .sideBtns */
-#friendsBtn{position:static!important;transform:none!important;width:100%!important;height:100%!important;border:none!important;border-bottom:1px solid #2a1200!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
+#friendsBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
 #friendsBtn:hover{background:#2a1200!important;}
 #friendsBtnIco{font-size:22px;line-height:1;}
 #friendsBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
 #friendsBtnBadge{position:absolute;top:4px;right:4px;background:#e74c3c;color:#fff;border:1px solid #000;border-radius:50%;min-width:14px;height:14px;font-size:8px;font-weight:bold;display:none;align-items:center;justify-content:center;padding:0 2px;}
 #friendsBtnBadge.show{display:flex;}
-#leaderboardBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-bottom:1px solid #2a1200!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
+#leaderboardBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
 #leaderboardBtn:hover{background:#2a1200!important;}
 #leaderboardBtnIco{font-size:22px;line-height:1;}
 #leaderboardBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
@@ -908,9 +908,9 @@ body.lightTheme .msReward{color:#a08060;}
 <div id="startupSplash" style="position:fixed;inset:0;background:#0a0500;z-index:9999;overflow:hidden;">
   <img id="ssCastle" src="/loading-castle.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.7s ease;">
   <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.25) 0%,rgba(5,2,0,0.6) 55%,rgba(5,2,0,0.92) 100%);"></div>
-  <div id="ssStar" style="position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) scale(0.1) rotate(-180deg);transition:none;font-size:64px;color:#f1c40f;text-shadow:0 0 30px rgba(241,196,15,.9);opacity:0;">♛</div>
-  <div id="ssTitle" style="position:absolute;top:42%;left:50%;transform:translate(-50%,14px) scale(0.05);font-family:Georgia,serif;font-size:36px;font-weight:900;color:#f1c40f;letter-spacing:5px;text-shadow:0 0 40px rgba(241,196,15,.9),4px 4px 0 #3e1a00;opacity:0;white-space:nowrap;transition:none;">CHESS STAR</div>
-  <div id="ssSub" style="position:absolute;top:calc(42% + 60px);left:50%;transform:translateX(-50%);font-size:12px;color:#c8a060;letter-spacing:4px;font-weight:bold;opacity:0;white-space:nowrap;">v0.09 — ONLINE</div>
+  <div id="ssStar" style="display:none;"></div>
+  <div id="ssTitle" style="display:none;"></div>
+  <div id="ssSub" style="display:none;"></div>
   <div id="ssProgress" style="position:absolute;bottom:55px;left:50%;transform:translateX(-50%);">
     <svg width="72" height="72" viewBox="0 0 72 72">
       <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="5"/>
@@ -1411,8 +1411,8 @@ body.lightTheme .msReward{color:#a08060;}
     </div>
     <div class="setSection">
       <h3>VOLUME</h3>
-      <div class="setRow"><span>Music</span><input type="range" id="volMusic" min="0" max="100" value="70" oninput="try{localStorage.setItem('chessstar_vol_music',this.value);}catch(e){}"></div>
-      <div class="setRow"><span>Effects</span><input type="range" id="volSfx" min="0" max="100" value="80" oninput="try{localStorage.setItem('chessstar_vol_sfx',this.value);}catch(e){}"></div>
+      <div class="setRow"><span style="min-width:50px;">Music</span><input type="range" id="volMusic" min="0" max="100" value="70" oninput="document.getElementById('volMusicPct').textContent=this.value+'%';try{localStorage.setItem('chessstar_vol_music',this.value);}catch(e){}"><span id="volMusicPct" style="min-width:32px;text-align:right;color:#f1c40f;font-weight:bold;font-size:10px;">70%</span></div>
+      <div class="setRow"><span style="min-width:50px;">Effects</span><input type="range" id="volSfx" min="0" max="100" value="80" oninput="document.getElementById('volSfxPct').textContent=this.value+'%';try{localStorage.setItem('chessstar_vol_sfx',this.value);}catch(e){}"><span id="volSfxPct" style="min-width:32px;text-align:right;color:#f1c40f;font-weight:bold;font-size:10px;">80%</span></div>
     </div>
     <div class="setSection">
       <h3>ACCOUNT</h3>
@@ -2143,8 +2143,10 @@ function _processFullImg(img, isWhite){
     const oc2 = document.createElement('canvas');
     oc2.width = W; oc2.height = H;
     const ox2 = oc2.getContext('2d');
-    ox2.shadowColor = 'rgba(255,255,255,0.9)';
-    ox2.shadowBlur = 8;
+    ox2.shadowColor = 'rgba(255,255,255,0.95)';
+    ox2.shadowBlur = 16;
+    ox2.drawImage(oc, 0, 0);
+    ox2.shadowBlur = 10;
     ox2.drawImage(oc, 0, 0);
     ox2.shadowBlur = 0;
     ox2.drawImage(oc, 0, 0); // redraw piece cleanly on top of glow
@@ -2203,7 +2205,13 @@ function drawClassic2D(ctx, type, pal){
     // HD smoothing — prevents pixelation when piece is scaled up or down
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
+    // Clip to piece bounds to suppress sub-pixel edge artifacts
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(-dw/2 - 1, -dh + 7, dw + 2, dh + 2);
+    ctx.clip();
     ctx.drawImage(oc, -dw / 2, -dh + 8, dw, dh);
+    ctx.restore();
     return;
   }
   // Fallback glyph while images load
@@ -2459,7 +2467,10 @@ function renderPiecesMenu(){
       const scale = Math.min(maxW / oc.width, maxH / oc.height);
       const dw = oc.width * scale, dh = oc.height * scale;
       const dx = (CW - dw) / 2, dy = (CH - dh) / 2;
+      x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high';
+      x.save(); x.beginPath(); x.rect(dx, dy, dw, dh); x.clip();
       x.drawImage(oc, dx, dy, dw, dh);
+      x.restore();
     } else {
       // Fallback glyph while images load
       x.save(); x.translate(CW/2, CH - 10);
@@ -2949,7 +2960,15 @@ function lpsGoMenu(){
   document.getElementById('lpsExitWrap').style.display='none';
   goTo('menuScreen');
 }
-function lpsReplay(){document.getElementById('lpsEndOverlay').classList.remove('show');initLPS(lpsChosenType);}
+function lpsReplay(){
+  document.getElementById('lpsEndOverlay').classList.remove('show');
+  startLoading('Last Piece Standing',()=>{
+    initLPS(lpsChosenType);
+    showEventOverlay('lpsEvOverlay','LAST PIECE STANDING',()=>{
+      if(lpsTurn!==0 && lpsRunning) setTimeout(lpsAiTurn, 380);
+    });
+  });
+}
 
 const lpsC=document.getElementById('lpsCanvas');
 const lpsX=lpsC.getContext('2d');
@@ -3027,6 +3046,17 @@ function initLPSStandard(type){
   for(let i=0;i<6;i++){
     if(i===p0SpawnIdx) pool.push(type);
     else pool.push(otherTypes[oi++]);
+  }
+  // Bishops must land on dark squares only — swap any bishop on a light square
+  // with a non-bishop on a dark square so diagonal movement is always valid
+  for(let i=0;i<6;i++){
+    if(pool[i]==='B' && (spawnPos[i].x+spawnPos[i].y)%2===0){
+      for(let j=0;j<6;j++){
+        if(i!==j && pool[j]!=='B' && (spawnPos[j].x+spawnPos[j].y)%2===1){
+          const tmp=pool[i]; pool[i]=pool[j]; pool[j]=tmp; break;
+        }
+      }
+    }
   }
   const others=[1,2,3,4,5];
   for(let i=others.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[others[i],others[j]]=[others[j],others[i]];}
@@ -4274,8 +4304,8 @@ window.addEventListener('DOMContentLoaded', function(){
     const vs = localStorage.getItem('chessstar_vol_sfx');
     const sm = document.getElementById('volMusic');
     const ss = document.getElementById('volSfx');
-    if(sm && vm != null) sm.value = vm;
-    if(ss && vs != null) ss.value = vs;
+    if(sm && vm != null){ sm.value = vm; const pl=document.getElementById('volMusicPct'); if(pl) pl.textContent=vm+'%'; }
+    if(ss && vs != null){ ss.value = vs; const pl=document.getElementById('volSfxPct'); if(pl) pl.textContent=vs+'%'; }
   }catch(e){}
 });
 
@@ -5681,9 +5711,9 @@ function drawThumbQOC(){
     if(typeof lpsBoard==='undefined') return {pieces};
     for(let r=0;r<8;r++) for(let c=0;c<8;c++){
       const p=lpsBoard[r][c]; if(!p) continue;
-      pieces.push({r, c2:c, c:p.player===0?'w':'b', s:PICO[p.t]||'?'});
+      pieces.push({r, c2:c, c:p.player===0?'w':'b', s:PICO[p.type]||'?', t:p.type, lgt:p.isLight});
     }
-    return {pieces};
+    return {pieces, poisonStg:lpsPoisonStg||0, poisonOn:lpsPoisonOn||false, event:'lps'};
   };
   function loadReplays(){
     try { return JSON.parse(localStorage.getItem('chessstar_replays')||'[]'); } catch(e){ return []; }
@@ -5815,7 +5845,7 @@ function drawThumbQOC(){
       list.innerHTML = '<div id="frEmpty" style="text-align:center;padding:30px 16px;color:#a08060;font-size:11px;letter-spacing:1px;">No matches recorded yet.<br><span style="font-size:9px;color:#666;">Play a game to see your match history here.</span></div>';
       return;
     }
-    const evMap = {cc:'Classic Chess',lps:'Last Piece Standing',gts:'Grind the Safe',qoc:'Queen of Castle'};
+    const evMap = {cc:'Classic Chess',lps:'Last Piece Standing',gts:'Grind the Safe',qoc:'Queens on Color'};
     reps.forEach((r,i)=>{
       const div = document.createElement('div'); div.className='repItem';
       div.onclick = ()=>openReplayPlayer(i);
@@ -5852,7 +5882,7 @@ function drawThumbQOC(){
   let repCur=null, repIdx=0, repPlaying=false, repTimer=null;
   function openReplayPlayer(i){
     const reps = loadReplays(); repCur = reps[i]; repIdx=0; repPlaying=false;
-    const evMap = {cc:'CLASSIC CHESS', lps:'LAST PIECE STANDING', gts:'GRIND THE SAFE', qoc:'QUEEN OF THE CASTLE'};
+    const evMap = {cc:'CLASSIC CHESS', lps:'LAST PIECE STANDING', gts:'GRIND THE SAFE', qoc:'QUEENS ON COLOR'};
     $('repPlayerTitle').textContent = (repCur.title||repCur.event||'REPLAY').toUpperCase();
     const tag = $('repEventTag');
     if(tag) tag.textContent = (evMap[repCur.event]||repCur.event||'') + (repCur.mode?' • '+repCur.mode:'');
@@ -5873,36 +5903,115 @@ function drawThumbQOC(){
     const pb = $('repPlayBtn'); if(pb) pb.textContent = '▶';
     repIdx = 0; drawReplayFrame();
   };
-  function drawReplayFrame(){
-    const c = $('repPlayerCanvas'); const x = c.getContext('2d');
+  let _repPrevFrame = null;
+  let _repAnimReq = null;
+  function _drawRepBoard(x, c, f, interp, prevF){
+    const cols = (f && f.cols) || 8, rows = (f && f.rows) || 8;
+    const tl = Math.floor(Math.min(c.width/cols, c.height/rows));
+    const ox = (c.width-tl*cols)/2, oy=(c.height-tl*rows)/2;
     x.fillStyle='#2d1b0d'; x.fillRect(0,0,c.width,c.height);
+    for(let r=0;r<rows;r++) for(let cc=0;cc<cols;cc++){
+      x.fillStyle=(r+cc)%2===1?'#7a4e20':'#d4a96a';
+      x.fillRect(ox+cc*tl, oy+r*tl, tl, tl);
+    }
+    // Draw poison ring for LPS frames
+    if(f && f.event==='lps' && f.poisonOn && f.poisonStg>=1){
+      const stg = f.poisonStg;
+      const inset = stg<=3 ? stg : 3;
+      x.save();
+      x.strokeStyle='rgba(50,200,80,0.55)';
+      x.lineWidth=tl*0.18;
+      x.shadowColor='rgba(50,255,80,0.7)';
+      x.shadowBlur=10;
+      const px=ox+inset*tl, py=oy+inset*tl, pw=(cols-inset*2)*tl, ph=(rows-inset*2)*tl;
+      if(pw>0 && ph>0) x.strokeRect(px,py,pw,ph);
+      x.restore();
+      // Shade poisoned squares
+      x.save(); x.fillStyle='rgba(50,200,80,0.18)';
+      for(let r=0;r<rows;r++) for(let cc=0;cc<cols;cc++){
+        let poisoned=false;
+        if(stg>=1&&(cc<1||cc>6||r<1||r>6))poisoned=true;
+        if(stg>=2&&(cc<2||cc>5||r<2||r>5))poisoned=true;
+        if(stg>=3&&(cc<3||cc>4||r<3||r>4))poisoned=true;
+        if(poisoned) x.fillRect(ox+cc*tl,oy+r*tl,tl,tl);
+      }
+      x.restore();
+    }
+    if(f && f.pieces){
+      // Build prev positions map for interpolation
+      const prevPos={};
+      if(prevF && prevF.pieces && interp<1){
+        prevF.pieces.forEach(p=>{prevPos[p.c+p.t+p.r+'_'+p.c2]=p;});
+      }
+      f.pieces.forEach(p=>{
+        const isLight = p.lgt !== undefined ? p.lgt : (p.c==='w');
+        const key=p.c+(p.t||'?')+p.r+'_'+p.c2;
+        let dr=p.r, dc=p.c2;
+        // Smooth interpolation: find where this piece came from in prev frame
+        if(prevF && prevF.pieces && interp<1){
+          // Match by piece type+color in the previous frame
+          const prev=prevF.pieces.find(pp=>pp.c===p.c && pp.t===p.t && !(pp.r===p.r&&pp.c2===p.c2));
+          if(prev){ dr=prev.r+(p.r-prev.r)*interp; dc=prev.c2+(p.c2-prev.c2)*interp; }
+        }
+        const px2=ox+dc*tl+tl/2, py2=oy+dr*tl+tl/2;
+        // Try to use processed piece image if available
+        const imgKey=(p.t||'?')+(isLight?'_w':'_b');
+        const img=typeof CLASSIC_PROC!=='undefined' && CLASSIC_PROC[imgKey];
+        if(img){
+          const maxS=tl*0.88;
+          const sc=Math.min(maxS/img.width,maxS/img.height);
+          const dw=img.width*sc, dh=img.height*sc;
+          x.save(); x.imageSmoothingEnabled=true; x.imageSmoothingQuality='high';
+          x.drawImage(img,px2-dw/2,py2-dh/2,dw,dh);
+          x.restore();
+        } else {
+          x.font='bold '+(tl*0.72)+'px Georgia'; x.textAlign='center'; x.textBaseline='middle';
+          if(!isLight){ x.save(); x.shadowColor='rgba(255,255,255,0.7)'; x.shadowBlur=5; }
+          x.fillStyle=isLight?'#fff':'#111';
+          x.fillText(p.s||'?', px2, py2);
+          if(!isLight) x.restore();
+        }
+      });
+    }
+  }
+  function drawReplayFrame(prevF, interp){
+    const c = $('repPlayerCanvas'); const x = c.getContext('2d');
     if(!repCur || !repCur.frames || !repCur.frames.length){
+      x.fillStyle='#2d1b0d'; x.fillRect(0,0,c.width,c.height);
       x.fillStyle='#a08060'; x.font='12px Verdana'; x.textAlign='center';
       x.fillText('No frames available', c.width/2, c.height/2);
       $('repProgress').textContent='— / —';
       return;
     }
     const f = repCur.frames[repIdx];
-    // Generic 8x8 board renderer for simple frames
-    const cols = (f && f.cols) || 8, rows = (f && f.rows) || 8;
-    const tl = Math.floor(Math.min(c.width/cols, c.height/rows));
-    const ox = (c.width-tl*cols)/2, oy=(c.height-tl*rows)/2;
-    for(let r=0;r<rows;r++) for(let cc=0;cc<cols;cc++){
-      const dark=(r+cc)%2===1;
-      x.fillStyle = dark?'#7a4e20':'#d4a96a';
-      x.fillRect(ox+cc*tl, oy+r*tl, tl, tl);
-    }
-    if(f && f.pieces){
-      x.font='bold '+(tl*0.7)+'px Georgia'; x.textAlign='center'; x.textBaseline='middle';
-      f.pieces.forEach(p=>{
-        x.fillStyle = p.c==='w'?'#fff':'#222';
-        x.fillText(p.s||'?', ox+p.c2*tl+tl/2, oy+p.r*tl+tl/2);
-      });
-    }
+    _drawRepBoard(x, c, f, interp===undefined?1:interp, prevF||null);
     $('repProgress').textContent = (repIdx+1)+' / '+repCur.frames.length;
   }
-  window.repPrev = function(){ if(!repCur) return; repIdx=Math.max(0,repIdx-1); drawReplayFrame(); };
-  window.repNext = function(){ if(!repCur) return; repIdx=Math.min(repCur.frames.length-1,repIdx+1); drawReplayFrame(); };
+  function animateRepTransition(fromF){
+    if(_repAnimReq){ cancelAnimationFrame(_repAnimReq); _repAnimReq=null; }
+    const dur=240, t0=Date.now();
+    function tick(){
+      const elapsed=Date.now()-t0;
+      const t=Math.min(1,elapsed/dur);
+      drawReplayFrame(fromF, t);
+      if(t<1){ _repAnimReq=requestAnimationFrame(tick); }
+      else { _repAnimReq=null; }
+    }
+    _repAnimReq=requestAnimationFrame(tick);
+  }
+  window.repPrev = function(){
+    if(!repCur) return;
+    const pf=repCur.frames[repIdx];
+    repIdx=Math.max(0,repIdx-1);
+    if(repIdx+1!==repIdx) animateRepTransition(pf);
+    else drawReplayFrame();
+  };
+  window.repNext = function(){
+    if(!repCur) return;
+    const pf=repCur.frames[repIdx];
+    repIdx=Math.min(repCur.frames.length-1,repIdx+1);
+    animateRepTransition(pf);
+  };
   window.repTogglePlay = function(){
     repPlaying = !repPlaying;
     $('repPlayBtn').textContent = repPlaying?'❚❚':'▶';
@@ -5910,8 +6019,10 @@ function drawThumbQOC(){
       repTimer = setInterval(()=>{
         if(!repCur) return;
         if(repIdx>=repCur.frames.length-1){ repPlaying=false; $('repPlayBtn').textContent='▶'; clearInterval(repTimer); return; }
-        repIdx++; drawReplayFrame();
-      }, 600);
+        const pf=repCur.frames[repIdx];
+        repIdx++;
+        animateRepTransition(pf);
+      }, 650);
     } else clearInterval(repTimer);
   };
   window.repClose = function(){
@@ -7673,35 +7784,23 @@ function drawThumbQOC(){
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       if(castle) castle.style.opacity = '1';
     }));
-    // Step 1: animate star icon in (after castle fades in)
-    setTimeout(()=>{
-      star.style.transition='transform .7s cubic-bezier(.17,.67,.4,1.5),opacity .5s';
-      star.style.transform='translate(-50%,-50%) scale(1) rotate(0deg)';
-      star.style.opacity='1';
-    }, 300);
-    // Step 2: title + subtitle pop in
-    setTimeout(()=>{
-      title.style.transition='transform .6s cubic-bezier(.17,.67,.4,1.3),opacity .45s';
-      title.style.transform='translate(-50%,14px) scale(1)';
-      title.style.opacity='1';
-      sub.style.transition='opacity .6s .2s';
-      sub.style.opacity='1';
-    }, 700);
-    // Animate progress arc: fill from 0% → 100% over ~1.8s
+    // Animate progress arc: fill from 0% → 100% over ~1.8s, then auto-fade
     const arcStart = Date.now();
     const arcDur = 1800;
     (function tickArc(){
       const elapsed = Date.now() - arcStart;
       const pct = Math.min(100, (elapsed / arcDur) * 100);
       setArc(pct);
-      if(pct < 100) requestAnimationFrame(tickArc);
+      if(pct < 100){
+        requestAnimationFrame(tickArc);
+      } else {
+        setTimeout(()=>{
+          sp.style.transition='opacity .6s';
+          sp.style.opacity='0';
+          setTimeout(()=>{ sp.style.display='none'; }, 650);
+        }, 150);
+      }
     })();
-    // Step 3: fade out and remove
-    setTimeout(()=>{
-      sp.style.transition='opacity .6s';
-      sp.style.opacity='0';
-      setTimeout(()=>{ sp.style.display='none'; }, 650);
-    }, 2600);
   })();
 
   // ── v0.06 FULL-SCREEN SCALE (9:16 for Median / phone) ─────────────
@@ -8435,13 +8534,13 @@ window.applyAccountFromServer=function(j){
 // ─────────────────────────────────────────────────────────
 window.maCreateNewAccount = async function(){
   try{
-    const r=await fetch('/api/account/new',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Player'})});
+    const SA_KEY='chessstar_saved_accts';
+    let saved=[]; try{ saved=JSON.parse(localStorage.getItem(SA_KEY)||'[]'); }catch(e){}
+    if(saved.length>=3){ window.showToast&&window.showToast('Maximum 3 accounts per device'); return; }
+    const r=await fetch('/api/account/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Player',color:'#f1c40f'})});
     if(!r.ok){ window.showToast&&window.showToast('Server error — could not create account'); return; }
     const j=await r.json();
     if(!j.code){ window.showToast&&window.showToast('Error: no code returned'); return; }
-    // Save to local saved accounts list
-    const SA_KEY='chessstar_saved_accts';
-    let saved=[]; try{ saved=JSON.parse(localStorage.getItem(SA_KEY)||'[]'); }catch(e){}
     saved.push({code:j.code,name:'Player',color:'#f1c40f',wins:0});
     localStorage.setItem(SA_KEY,JSON.stringify(saved));
     // Switch to new account
