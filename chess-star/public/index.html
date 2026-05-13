@@ -897,7 +897,7 @@ body.lightTheme #leaderboardBtn:hover,body.lightTheme #friendsBtn:hover{backgrou
 body.lightTheme #leaderboardBtnLbl,body.lightTheme #friendsBtnLbl{color:#7a4e20;}
 body.lightTheme .msReward{color:#a08060;}
 /* ── v0.08 notification badge ── */
-.v08Badge{position:absolute;top:4px;right:4px;background:#e74c3c;color:#fff;border:1px solid #000;border-radius:50%;min-width:14px;height:14px;font-size:8px;font-weight:bold;display:none;align-items:center;justify-content:center;padding:0 2px;pointer-events:none;}
+.v08Badge{position:absolute;top:4px;left:4px;background:#e74c3c;color:#fff;border:1px solid #000;border-radius:50%;min-width:14px;height:14px;font-size:8px;font-weight:bold;display:none;align-items:center;justify-content:center;padding:0 2px;pointer-events:none;}
 .v08Badge.show{display:flex;}
 </style>
 </head>
@@ -916,7 +916,7 @@ body.lightTheme .msReward{color:#a08060;}
       <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="5"/>
       <circle id="ssArc" cx="36" cy="36" r="28" fill="none" stroke="#f1c40f" stroke-width="5"
         stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="175.9"
-        transform="rotate(-90,36,36)" style="transition:stroke-dashoffset 0.35s ease;"/>
+        transform="rotate(-90,36,36)"/>
       <text id="ssArcPct" x="36" y="40" text-anchor="middle" font-size="11" font-weight="bold" fill="#f1c40f" font-family="Verdana">0%</text>
     </svg>
   </div>
@@ -2205,13 +2205,7 @@ function drawClassic2D(ctx, type, pal){
     // HD smoothing — prevents pixelation when piece is scaled up or down
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    // Clip to piece bounds to suppress sub-pixel edge artifacts
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(-dw/2 - 1, -dh + 7, dw + 2, dh + 2);
-    ctx.clip();
     ctx.drawImage(oc, -dw / 2, -dh + 8, dw, dh);
-    ctx.restore();
     return;
   }
   // Fallback glyph while images load
@@ -2594,7 +2588,7 @@ function renderSkinDrawer(){
 // FIX 10: Skin definitions with category and full naming convention
 const SKIN_DEFS=[
   {id:'classic',name:'Classic',cat:'classic',catName:'Web Classic'},
-  {id:'wood',   name:'Wood',   cat:'wood',   catName:'Carved Wood'},
+  {id:'wood',   name:'E.Woods',cat:'wood',   catName:'Enchanted Woods'},
 ];
 
 function skinLabelFor(skinId, pieceType){
@@ -3213,7 +3207,7 @@ function lpsNextTurn(){
     if(p&&p.player===lpsTurn){
       if(lpsPoison(x,y)){p.poisonTurns++;lpsSkulls.push({x:x*LTL+LTL/2,y:y*LTL+LTL/2,life:40});}
       else p.poisonTurns=0;
-      if(p.poisonTurns>=3){if(p.player===0)lpsStats.killer='Poison ☠';lpsBoard[y][x]=null;}
+      if(p.poisonTurns>=3){if(p.player===0){lpsStats.killer='Poison ☠';if(lpsAlive().length===2)window._lps2ndPlace=true;}lpsBoard[y][x]=null;}
     }
   }));
   const alive=lpsAlive();
@@ -3281,7 +3275,10 @@ function lpsAiTurn(){
     }
     if(tgt && tgt.player!==lpsTurn){
       if(lpsTurn===0) lpsStats.kills++;
-      if(tgt.player===0) lpsStats.killer = 'Piece '+(lpsTurn+1);
+      if(tgt.player===0){
+        lpsStats.killer = 'Piece '+(lpsTurn+1);
+        if(lpsAlive().length===2) window._lps2ndPlace=true;
+      }
       spawnParticles(lpsParticles, ch.dx*LTL+LTL/2, ch.dy*LTL+LTL/2);
     }
     att.px = ch.sx*LTL; att.py = ch.sy*LTL;
@@ -3295,15 +3292,18 @@ function lpsAiTurn(){
 function lpsEnd(alive){
   lpsRunning=false;
   const won=alive.includes(0);
-  document.getElementById('lpsWinMsg').textContent=won?'YOU WON! 🏆':'ELIMINATED ☠';
+  const got2nd=!won&&!!window._lps2ndPlace;
+  window._lps2ndPlace=false;
+  const _lpsResult=won?'win':(got2nd?'draw':'loss');
+  document.getElementById('lpsWinMsg').textContent=won?'YOU WON! 🏆':(got2nd?'2ND PLACE 🥈':'ELIMINATED ☠');
   document.getElementById('lpsKills').textContent=lpsStats.kills;
   document.getElementById('lpsKillerTxt').textContent=won?'Nobody':lpsStats.killer;
   document.getElementById('lpsEndOverlay').classList.add('show');
-  try{ window.notifyMatchFinished && window.notifyMatchFinished(won?'win':'loss',{noStreakReset:!won}); }catch(e){}
+  try{ window.notifyMatchFinished && window.notifyMatchFinished(_lpsResult,{noStreakReset:!won}); }catch(e){}
   try{
     window.saveReplay && window.saveReplay({
       event:'lps', mode:'1v1', date:Date.now(),
-      result:won?'win':'loss',
+      result:_lpsResult,
       kills:lpsStats.kills,
       piece:lpsChosenType,
       frames:(window._repFrames||[]).slice()
@@ -3643,6 +3643,20 @@ function ccEndMove(){
     document.getElementById('ccStatChecks').textContent = window.ccPlayerChecks||0;
     document.getElementById('classicEndOverlay').classList.add('show');
   } else {
+    // Only-kings draw: both sides have only their king left — insufficient material
+    const _ccAll=ccBoard.flat().filter(p=>p);
+    if(_ccAll.length===2&&_ccAll.every(p=>p.t==='K')){
+      ccGameOver=true;
+      document.getElementById('classicWinMsg').textContent='DRAW — KINGS ONLY';
+      const subEl=document.getElementById('classicEndSub');
+      if(subEl) subEl.textContent='Only kings remain — neither side can win.';
+      document.getElementById('ccStatKills').textContent=window.ccPlayerKills||0;
+      document.getElementById('ccStatChecks').textContent=window.ccPlayerChecks||0;
+      document.getElementById('classicEndOverlay').classList.add('show');
+      try{ window.notifyMatchFinished&&window.notifyMatchFinished('draw'); }catch(e){}
+      try{ window.saveReplay&&window.saveReplay({event:'classic',mode:'1v1',date:Date.now(),result:'draw',kills:window.ccPlayerKills||0,checks:window.ccPlayerChecks||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
+      return;
+    }
     ccCheck=st==='check';
     // v0.06 — count checks GIVEN by player (check exists & opponent's turn now)
     if(ccCheck && ccTurn !== classicPlayerColor){
@@ -4536,7 +4550,25 @@ function qocDoMove(fr,fc,tr,tc,mv){
   qocPlies++;
   const myCol2 = qocPlayerColor||'w';
   document.getElementById('qocMsg').textContent = qocTurn===myCol2 ? 'Your turn' : 'Opponent thinking...';
-  if(qocTurn!==myCol2) setTimeout(qocAiTurn, 600);
+  if(qocTurn!==myCol2){
+    setTimeout(qocAiTurn, 600);
+  } else {
+    // Check if player has any legal moves — if not, draw (no captures possible)
+    let _pHasMoves=false;
+    outer2: for(let _r=0;_r<8;_r++) for(let _c=0;_c<8;_c++){
+      const _pp=qocBoard[_r][_c];
+      if(_pp&&_pp.c===myCol2&&qocGetMoves(_r,_c).length>0){_pHasMoves=true;break outer2;}
+    }
+    if(!_pHasMoves&&qocBoard.flat().some(x=>x&&x.c===myCol2)){
+      qocOver=true; qocRunning=false;
+      document.getElementById('qocWinMsg').textContent='DRAW — NO MOVES';
+      const _qSubP=document.getElementById('qocEndSub');
+      if(_qSubP) _qSubP.textContent='You have no legal moves — neither side wins.';
+      document.getElementById('qocEndOverlay').classList.add('show');
+      try{ window.notifyMatchFinished&&window.notifyMatchFinished('draw'); }catch(e){}
+      try{ window.saveReplay&&window.saveReplay({event:'qoc',mode:'1v1',date:Date.now(),result:'draw',kills:window.qocPlayerKills||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
+    }
+  }
 }
 
 let _qocAiBusy = false; // v0.06 — guard against concurrent AI calls
@@ -4575,10 +4607,12 @@ function qocAiTurn(){
   if(all.length===0){
     _qocAiBusy=false;
     qocOver=true; qocRunning=false;
-    document.getElementById('qocWinMsg').textContent='YOU WIN! 🏆';
+    document.getElementById('qocWinMsg').textContent='DRAW — NO MOVES';
+    const _qSubD=document.getElementById('qocEndSub');
+    if(_qSubD) _qSubD.textContent='Opponent has no legal moves — neither side wins.';
     document.getElementById('qocEndOverlay').classList.add('show');
-    if(window.notifyMatchFinished) window.notifyMatchFinished('win');
-    try{ window.saveReplay && window.saveReplay({event:'qoc',mode:'1v1',date:Date.now(),result:'win',kills:window.qocPlayerKills||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
+    if(window.notifyMatchFinished) window.notifyMatchFinished('draw');
+    try{ window.saveReplay && window.saveReplay({event:'qoc',mode:'1v1',date:Date.now(),result:'draw',kills:window.qocPlayerKills||0,frames:(window._repFrames||[]).slice()}); }catch(e){}
     return;
   }
   const caps = all.filter(x=>x.m.atk);
@@ -4873,6 +4907,7 @@ function drawThumbQOC(){
 
   // v0.04 — milestone tiers (claim points). Wins are forever; trophies move ±1 in special events.
   const WIN_TIERS    = [1,2,5,10,15,20,25,30,35,40,50,60,75,100,125,150,200,250,300,400,500,750,1000];
+  const WIN_BAR_TIERS= [1,5,10,20,30,40,50,60,75,100,200,300,400,500,750,1000];
   const TROPHY_TIERS = [1,2,3,5,7,10,13,15,17,20,25,30,35,40,50,60,75,100];
   function loadClaimed(key){ try{ return new Set(JSON.parse(localStorage.getItem(key)||'[]')); }catch(e){ return new Set(); } }
   function saveClaimed(key,s){ localStorage.setItem(key, JSON.stringify(Array.from(s))); }
@@ -4890,17 +4925,20 @@ function drawThumbQOC(){
   window.updateMilestones = function(){
     const wEl = document.getElementById('winsCount'); if(wEl) wEl.textContent = window.totalWins;
     const tEl = document.getElementById('trophyCount'); if(tEl) tEl.textContent = window.totalTrophies;
-    // wins bar fill: progress from current tier (prev) toward next tier
-    // Example: at 11 wins, prev=10, next=15 → fill = 1/5 = 20%, label "1/5"
+    // wins bar fill: uses WIN_BAR_TIERS (coarser, round milestones) so the bar spans
+    // feel intuitive — e.g. 39/40 shows 90% full (9 wins of 10 from 30→40)
     const wIdx = nextTierIdx(WIN_TIERS, window.totalWins);
     const wPrev = wIdx===0?0:WIN_TIERS[wIdx-1];
     const wNext = wIdx>=WIN_TIERS.length?WIN_TIERS[WIN_TIERS.length-1]:WIN_TIERS[wIdx];
-    const wSpan = Math.max(1, wNext-wPrev);
-    const wDone = Math.max(0, Math.min(wSpan, window.totalWins-wPrev));
-    const wPct  = wNext===wPrev?100:(wDone/wSpan)*100;
+    const wBIdx = nextTierIdx(WIN_BAR_TIERS, window.totalWins);
+    const wBPrev = wBIdx===0?0:WIN_BAR_TIERS[wBIdx-1];
+    const wBNext = wBIdx>=WIN_BAR_TIERS.length?WIN_BAR_TIERS[WIN_BAR_TIERS.length-1]:WIN_BAR_TIERS[wBIdx];
+    const wSpan = Math.max(1, wBNext-wBPrev);
+    const wDone = Math.max(0, Math.min(wSpan, window.totalWins-wBPrev));
+    const wPct  = wBNext===wBPrev?100:(wDone/wSpan)*100;
     const wFill = document.getElementById('winsFill'); if(wFill) wFill.style.width = wPct+'%';
-    const wPrevEl = document.getElementById('winsPrev'); if(wPrevEl) wPrevEl.textContent = wPrev;
-    const wNextEl = document.getElementById('winsNext'); if(wNextEl) wNextEl.textContent = wNext;
+    const wPrevEl = document.getElementById('winsPrev'); if(wPrevEl) wPrevEl.textContent = wBPrev;
+    const wNextEl = document.getElementById('winsNext'); if(wNextEl) wNextEl.textContent = wBNext;
     const wProg   = document.getElementById('winsProg'); if(wProg)   wProg.textContent   = wDone+'/'+wSpan;
     // trophies bar fill — same idea
     const tIdx = nextTierIdx(TROPHY_TIERS, window.totalTrophies);
@@ -4929,7 +4967,7 @@ function drawThumbQOC(){
     if(sfn) sfn.textContent = streak;
     // Reward target labels (next milestone to reach)
     const wRT = document.getElementById('winsRewardTarget');
-    if(wRT) wRT.textContent = wNext;
+    if(wRT) wRT.textContent = wBNext;
     const tRT = document.getElementById('trophyRewardTarget');
     if(tRT) tRT.textContent = tNext;
     // Profile stats sync
@@ -5567,9 +5605,18 @@ function drawThumbQOC(){
   };
   async function refreshFriends(){
     if(!myCode) return;
+    // Pre-populate from cache for instant display while awaiting server
+    try{
+      const _c=JSON.parse(localStorage.getItem('cs_frCache_'+myCode)||'null');
+      if(_c&&_c.f){ friendsList=_c.f||[]; friendRequests=_c.q||[]; renderFriends(); updateFriendsBadge(); }
+    }catch(e){}
     try{
       const r = await fetch('/api/account/friends?code='+encodeURIComponent(myCode));
-      if(r.ok){ const j = await r.json(); friendsList = j.friends||[]; friendRequests = j.requests||[]; onlinePlayers = j.online||[]; }
+      if(r.ok){
+        const j = await r.json();
+        friendsList = j.friends||[]; friendRequests = j.requests||[]; onlinePlayers = j.online||[];
+        try{ localStorage.setItem('cs_frCache_'+myCode, JSON.stringify({f:friendsList,q:friendRequests,ts:Date.now()})); }catch(e2){}
+      }
     }catch(e){}
     renderFriends();
     updateFriendsBadge();
@@ -5762,7 +5809,7 @@ function drawThumbQOC(){
           }
         }).catch(()=>{});
         fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({code:myCode,wins:window.totalWins,best_streak:window.bestStreak,trophies:window.totalTrophies,name:profile.name,color:profile.color})
+          body:JSON.stringify({code:myCode,wins:window.totalWins,best_streak:window.bestStreak,trophies:window.totalTrophies,name:profile.name,color:profile.color,icon:localStorage.getItem('chessstar_profile_icon')||''})
         }).catch(()=>{});
       }
     } else if(result==='loss'){
@@ -5773,6 +5820,13 @@ function drawThumbQOC(){
       if(special){
         window.totalTrophies = Math.max(0, window.totalTrophies - 1);
         localStorage.setItem('chessstar_trophies', String(window.totalTrophies));
+      }
+    } else if(result==='draw'){
+      // Draw: streak preserved unchanged (neither incremented nor reset)
+      if(myCode){
+        fetch('/api/account/sync-wins',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({code:myCode,wins:window.totalWins,best_streak:window.bestStreak,trophies:window.totalTrophies,name:profile.name,color:profile.color,icon:localStorage.getItem('chessstar_profile_icon')||''})
+        }).catch(()=>{});
       }
     }
     try{ window.updateMilestones && window.updateMilestones(); }catch(e){}
@@ -5949,9 +6003,13 @@ function drawThumbQOC(){
         let dr=p.r, dc=p.c2;
         // Smooth interpolation: find where this piece came from in prev frame
         if(prevF && prevF.pieces && interp<1){
-          // Match by piece type+color in the previous frame
-          const prev=prevF.pieces.find(pp=>pp.c===p.c && pp.t===p.t && !(pp.r===p.r&&pp.c2===p.c2));
-          if(prev){ dr=prev.r+(p.r-prev.r)*interp; dc=prev.c2+(p.c2-prev.c2)*interp; }
+          // Only animate pieces that actually moved position
+          const wasHere=prevF.pieces.some(pp=>pp.c===p.c&&pp.t===p.t&&pp.r===p.r&&pp.c2===p.c2);
+          if(!wasHere){
+            const curSet=new Set(f.pieces.filter(pp=>pp.c===p.c&&pp.t===p.t).map(pp=>pp.r+','+pp.c2));
+            const prev=prevF.pieces.find(pp=>pp.c===p.c&&pp.t===p.t&&!curSet.has(pp.r+','+pp.c2));
+            if(prev){ dr=prev.r+(p.r-prev.r)*interp; dc=prev.c2+(p.c2-prev.c2)*interp; }
+          }
         }
         const px2=ox+dc*tl+tl/2, py2=oy+dr*tl+tl/2;
         // Try to use processed piece image if available
@@ -8590,7 +8648,7 @@ window.refreshFriends=async function(){
 /* Streak fire: gray when 0 */
 #streakFireBadge.v08StreakZero { filter:grayscale(1); opacity:.45; }
 /* Notification badges */
-.v08Badge { position:absolute;top:-5px;right:-5px;background:#e74c3c;color:#fff;font-size:8px;font-weight:bold;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 3px;z-index:15;border:1.5px solid #fff;pointer-events:none; }
+.v08Badge { position:absolute;top:-5px;left:-5px;background:#e74c3c;color:#fff;font-size:8px;font-weight:bold;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 3px;z-index:15;border:1.5px solid #fff;pointer-events:none; }
 .v08Badge.show { display:flex; }
 /* Generic confirm dialog */
 #v08Confirm { position:absolute;inset:0;background:rgba(0,0,0,.93);z-index:300;display:none;align-items:center;justify-content:center;padding:20px; }
