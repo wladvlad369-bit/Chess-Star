@@ -2,7 +2,8 @@ modules = ["web", "nodejs-20", "bash"]
 
 [deployment]
 router = "application"
-deploymentTarget = "autoscale"
+deploymentTarget = "vm"
+run = ["node", "chess-star/server.js"]
 
 [deployment.postBuild]
 args = ["pnpm", "store", "prune"]
