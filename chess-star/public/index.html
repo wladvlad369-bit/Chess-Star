@@ -226,7 +226,7 @@ body.lightTheme #iconSelectBtn,body.lightTheme #nameSelectBtn{background:#1976d2
 .lockBadge{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.78);color:#f1c40f;border:1px solid #f1c40f;border-radius:5px;font-size:8px;font-weight:bold;padding:2px 5px;letter-spacing:1px;}
 
 /* v0.04 — MILESTONE BARS (Wins + Trophies) */
-.msBtn{flex:1;display:flex;align-items:center;gap:5px;background:#160a02;border:2px solid #5d4037;border-radius:7px;padding:3px 7px 3px 5px;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .2s;min-width:0;}
+.msBtn{flex:1;display:flex;align-items:center;gap:5px;background:#160a02;border:2px solid #5d4037;border-radius:7px;padding:3px 7px 3px 5px;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .2s;min-width:0;position:relative;}
 .msBtn:hover{border-color:#f1c40f;}
 .msBtn.claimable{border-color:#f1c40f;background:#3a2a05;box-shadow:0 0 12px rgba(241,196,15,.6);animation:msPulse 1.4s ease-in-out infinite;}
 .msBtn.claimable .msIco{filter:drop-shadow(0 0 6px #f1c40f);}
@@ -384,9 +384,10 @@ body.lightTheme #iconSelectBtn,body.lightTheme #nameSelectBtn{background:#1976d2
 #pdTitleBig{font-size:24px;font-weight:900;color:#fff;letter-spacing:4px;text-shadow:2px 2px 0 rgba(0,0,0,.55),0 0 14px rgba(0,0,0,.45);font-family:'Georgia',serif;line-height:1;}
 #pdTitleSub{font-size:10px;color:rgba(255,255,255,.85);letter-spacing:3px;font-weight:bold;margin-top:4px;text-shadow:1px 1px 0 rgba(0,0,0,.55);}
 
-#pdMain{flex:1;width:100%;position:relative;display:flex;align-items:center;justify-content:center;padding:8px;}
+#pdMain{flex:0 0 260px;width:100%;position:relative;display:flex;align-items:center;justify-content:center;padding:8px;}
+#pdPowerSection{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;border-top:1px solid rgba(255,255,255,0.07);padding:12px 20px;min-height:60px;}
 #pdCanvas{width:300px;height:300px;display:block;}
-#pdPowerSide{position:absolute;right:10px;top:50%;transform:translateY(-50%);text-align:right;max-width:80px;}
+#pdPowerSide{text-align:center;width:100%;}
 #pdPowerSide h3{font-size:11px;color:#f1c40f;letter-spacing:1.5px;margin-bottom:5px;}
 #pdPowerSide p{font-size:10px;color:#777;letter-spacing:1px;line-height:1.4;}
 #pdBottom{width:100%;padding:10px 14px 16px;display:flex;justify-content:center;flex-shrink:0;}
@@ -649,13 +650,13 @@ body.lightTheme .eCard h3,body.lightTheme .pieceCard .pcName,body.lightTheme .pp
 #acctSkip:hover{color:#f1c40f;}
 
 /* friendsBtn + leaderboardBtn now live inside .colBtns as .sideBtns */
-#friendsBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
+#friendsBtn{position:relative!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
 #friendsBtn:hover{background:#2a1200!important;}
 #friendsBtnIco{font-size:22px;line-height:1;}
 #friendsBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
 #friendsBtnBadge{position:absolute;top:4px;right:4px;background:#e74c3c;color:#fff;border:1px solid #000;border-radius:50%;min-width:14px;height:14px;font-size:8px;font-weight:bold;display:none;align-items:center;justify-content:center;padding:0 2px;}
 #friendsBtnBadge.show{display:flex;}
-#leaderboardBtn{position:static!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
+#leaderboardBtn{position:relative!important;transform:none!important;width:100%!important;border:none!important;border-radius:0!important;background:transparent!important;flex-direction:column;gap:3px;}
 #leaderboardBtn:hover{background:#2a1200!important;}
 #leaderboardBtnIco{font-size:22px;line-height:1;}
 #leaderboardBtnLbl{font-size:7px;color:#a08060;letter-spacing:1px;font-weight:bold;}
@@ -1214,11 +1215,13 @@ body.lightTheme .msReward{color:#a08060;}
   </div>
   <div id="pdMain">
     <canvas id="pdCanvas" width="300" height="300"></canvas>
-    <div id="pdPowerSide"><h3>POWER<br>LEVEL</h3><p>COMING<br>SOON</p></div>
     <div id="skinBackdrop" onclick="closeSkinDrawer()"></div>
   </div>
   <div id="pdBottom">
     <div id="skinBtn" onclick="openSkinDrawer()"><div id="skinBtnIco">🧥</div><div id="skinBtnLbl">SKINS</div></div>
+  </div>
+  <div id="pdPowerSection">
+    <div id="pdPowerSide"><h3>POWER<br>LEVEL</h3><p>COMING<br>SOON</p></div>
   </div>
   <!-- Skin drawer slides up from bottom -->
   <div id="skinDrawer">
@@ -2608,7 +2611,7 @@ function renderSkins(){
     lbl.textContent=sk.name + ' ' + PIECE_NAMES[currentDetailPiece];
     const sub=document.createElement('div'); sub.className='skinCardSub';
     sub.textContent=sk.catName.toUpperCase();
-    div.appendChild(c); div.appendChild(lbl); div.appendChild(sub);
+    div.appendChild(c); div.appendChild(lbl);
     div.onclick=()=>{ pieceSkins[currentDetailPiece]=sk.id; savePersistedSkins(); renderPieceDetail(); renderSkins(); };
     grid.appendChild(div);
     const x=c.getContext('2d'); x.save();x.translate(32,52);
@@ -5663,7 +5666,7 @@ function drawThumbQOC(){
     const bw = document.createElement('div'); bw.className='fBtns';
     btns.forEach(b=>{
       const btn = document.createElement('button'); btn.className='fBtnSm';
-      if(b==='see'){ btn.textContent='SEE-ACC'; btn.onclick=()=>showAccDetails(p); }
+      if(b==='see'){ btn.textContent='SEE-ACC'; btn.onclick=()=>window.showAccDetails(p); }
       if(b==='invite'){ btn.textContent='INVITE'; btn.onclick=()=>frInvite(p); }
       if(b==='remove'){ btn.textContent='REMOVE'; btn.onclick=()=>frRemove(p); }
       if(b==='accept'){ btn.textContent='ACCEPT'; btn.classList.add('acc'); btn.onclick=()=>frRespond(p,true); }
@@ -5758,7 +5761,7 @@ function drawThumbQOC(){
     if(typeof lpsBoard==='undefined') return {pieces};
     for(let r=0;r<8;r++) for(let c=0;c<8;c++){
       const p=lpsBoard[r][c]; if(!p) continue;
-      pieces.push({r, c2:c, c:p.player===0?'w':'b', s:PICO[p.type]||'?', t:p.type, lgt:p.isLight});
+      pieces.push({r, c2:c, c:p.player===0?'w':'b', s:PICO[p.type]||'?', t:p.type, lgt:p.isLight, sh:p.shield, sk:p.player===0?(typeof pieceSkins!=='undefined'?pieceSkins[p.type]:'classic'):'classic'});
     }
     return {pieces, poisonStg:lpsPoisonStg||0, poisonOn:lpsPoisonOn||false, event:'lps'};
   };
@@ -5991,16 +5994,32 @@ function drawThumbQOC(){
       }
       x.restore();
     }
+    // Skull emojis on poisoned squares for LPS replays
+    if(f && f.event==='lps' && f.poisonOn && f.poisonStg>=1){
+      x.save(); x.font='bold '+(tl*0.48)+'px Arial'; x.textAlign='center'; x.textBaseline='middle';
+      x.globalAlpha=0.55;
+      for(let r=0;r<rows;r++) for(let cc=0;cc<cols;cc++){
+        let poisoned=false;
+        if(f.poisonStg>=1&&(cc<1||cc>6||r<1||r>6))poisoned=true;
+        if(f.poisonStg>=2&&(cc<2||cc>5||r<2||r>5))poisoned=true;
+        if(f.poisonStg>=3&&(cc<3||cc>4||r<3||r>4))poisoned=true;
+        if(poisoned) x.fillText('💀',ox+cc*tl+tl/2,oy+r*tl+tl/2);
+      }
+      x.globalAlpha=1; x.restore();
+    }
     if(f && f.pieces){
       // Build prev positions map for interpolation
       const prevPos={};
       if(prevF && prevF.pieces && interp<1){
         prevF.pieces.forEach(p=>{prevPos[p.c+p.t+p.r+'_'+p.c2]=p;});
       }
+      // Golden sparkle trail for moving pieces
+      const trailPieces=[];
       f.pieces.forEach(p=>{
         const isLight = p.lgt !== undefined ? p.lgt : (p.c==='w');
         const key=p.c+(p.t||'?')+p.r+'_'+p.c2;
         let dr=p.r, dc=p.c2;
+        let moved=false;
         // Smooth interpolation: find where this piece came from in prev frame
         if(prevF && prevF.pieces && interp<1){
           // Only animate pieces that actually moved position
@@ -6008,26 +6027,58 @@ function drawThumbQOC(){
           if(!wasHere){
             const curSet=new Set(f.pieces.filter(pp=>pp.c===p.c&&pp.t===p.t).map(pp=>pp.r+','+pp.c2));
             const prev=prevF.pieces.find(pp=>pp.c===p.c&&pp.t===p.t&&!curSet.has(pp.r+','+pp.c2));
-            if(prev){ dr=prev.r+(p.r-prev.r)*interp; dc=prev.c2+(p.c2-prev.c2)*interp; }
+            if(prev){ dr=prev.r+(p.r-prev.r)*interp; dc=prev.c2+(p.c2-prev.c2)*interp; moved=true; }
           }
         }
         const px2=ox+dc*tl+tl/2, py2=oy+dr*tl+tl/2;
-        // Try to use processed piece image if available
-        const imgKey=(p.t||'?')+(isLight?'_w':'_b');
-        const img=typeof CLASSIC_PROC!=='undefined' && CLASSIC_PROC[imgKey];
-        if(img){
-          const maxS=tl*0.88;
-          const sc=Math.min(maxS/img.width,maxS/img.height);
-          const dw=img.width*sc, dh=img.height*sc;
-          x.save(); x.imageSmoothingEnabled=true; x.imageSmoothingQuality='high';
-          x.drawImage(img,px2-dw/2,py2-dh/2,dw,dh);
-          x.restore();
+        // Draw golden sparkle trail for moving piece
+        if(moved && interp>0.05 && interp<0.95){
+          x.save();
+          const sparkAlpha=(0.7-Math.abs(interp-0.5)*1.4)*0.9;
+          if(sparkAlpha>0){
+            x.globalAlpha=sparkAlpha;
+            for(let si=0;si<4;si++){
+              const ang=si*Math.PI/2+interp*Math.PI;
+              const sr=tl*0.3; const sx=px2+Math.cos(ang)*sr, sy=py2+Math.sin(ang)*sr;
+              x.fillStyle='#FFD700'; x.beginPath(); x.arc(sx,sy,2,0,Math.PI*2); x.fill();
+            }
+          }
+          x.globalAlpha=1; x.restore();
+        }
+        // Determine skin for this piece
+        const skin = p.sk || 'classic';
+        x.save();
+        if(skin==='wood' && typeof getPal==='function' && typeof drawPieceShape==='function'){
+          const pal=getPal(isLight,'wood');
+          x.translate(px2,py2);
+          // Scale to fit tile
+          const scaleF=tl/52;
+          x.scale(scaleF,scaleF);
+          drawPieceShape(x,p.t||'P',pal,false);
         } else {
-          x.font='bold '+(tl*0.72)+'px Georgia'; x.textAlign='center'; x.textBaseline='middle';
-          if(!isLight){ x.save(); x.shadowColor='rgba(255,255,255,0.7)'; x.shadowBlur=5; }
-          x.fillStyle=isLight?'#fff':'#111';
-          x.fillText(p.s||'?', px2, py2);
-          if(!isLight) x.restore();
+          // Try to use processed classic piece image if available
+          const imgKey=(p.t||'?')+(isLight?'_w':'_b');
+          const img=typeof CLASSIC_PROC!=='undefined' && CLASSIC_PROC[imgKey];
+          if(img){
+            const maxS=tl*0.88;
+            const sc=Math.min(maxS/img.width,maxS/img.height);
+            const dw=img.width*sc, dh=img.height*sc;
+            x.imageSmoothingEnabled=true; x.imageSmoothingQuality='high';
+            x.drawImage(img,px2-dw/2,py2-dh/2,dw,dh);
+          } else {
+            x.font='bold '+(tl*0.72)+'px Georgia'; x.textAlign='center'; x.textBaseline='middle';
+            if(!isLight){ x.shadowColor='rgba(255,255,255,0.7)'; x.shadowBlur=5; }
+            x.fillStyle=isLight?'#fff':'#111';
+            x.fillText(p.s||'?', px2, py2);
+          }
+        }
+        x.restore();
+        // Draw shield glow for shielded pieces
+        if(p.sh){
+          x.save();
+          x.strokeStyle='#00E5FF'; x.lineWidth=2; x.shadowColor='#00E5FF'; x.shadowBlur=8;
+          x.beginPath(); x.arc(px2,py2,tl*0.44,0,Math.PI*2); x.stroke();
+          x.shadowBlur=0; x.restore();
         }
       });
     }
