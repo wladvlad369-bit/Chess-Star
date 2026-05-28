@@ -1442,14 +1442,14 @@ body.lightTheme .msReward{color:#a08060;}
       </div>
       <div class="setRow"><span>Server</span><span id="connServer" style="color:#4caf50;">●●● online</span></div>
       <div class="setRow"><span>FPS</span><span id="connFpsVal" style="color:#4caf50;">60</span></div>
-      <div id="connFps">Ping: <span id="connPing">12</span> ms</div>
+      <div class="setRow"><span>Ping</span><span><span id="connPing" style="color:#4caf50;font-weight:bold;">12</span><span style="color:#4caf50;font-weight:bold;margin-left:2px;">ms</span></span></div>
     </div>
     <div class="setSection">
-      <h3>VERSION</h3>
+      <h3>GAME DETAILS</h3>
       <div id="versionRow">
-        <div class="setRow"><span>Game</span><span style="color:#f1c40f;font-weight:bold;letter-spacing:2px;">CHESS STAR</span></div>
-        <div class="setRow"><span>Build</span><span id="versionLabel" style="color:#4caf50;font-weight:bold;letter-spacing:2px;">v0.09</span></div>
-        <div class="setRow"><span>Realtime</span><span style="color:#42a5f5;letter-spacing:1px;">Socket.io</span></div>
+        <div class="setRow"><span>Name</span><span style="color:#f1c40f;font-weight:bold;letter-spacing:2px;">CHESS STAR</span></div>
+        <div class="setRow"><span>Version</span><span id="versionLabel" style="color:#4caf50;font-weight:bold;letter-spacing:2px;">v0.09</span></div>
+        <div class="setRow"><span>Server</span><span style="color:#42a5f5;letter-spacing:1px;">Socket.io</span></div>
       </div>
     </div>
   </div>
@@ -3215,7 +3215,7 @@ function lpsNextTurn(){
   }));
   const alive=lpsAlive();
   document.getElementById('lpsExitWrap').style.display=(!alive.includes(0)&&alive.length>1)?'block':'none';
-  if(alive.length<=1){lpsEnd(alive);return;}
+  if(alive.length<=1){try{window._pushRepFrame&&window._pushRepFrame(window._snapLpsBoard());}catch(e){}lpsEnd(alive);return;}
   if(alive.length===2&&!lps1v1){lps1v1=true;lps1v1T=Date.now();}
   do{lpsTurn=(lpsTurn+1)%lpsNumPlayers;}while(!alive.includes(lpsTurn));
   document.getElementById('lpsTurnNum').textContent=lpsTurn+1;
@@ -3254,7 +3254,7 @@ function lpsAiTurn(){
   if(!moves.length){
     // No legal move — skip turn
     const alive = lpsAlive();
-    if(alive.length<=1){lpsEnd(alive);return;}
+    if(alive.length<=1){try{window._pushRepFrame&&window._pushRepFrame(window._snapLpsBoard());}catch(e){}lpsEnd(alive);return;}
     do{lpsTurn=(lpsTurn+1)%lpsNumPlayers;}while(!alive.includes(lpsTurn));
     document.getElementById('lpsTurnNum').textContent=lpsTurn+1;
     if(lpsTurn!==0) setTimeout(lpsAiTurn, 380);
@@ -5761,7 +5761,7 @@ function drawThumbQOC(){
     if(typeof lpsBoard==='undefined') return {pieces};
     for(let r=0;r<8;r++) for(let c=0;c<8;c++){
       const p=lpsBoard[r][c]; if(!p) continue;
-      pieces.push({r, c2:c, c:p.player===0?'w':'b', s:PICO[p.type]||'?', t:p.type, lgt:p.isLight, sh:p.shield, sk:p.player===0?(typeof pieceSkins!=='undefined'?pieceSkins[p.type]:'classic'):'classic'});
+      pieces.push({r, c2:c, c:p.player===0?'w':'b', s:PICO[p.type]||'?', t:p.type, lgt:p.isLight, sh:p.shield, pl:p.player, sk:p.player===0?(typeof pieceSkins!=='undefined'?pieceSkins[p.type]:'classic'):'classic'});
     }
     return {pieces, poisonStg:lpsPoisonStg||0, poisonOn:lpsPoisonOn||false, event:'lps'};
   };
@@ -5996,8 +5996,9 @@ function drawThumbQOC(){
     }
     // Skull emojis on poisoned squares for LPS replays
     if(f && f.event==='lps' && f.poisonOn && f.poisonStg>=1){
-      x.save(); x.font='bold '+(tl*0.48)+'px Arial'; x.textAlign='center'; x.textBaseline='middle';
-      x.globalAlpha=0.55;
+      x.save();
+      x.font='bold '+(tl*0.28)+'px Arial'; x.textAlign='center'; x.textBaseline='middle';
+      x.globalAlpha=0.58;
       for(let r=0;r<rows;r++) for(let cc=0;cc<cols;cc++){
         let poisoned=false;
         if(f.poisonStg>=1&&(cc<1||cc>6||r<1||r>6))poisoned=true;
@@ -6005,7 +6006,7 @@ function drawThumbQOC(){
         if(f.poisonStg>=3&&(cc<3||cc>4||r<3||r>4))poisoned=true;
         if(poisoned) x.fillText('💀',ox+cc*tl+tl/2,oy+r*tl+tl/2);
       }
-      x.globalAlpha=1; x.restore();
+      x.restore();
     }
     if(f && f.pieces){
       // Build prev positions map for interpolation
@@ -6023,10 +6024,19 @@ function drawThumbQOC(){
         // Smooth interpolation: find where this piece came from in prev frame
         if(prevF && prevF.pieces && interp<1){
           // Only animate pieces that actually moved position
-          const wasHere=prevF.pieces.some(pp=>pp.c===p.c&&pp.t===p.t&&pp.r===p.r&&pp.c2===p.c2);
+          // Use player id (p.pl) when available so same-type pieces from different players
+          // don't get mixed up during interpolation (e.g. two black pawns)
+          const hasPl = p.pl !== undefined;
+          const matchFn = hasPl
+            ? (pp) => pp.pl===p.pl && pp.t===p.t && pp.r===p.r && pp.c2===p.c2
+            : (pp) => pp.c===p.c && pp.t===p.t && pp.r===p.r && pp.c2===p.c2;
+          const filterFn = hasPl
+            ? (pp) => pp.pl===p.pl && pp.t===p.t
+            : (pp) => pp.c===p.c && pp.t===p.t;
+          const wasHere=prevF.pieces.some(matchFn);
           if(!wasHere){
-            const curSet=new Set(f.pieces.filter(pp=>pp.c===p.c&&pp.t===p.t).map(pp=>pp.r+','+pp.c2));
-            const prev=prevF.pieces.find(pp=>pp.c===p.c&&pp.t===p.t&&!curSet.has(pp.r+','+pp.c2));
+            const curSet=new Set(f.pieces.filter(filterFn).map(pp=>pp.r+','+pp.c2));
+            const prev=prevF.pieces.find(pp=>filterFn(pp)&&!curSet.has(pp.r+','+pp.c2));
             if(prev){ dr=prev.r+(p.r-prev.r)*interp; dc=prev.c2+(p.c2-prev.c2)*interp; moved=true; }
           }
         }
