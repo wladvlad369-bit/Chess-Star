@@ -20,6 +20,7 @@ body.lightTheme #root{background:#f5ecd8;border-color:#a08060;}
 /* MENU */
 #menuScreen{justify-content:flex-start;}
 #menuBg{position:absolute;inset:0;width:100%;height:100%;}
+#menuFx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
 #titleBlock{display:none!important;}
 
 /* ── TOP BAR: Profile | [Wins | Trophies side-by-side] | Settings ── */
@@ -927,8 +928,9 @@ body.lightTheme .msReward{color:#a08060;}
 
 <!-- MENU -->
 <div id="menuScreen" class="screen active">
-  <canvas id="menuBg" width="360" height="600"></canvas>
-  <div id="titleBlock"><h1>CHESS STAR</h1><p>v0.09</p></div>
+  <canvas id="menuBg" width="360" height="640"></canvas>
+  <canvas id="menuFx" width="360" height="640"></canvas>
+  <div id="titleBlock"><h1>CHESS STAR</h1><p>v0.10</p></div>
 
   <!-- TOP ROW: Profile | Wins+Trophies bars | Settings -->
   <div id="milestoneRow">
@@ -3190,6 +3192,7 @@ function lpsAlive(){
 }
 
 function lpsNextTurn(){
+  try{ window._sfxMove && window._sfxMove(); }catch(e){}
   try{ window._pushRepFrame && window._pushRepFrame(window._snapLpsBoard()); }catch(e){}
   lpsMoves++;
   lpsBoard.forEach(r=>r.forEach(p=>{
@@ -3576,6 +3579,7 @@ function ccStatus(){
 }
 
 function ccDoMove(fr,fc,tr,tc,mv){
+  try{ window._sfxMove && window._sfxMove(); }catch(e){}
   const p=ccBoard[fr][fc];
   // v0.06 — track player captures
   const target = ccBoard[tr][tc];
@@ -3956,6 +3960,7 @@ function gtsGetMoves(r,c){
 }
 
 function gtsDoMove(fr,fc,tr,tc,mv){
+  try{ window._sfxMove && window._sfxMove(); }catch(e){}
   const p=gtsBoard[fr][fc];
   // v0.06 — track player captures (normal piece capture, not safe hit)
   const _gtsTarget = gtsBoard[tr][tc];
@@ -4505,6 +4510,7 @@ function qocAnyCaptures(color){
 }
 
 function qocDoMove(fr,fc,tr,tc,mv){
+  try{ window._sfxMove && window._sfxMove(); }catch(e){}
   const p = qocBoard[fr][fc];
   // v0.06 — track player captures + queens promoted
   const _qMyCol = window.qocPlayerColor || 'w';
@@ -6662,7 +6668,7 @@ function drawThumbQOC(){
   //  - Version-required gate
   //  - Profile stats refresh on Profile screen open
   // ════════════════════════════════════════════════════════════════
-  const APP_VERSION = 'v0.09';
+  const APP_VERSION = 'v0.10';
 
   // ── i18n ──
   const I18N = {
@@ -8870,6 +8876,331 @@ window.showComingSoon = function(feature) {
     }
   }
 };
+
+// ══════════════════════════════════════════════════════════════════════
+// v0.10 — AUDIO ENGINE + BEAT-SYNCED MENU EFFECTS
+// ══════════════════════════════════════════════════════════════════════
+(function(){
+  'use strict';
+
+  // ── Screen classification ─────────────────────────────────────────
+  const MENU_SCREENS = new Set([
+    'menuScreen','loadingScreen','splashScreen','colorRandScreen',
+    'profileScreen','settingsScreen','piecesMenuScreen','eventsScreen',
+    'selectScreen','skinsScreen','catalogScreen','pieceDetailScreen',
+    'replaysScreen','leaderboardScreen','friendsScreen'
+  ]);
+  const GAME_SCREENS = new Set(['lpsScreen','classicScreen','gtsScreen','qocScreen']);
+
+  // ── State ─────────────────────────────────────────────────────────
+  let actx=null, musicGain=null, sfxGain=null, analyser=null, aData=null;
+  let musicBuf=null, moveBuf=null, clickBuf=null, startBuf=null;
+  let musicSrc=null;
+  let musicPlaying=false, musicLoaded=false, interacted=false;
+  let restartTimer=null;
+  let fxActive=false;
+
+  // FX canvas state
+  const rings=[], sparks=[];
+  let fxCv=null, fxX=null;
+  let bassPrev=0, midPrev=0, frameN=0, lastBeat=0;
+
+  // ── AudioContext ──────────────────────────────────────────────────
+  function ensureCtx(){
+    if(actx) return true;
+    try{
+      actx=new(window.AudioContext||window.webkitAudioContext)();
+      musicGain=actx.createGain();
+      sfxGain=actx.createGain();
+      analyser=actx.createAnalyser();
+      analyser.fftSize=256;
+      aData=new Uint8Array(analyser.frequencyBinCount); // 128 bins
+      musicGain.connect(analyser);
+      analyser.connect(actx.destination);
+      sfxGain.connect(actx.destination);
+      applyVols(); return true;
+    }catch(e){ return false; }
+  }
+
+  function getMVol(){ var v=localStorage.getItem('chessstar_vol_music'); return v!=null?Math.max(0,Math.min(1,+v/100)):0.75; }
+  function getSVol(){ var v=localStorage.getItem('chessstar_vol_sfx');   return v!=null?Math.max(0,Math.min(1,+v/100)):0.80; }
+
+  function applyVols(){
+    if(!actx) return;
+    var t=actx.currentTime;
+    if(musicGain) musicGain.gain.setTargetAtTime(getMVol(),t,0.05);
+    if(sfxGain)   sfxGain.gain.setTargetAtTime(getSVol(),t,0.05);
+  }
+
+  // Live volume slider sync
+  document.addEventListener('input',function(e){
+    if(e.target.id==='volMusic'||e.target.id==='volSfx') applyVols();
+  });
+
+  // ── Load all audio buffers ────────────────────────────────────────
+  function fetchBuf(url){
+    return fetch(url).then(function(r){ return r.arrayBuffer(); })
+      .then(function(ab){ return actx.decodeAudioData(ab); });
+  }
+
+  function loadAll(){
+    Promise.all([
+      fetchBuf('/music-menu.mp3'),
+      fetchBuf('/sfx-move.mp3'),
+      fetchBuf('/sfx-click.mp3'),
+      fetchBuf('/sfx-start.mp3')
+    ]).then(function(bufs){
+      musicBuf=bufs[0]; moveBuf=bufs[1]; clickBuf=bufs[2]; startBuf=bufs[3];
+      musicLoaded=true;
+      var a=document.querySelector('.screen.active');
+      if(a && MENU_SCREENS.has(a.id)) startMusic();
+    }).catch(function(e){ console.warn('[audio]',e); });
+  }
+
+  // ── Music playback ────────────────────────────────────────────────
+  function startMusic(){
+    if(!musicLoaded||musicPlaying||!actx) return;
+    if(musicSrc){ try{musicSrc.stop();}catch(e){} musicSrc=null; }
+    musicSrc=actx.createBufferSource();
+    musicSrc.buffer=musicBuf;
+    musicSrc.connect(musicGain);
+    musicSrc.start(0);
+    musicPlaying=true;
+    fxActive=true;
+    musicSrc.onended=function(){
+      if(!musicPlaying) return; // was stopped externally
+      musicPlaying=false;
+      fxActive=false; // effects pause during the 3-second gap
+      if(restartTimer) clearTimeout(restartTimer);
+      restartTimer=setTimeout(function(){
+        var a=document.querySelector('.screen.active');
+        if(a && MENU_SCREENS.has(a.id)){ fxActive=true; startMusic(); }
+      }, 3000);
+    };
+  }
+
+  function stopMusic(){
+    if(restartTimer){clearTimeout(restartTimer);restartTimer=null;}
+    fxActive=false;
+    if(musicPlaying){ musicPlaying=false; if(musicSrc){try{musicSrc.stop();}catch(e){} musicSrc=null;} }
+  }
+
+  // ── SFX helper ───────────────────────────────────────────────────
+  function playSFX(buf){
+    if(!actx||!buf) return;
+    var s=actx.createBufferSource(); s.buffer=buf; s.connect(sfxGain); s.start(0);
+  }
+
+  // ── First user gesture bootstrap ─────────────────────────────────
+  function onFirstTap(){
+    if(interacted) return;
+    interacted=true;
+    document.removeEventListener('click',onFirstTap,true);
+    if(ensureCtx()) loadAll();
+  }
+  document.addEventListener('click',onFirstTap,{capture:true,passive:true});
+
+  // ── Global button click SFX ──────────────────────────────────────
+  document.addEventListener('click',function(e){
+    if(!actx||!clickBuf) return;
+    var t=e.target;
+    // Skip: start game buttons (they get their own sound via startSelectedEvent)
+    if(t.id==='startBtn'||t.closest('#startBtn')||t.id==='ppGo'||t.closest('#ppGo')) return;
+    // Play click SFX on any interactive element
+    if(t.tagName==='BUTTON'||t.closest('button')||
+       t.classList.contains('sideBtn')||t.closest('.sideBtn')||
+       t.classList.contains('msBtn')||t.closest('.msBtn')||
+       t.classList.contains('eCard')||t.closest('.eCard')||
+       t.classList.contains('repItem')||t.closest('.repItem')||
+       t.classList.contains('friendItem')||t.closest('.friendItem')||
+       t.classList.contains('modeOpt')||t.closest('.modeOpt')||
+       t.classList.contains('miniBtn')||t.closest('.miniBtn')||
+       t.classList.contains('acctTab')||t.closest('.acctTab')||
+       t.classList.contains('fBtnSm')||t.closest('.fBtnSm')||
+       t.classList.contains('langBtn')||t.closest('.langBtn')||
+       t.classList.contains('themeToggle')||t.closest('.themeToggle')||
+       t.id==='settingsBtn'||t.closest('#settingsBtn')||
+       t.id==='profileBox'||t.closest('#profileBox')||
+       t.id==='lpsExitBtn'||t.closest('#lpsExitBtn')||
+       t.id==='lbRefreshBtn'||t.closest('#lbRefreshBtn')||
+       t.id==='evSelectBtn'||t.closest('#evSelectBtn')){
+      playSFX(clickBuf);
+    }
+  },{capture:false,passive:true});
+
+  // ── goTo() hook — music control per screen ────────────────────────
+  var _origGoTo=window.goTo;
+  window.goTo=function(id){
+    if(typeof _origGoTo==='function') _origGoTo.call(this,id);
+    if(!actx) return;
+    if(MENU_SCREENS.has(id)){
+      fxActive=true;
+      if(!musicPlaying&&!restartTimer) startMusic();
+    } else if(GAME_SCREENS.has(id)){
+      stopMusic();
+    }
+  };
+
+  // ── startSelectedEvent hook — start SFX + stop music ─────────────
+  var _origSSE=window.startSelectedEvent;
+  window.startSelectedEvent=function(){
+    playSFX(startBuf);
+    stopMusic();
+    if(typeof _origSSE==='function') _origSSE.apply(this,arguments);
+  };
+
+  // ── Expose piece move SFX ─────────────────────────────────────────
+  window._sfxMove=function(){ playSFX(moveBuf); };
+
+  // ══ BEAT-SYNCED MENU EFFECTS ══════════════════════════════════════
+
+  function getFxCv(){
+    if(fxCv) return fxCv;
+    fxCv=document.getElementById('menuFx');
+    if(fxCv) fxX=fxCv.getContext('2d');
+    return fxCv;
+  }
+
+  function spawnRing(cx,cy,col,maxR,w){
+    rings.push({x:cx,y:cy,r:4,maxR:maxR,alpha:0.9,col:col,w:w,dead:false});
+  }
+
+  function spawnSpark(cx,cy){
+    var ang=Math.random()*Math.PI*2, spd=1+Math.random()*2.5;
+    sparks.push({
+      x:cx+(Math.random()-0.5)*110, y:cy+(Math.random()-0.5)*110,
+      vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd-0.5,
+      life:1, dec:0.016+Math.random()*0.018, sz:1.5+Math.random()*2.5, dead:false
+    });
+  }
+
+  function fxFrame(ts){
+    requestAnimationFrame(fxFrame);
+    var c=getFxCv(); if(!c||!fxX) return;
+    var W=c.width, H=c.height;
+    fxX.clearRect(0,0,W,H);
+
+    if(!fxActive||!analyser) return; // no effects during gap or game screens
+
+    analyser.getByteFrequencyData(aData);
+
+    // Band energies (128 bins @ ~172Hz each)
+    var bass=0,i; for(i=0;i<4;i++) bass+=aData[i]; bass/=4;
+    var mid=0;   for(i=4;i<14;i++) mid+=aData[i];  mid/=10;
+    var high=0;  for(i=14;i<45;i++) high+=aData[i]; high/=31;
+
+    var bN=bass/255, mN=mid/255, hN=high/255;
+    var amp=bN*0.6+mN*0.3+hN*0.1;
+
+    bassPrev=bassPrev*0.70+bN*0.30;
+    midPrev =midPrev*0.74 +mN*0.26;
+
+    var CX=W*0.5, CY=H*0.46;
+
+    // ① Central ambient glow — breathes with overall amplitude
+    var gR=90+amp*180;
+    var gA=Math.min(0.58,0.08+amp*0.50);
+    var g=fxX.createRadialGradient(CX,CY,0,CX,CY,gR);
+    g.addColorStop(0,'rgba(241,196,15,'+(gA*0.88).toFixed(3)+')');
+    g.addColorStop(0.42,'rgba(180,100,5,'+(gA*0.35).toFixed(3)+')');
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    fxX.beginPath(); fxX.arc(CX,CY,gR,0,Math.PI*2);
+    fxX.fillStyle=g; fxX.fill();
+
+    // ② Four-corner ambient haze — intensifies on bass
+    var cA=Math.min(0.24,0.03+bN*0.21);
+    var corners=[[0,0],[W,0],[0,H],[W,H]];
+    for(var ci=0;ci<corners.length;ci++){
+      var cx=corners[ci][0], cy=corners[ci][1];
+      var cg=fxX.createRadialGradient(cx,cy,0,cx,cy,W*0.62);
+      cg.addColorStop(0,'rgba(110,55,5,'+cA.toFixed(3)+')');
+      cg.addColorStop(1,'rgba(0,0,0,0)');
+      fxX.beginPath(); fxX.arc(cx,cy,W*0.62,0,Math.PI*2);
+      fxX.fillStyle=cg; fxX.fill();
+    }
+
+    // ③ Beat ring detection & spawning
+    var now=ts;
+    if(bN>0.52&&bassPrev<0.44&&now-lastBeat>100){
+      lastBeat=now;
+      spawnRing(CX,CY,'#f1c40f',155+bN*85,2.5+bN*2.2);
+      if(bN>0.68) spawnRing(CX,CY,'rgba(241,176,0,0.52)',205+bN*55,1.3);
+    }
+    if(mN>0.46&&midPrev<0.36&&now-lastBeat>55){
+      spawnRing(CX,CY,'rgba(200,155,22,0.62)',75+mN*58,1.5);
+    }
+
+    // ④ High-freq sparks
+    if(hN>0.36&&frameN%3===0){
+      for(var si=0;si<Math.ceil(hN*5);si++) spawnSpark(CX,CY);
+    }
+    // Radial arc sparks on strong bass hits
+    if(bN>0.60&&frameN%4===0){
+      for(var bi=0;bi<3;bi++){
+        var a2=-Math.PI+Math.random()*Math.PI*2, rr=115+Math.random()*75;
+        sparks.push({
+          x:CX+Math.cos(a2)*rr, y:CY+Math.sin(a2)*rr,
+          vx:Math.cos(a2)*1.5, vy:Math.sin(a2)*1.5-0.35,
+          life:1, dec:0.022, sz:2+Math.random()*2.2, dead:false
+        });
+      }
+    }
+
+    // ⑤ Draw & advance rings
+    for(var ri=0;ri<rings.length;ri++){
+      var rng=rings[ri]; if(rng.dead) continue;
+      rng.r+=3.8+(rng.r/rng.maxR)*1.6; rng.alpha*=0.934;
+      if(rng.r>=rng.maxR||rng.alpha<0.012){rng.dead=true;continue;}
+      fxX.beginPath(); fxX.arc(rng.x,rng.y,rng.r,0,Math.PI*2);
+      if(rng.col.indexOf('rgba')===0){
+        fxX.strokeStyle=rng.col.replace(/[\d.]+\)$/,rng.alpha.toFixed(3)+')');
+        fxX.globalAlpha=1;
+      } else { fxX.strokeStyle=rng.col; fxX.globalAlpha=rng.alpha; }
+      fxX.lineWidth=rng.w; fxX.stroke(); fxX.globalAlpha=1;
+    }
+    for(var ri2=rings.length-1;ri2>=0;ri2--) if(rings[ri2].dead) rings.splice(ri2,1);
+
+    // ⑥ Draw & advance sparks
+    for(var spi=0;spi<sparks.length;spi++){
+      var sp=sparks[spi]; if(sp.dead) continue;
+      sp.x+=sp.vx; sp.y+=sp.vy; sp.vy+=0.045; sp.life-=sp.dec;
+      if(sp.life<=0){sp.dead=true;continue;}
+      fxX.beginPath(); fxX.arc(sp.x,sp.y,sp.sz*sp.life,0,Math.PI*2);
+      fxX.fillStyle='rgba(241,196,15,'+(sp.life*0.92).toFixed(3)+')'; fxX.fill();
+      // Trailing glow
+      fxX.beginPath(); fxX.arc(sp.x-sp.vx*1.8,sp.y-(sp.vy+0.045)*1.8,sp.sz*sp.life*0.45,0,Math.PI*2);
+      fxX.fillStyle='rgba(241,145,10,'+(sp.life*0.38).toFixed(3)+')'; fxX.fill();
+    }
+    for(var spi2=sparks.length-1;spi2>=0;spi2--) if(sparks[spi2].dead) sparks.splice(spi2,1);
+
+    // ⑦ Mirrored frequency bars along the bottom edge (subtle viz)
+    fxX.globalAlpha=0.15;
+    var halfBins=aData.length/2;
+    var barW=W/halfBins*0.88;
+    for(var bi2=0;bi2<halfBins;bi2++){
+      var v=aData[bi2]/255; if(v<0.04) continue;
+      var bh=v*(H*0.10);
+      fxX.fillStyle='rgba(241,'+(Math.round(150+v*50))+',15,'+(v*0.88).toFixed(3)+')';
+      fxX.fillRect(bi2*barW*2, H-bh, barW*1.65, bh);          // right half
+      fxX.fillRect(W-(bi2*barW*2)-barW*1.65, H-bh, barW*1.65, bh); // mirror left
+    }
+    fxX.globalAlpha=1;
+
+    // ⑧ Hard-beat vignette flash
+    if(bN>0.63){
+      var va=Math.min(0.38,(bN-0.63)*1.05);
+      var vg=fxX.createRadialGradient(CX,CY,H*0.18,CX,CY,H*0.80);
+      vg.addColorStop(0,'rgba(0,0,0,0)');
+      vg.addColorStop(1,'rgba(130,45,0,'+va.toFixed(3)+')');
+      fxX.fillStyle=vg; fxX.fillRect(0,0,W,H);
+    }
+
+    frameN++;
+  }
+
+  requestAnimationFrame(fxFrame);
+
+})();
 </script>
 
 </body>
