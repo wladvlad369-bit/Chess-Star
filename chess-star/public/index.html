@@ -785,6 +785,7 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
 .repResult{font-size:10px;font-weight:bold;letter-spacing:1px;flex-shrink:0;padding:3px 7px;border-radius:4px;}
 .repResult.win{background:rgba(76,175,80,.2);color:#4caf50;border:1px solid #4caf50;}
 .repResult.loss{background:rgba(231,76,60,.2);color:#e74c3c;border:1px solid #e74c3c;}
+.repResult.draw{background:rgba(241,196,15,.22);color:#f1c40f;border:1px solid #f1c40f;}
 #repPlayer{position:absolute;inset:0;background:rgba(0,0,0,.93);z-index:120;display:none;flex-direction:column;align-items:center;justify-content:center;padding:18px;}
 #repPlayer.show{display:flex;}
 #repPlayerInner{background:#1a0a04;border:3px solid #f1c40f;border-radius:12px;padding:14px;width:100%;max-width:320px;position:relative;}
@@ -801,6 +802,7 @@ body.lightTheme .lbTab.on{background:#f1c40f;color:#3a2306;border-color:#c89c0a;
 #repWinnerBanner{margin-top:10px;text-align:center;font-size:12px;font-weight:bold;letter-spacing:2px;padding:6px;border-radius:6px;display:none;}
 #repWinnerBanner.win{display:block;background:rgba(76,175,80,.18);color:#4caf50;border:1px solid #4caf50;}
 #repWinnerBanner.loss{display:block;background:rgba(231,76,60,.18);color:#e74c3c;border:1px solid #e74c3c;}
+#repWinnerBanner.draw{display:block;background:rgba(241,196,15,.18);color:#f1c40f;border:1px solid #f1c40f;}
 .statsRow{display:flex;gap:8px;margin:6px 0 4px;}
 .statBox{flex:1;background:#140800;border:2px solid #3e1a00;border-radius:6px;padding:6px;text-align:center;}
 .statBox small{display:block;font-size:8px;color:#a08060;letter-spacing:1px;margin-bottom:3px;}
@@ -3007,6 +3009,8 @@ function initLPS(type){
   if(type==='P'){ initLPSPawn(); }
   else if(type==='Q'){ initLPSQueen(); }
   else { initLPSStandard(type); }
+  // Push frame 0 — initial spawn state so replay starts at "0 / N"
+  try{ window._pushRepFrame && window._pushRepFrame(window._snapLpsBoard()); }catch(e){}
 
   // Random starting turn from those alive
   const aliveNow=lpsAlive();
@@ -5911,8 +5915,8 @@ function drawThumbQOC(){
       const dt = new Date(r.t||r.date||Date.now());
       const dateStr = dt.toLocaleDateString(undefined,{month:'short',day:'numeric'});
       const timeStr = dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
-      const cls = r.result==='win'?'win':'loss';
-      const resultIco = r.result==='win'?'🏆':'💀';
+      const cls = r.result==='win'?'win':r.result==='draw'?'draw':'loss';
+      const resultIco = r.result==='win'?'🏆':r.result==='draw'?'🤝':'💀';
       // Build stat chips
       const chips = [];
       if(typeof r.kills==='number') chips.push('⚔ '+r.kills+' kills');
@@ -5929,7 +5933,7 @@ function drawThumbQOC(){
           +(chips.length ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">'+chips.map(c=>'<span style="font-size:8px;color:#c8a060;background:#1a0800;border:1px solid #3e1a00;border-radius:4px;padding:1px 5px;">'+c+'</span>').join('')+'</div>' : '')
         +'</div>'
         +'<div class="repResult '+cls+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;">'
-          +'<span style="font-size:16px;">'+resultIco+'</span>'
+          +'<span style="font-size:16px;'+(r.result==='draw'?'filter:drop-shadow(0 0 1.5px #000) drop-shadow(0 0 1.5px #000);':'')+'">'+resultIco+'</span>'
           +'<span style="font-size:8px;letter-spacing:1px;">'+(r.result||'-').toUpperCase()+'</span>'
         +'</div>';
       list.appendChild(div);
@@ -5948,6 +5952,7 @@ function drawThumbQOC(){
       banner.className = '';
       if(repCur.result==='win'){ banner.classList.add('win'); banner.textContent = 'YOU WON 🏆'; }
       else if(repCur.result==='loss'){ banner.classList.add('loss'); banner.textContent = 'YOU LOST ☠'; }
+      else if(repCur.result==='draw'){ banner.classList.add('draw'); banner.innerHTML = '<span style="filter:drop-shadow(0 0 2px #000) drop-shadow(0 0 2px #000);">🤝</span> DRAW'; }
       else { banner.style.display='none'; }
     }
     const pb = $('repPlayBtn'); if(pb) pb.textContent = '▶';
@@ -6104,7 +6109,7 @@ function drawThumbQOC(){
     }
     const f = repCur.frames[repIdx];
     _drawRepBoard(x, c, f, interp===undefined?1:interp, prevF||null);
-    $('repProgress').textContent = (repIdx+1)+' / '+repCur.frames.length;
+    $('repProgress').textContent = repIdx+' / '+(repCur.frames.length-1);
   }
   function animateRepTransition(fromF){
     if(_repAnimReq){ cancelAnimationFrame(_repAnimReq); _repAnimReq=null; }
