@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "P2AE37eD3P7xhR5VSr46O"
+uri = "file://generated-artifacts/ChessStar_v.0.09.zip"
+type = "unspecified"
+title = "ChessStar_v.0.09.zip"
+description = "Arhiva proiectului Chess Star cu codul sursă, resursele grafice și fișierele de configurare. node_modules și fișierele .env sunt excluse."
+logical_id = "43a6ac08-ea43-446b-9e9e-efcd887e9797"
+content_hash = "sha256:0e5ac19998a83626b3ccf18ffcf968d6b68ad2632437be0c9a3ef28e58b810d7"
+size = 4767069
+mtime_ms = 1793183830840
+storage_uri = "gcs://replit-rams-assets-riker/rams/assets/repl:773d318c-8234-4363-80f9-34d9b6ce7c41/43a6ac08-ea43-446b-9e9e-efcd887e9797/0ca66ee2-ec92-4c6d-92c4-2a6f24b242ed"
+storage_version_token = "1793183854533263"
+content_type = "application/octet-stream"
